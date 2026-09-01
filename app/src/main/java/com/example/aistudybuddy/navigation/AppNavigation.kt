@@ -13,11 +13,14 @@ import com.example.aistudybuddy.auth.AuthUiState
 import com.example.aistudybuddy.auth.AuthViewModel
 import com.example.aistudybuddy.screens.HomeScreen
 import com.example.aistudybuddy.screens.LoginScreen
+import com.example.aistudybuddy.screens.StudyPlannerScreen
 import com.example.aistudybuddy.screens.SignUpScreen
 import com.example.aistudybuddy.screens.SplashScreen
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 import androidx.navigation.navDeepLink
+import com.example.aistudybuddy.screens.FocusTimerScreen
+import com.example.aistudybuddy.screens.ProgressDashboardScreen
 import com.example.aistudybuddy.screens.ResetPasswordScreen
 
 
@@ -153,6 +156,10 @@ fun AppNavigation(incomingDeepLink: Uri?) {
 
         composable(Routes.Home) {
             HomeScreen(
+                onStudyPlannerClick = {
+                    navController.navigate(Routes.StudyPlanner)
+                },
+
                 onLogoutClick = {
                     authViewModel.logout(
                         onSuccess = {
@@ -167,6 +174,16 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                     )
                 }
             )
+        }
+        composable(Routes.StudyPlanner) {
+            StudyPlannerScreen()
+        }
+        composable(Routes.FocusTimer) {
+            FocusTimerScreen()
+        }
+
+        composable(Routes.ProgressDashboard) {
+            ProgressDashboardScreen()
         }
     }
 }

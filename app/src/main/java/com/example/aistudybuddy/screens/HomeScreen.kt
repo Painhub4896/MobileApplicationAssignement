@@ -11,7 +11,8 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun HomeScreen(
-    onLogoutClick: () -> Unit
+    onLogoutClick: () -> Unit,
+    onStudyPlannerClick: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -21,6 +22,12 @@ fun HomeScreen(
         Text("Supabase connection successful!")
 
         Text("Welcome to AIStudyBuddy")
+
+        Button(
+            onClick = onStudyPlannerClick
+        ) {
+            Text("Study Planner")
+        }
 
         Button(
             onClick = onLogoutClick
