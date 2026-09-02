@@ -9,4 +9,12 @@ object Routes {
     const val StudyPlanner = "study-planner"
     const val FocusTimer = "focus-timer"
     const val ProgressDashboard = "progress-dashboard"
+
+    // Timetable
+    const val TimetableSetup = "timetable-setup"
+    const val WeeklyTimetable = "weekly-timetable"
+
+    // Gemini AI Routine
+    const val AIRoutineSetup = "ai-routine-setup"
+    const val GeneratedRoutine = "generated-routine"
 }

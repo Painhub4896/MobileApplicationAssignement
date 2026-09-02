@@ -31,7 +31,10 @@ import com.example.aistudybuddy.components.StudySessionCard
 import com.example.aistudybuddy.components.WeekSelector
 
 @Composable
-fun StudyPlannerScreen() {
+fun StudyPlannerScreen(
+    onTimetableSetupClick: () -> Unit = {},
+    onWeeklyTimetableClick: () -> Unit = {}
+) {
 
     Scaffold(
         bottomBar = {
@@ -130,7 +133,10 @@ fun StudyPlannerScreen() {
                         modifier = Modifier.height(17.dp)
                     )
 
-                    PlannerActionButtons()
+                    PlannerActionButtons(
+                        onGenerateWithAiClick = onWeeklyTimetableClick,
+                        onAddSessionClick = onTimetableSetupClick
+                    )
                 }
             }
 

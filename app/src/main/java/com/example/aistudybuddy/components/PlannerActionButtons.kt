@@ -22,7 +22,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun PlannerActionButtons() {
+fun PlannerActionButtons(
+    onGenerateWithAiClick: () -> Unit = {},
+    onAddSessionClick: () -> Unit = {}
+) {
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -32,7 +35,7 @@ fun PlannerActionButtons() {
 
         // Generate with AI
         Button(
-            onClick = { },
+            onClick = onGenerateWithAiClick,
             modifier = Modifier
                 .weight(1f)
                 .height(46.dp),
@@ -64,7 +67,7 @@ fun PlannerActionButtons() {
 
         // Add Session
         Button(
-            onClick = { },
+            onClick = onAddSessionClick,
             modifier = Modifier
                 .weight(1f)
                 .height(42.dp),
