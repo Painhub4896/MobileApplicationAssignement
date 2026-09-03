@@ -1,12 +1,15 @@
 package com.example.aistudybuddy.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.BarChart
@@ -14,8 +17,10 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,7 +30,12 @@ import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun BottomNavigationBar(
-    selectedItem: String = "Planner"
+    selectedItem: String,
+    onHomeClick: () -> Unit = {},
+    onAssignmentClick: () -> Unit = {},
+    onPlannerClick: () -> Unit = {},
+    onProgressClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {}
 ) {
 
     val blue = Color(0xFF4169E1)
@@ -52,7 +62,8 @@ fun BottomNavigationBar(
             label = "Home",
             selected = selectedItem == "Home",
             selectedColor = blue,
-            unselectedColor = grey
+            unselectedColor = grey,
+            onClick = onHomeClick
         )
 
         // Assignments
@@ -66,7 +77,8 @@ fun BottomNavigationBar(
             label = "Assignments",
             selected = selectedItem == "Assignments",
             selectedColor = blue,
-            unselectedColor = grey
+            unselectedColor = grey,
+            onClick = onAssignmentClick
         )
 
         // Planner
@@ -80,7 +92,8 @@ fun BottomNavigationBar(
             label = "Planner",
             selected = selectedItem == "Planner",
             selectedColor = blue,
-            unselectedColor = grey
+            unselectedColor = grey,
+            onClick = onPlannerClick
         )
 
         // Progress
@@ -94,7 +107,8 @@ fun BottomNavigationBar(
             label = "Progress",
             selected = selectedItem == "Progress",
             selectedColor = blue,
-            unselectedColor = grey
+            unselectedColor = grey,
+            onClick = onProgressClick
         )
 
         // Profile
@@ -108,7 +122,8 @@ fun BottomNavigationBar(
             label = "Profile",
             selected = selectedItem == "Profile",
             selectedColor = blue,
-            unselectedColor = grey
+            unselectedColor = grey,
+            onClick = onProfileClick
         )
     }
 }
@@ -120,7 +135,8 @@ private fun BottomNavItem(
     label: String,
     selected: Boolean,
     selectedColor: Color,
-    unselectedColor: Color
+    unselectedColor: Color,
+    onClick: () -> Unit
 ) {
 
     val color =
@@ -128,13 +144,21 @@ private fun BottomNavItem(
         else unselectedColor
 
     Column(
+        modifier = Modifier
+            .width(70.dp)
+            .fillMaxHeight()
+            .clickable {
+                onClick()
+            }
+            .padding(vertical = 8.dp),
+
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
 
         // Icon
-        androidx.compose.runtime.CompositionLocalProvider(
-            androidx.compose.material3.LocalContentColor provides color
+        CompositionLocalProvider(
+            LocalContentColor provides color
         ) {
             icon()
         }
@@ -143,10 +167,11 @@ private fun BottomNavItem(
         Text(
             text = label,
             fontSize = 9.sp,
-            fontWeight = if (selected)
-                FontWeight.Bold
-            else
-                FontWeight.Normal,
+            fontWeight =
+                if (selected)
+                    FontWeight.Bold
+                else
+                    FontWeight.Normal,
             color = color
         )
     }

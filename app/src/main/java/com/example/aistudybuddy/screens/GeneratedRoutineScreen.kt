@@ -82,7 +82,6 @@ fun GeneratedRoutineScreen(
                 .padding(innerPadding)
         ) {
 
-            AppHeader()
 
             Column(
                 modifier = Modifier

@@ -12,15 +12,20 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import android.util.Patterns
 
+// Authentication with Supabase before updating UI
 class AuthViewModel : ViewModel() {
 
+    //Get the shared Supabase client for authentication operations
     private val supabase = SupabaseProvider.client
 
+    // Stores the current authentication state that can be updated by the ViewModel
     private val _uiState =
         MutableStateFlow<AuthUiState>(AuthUiState.Idle)
 
+    // Expose the authentication state to the UI as read-only
     val uiState = _uiState.asStateFlow()
 
+    // Check whether the user already has an active Supabase login session (User logged in before)
     fun checkSession() {
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
@@ -33,11 +38,11 @@ class AuthViewModel : ViewModel() {
                     if (currentSession != null) {
                         AuthUiState.Authenticated
                     } else {
-                        AuthUiState.NotAuthenticated
+                        AuthUiState.NotAuthenticated    // If return null, no user is logged in
                     }
             } catch (exception: Exception) {
                 _uiState.value =
-                    AuthUiState.NotAuthenticated
+                    AuthUiState.NotAuthenticated    // Treat user as logout if failed
             }
         }
     }
@@ -69,11 +74,12 @@ class AuthViewModel : ViewModel() {
             _uiState.value = AuthUiState.Loading
 
             try {
+                // Authenticate the user with Supabase using email and password
                 supabase.auth.signInWith(Email) {
                     this.email = email.trim()
                     this.password = password
                 }
-
+                // Login successfully, so update the application authentication state
                 _uiState.value = AuthUiState.Authenticated
             } catch (exception: Exception) {
                 _uiState.value = AuthUiState.Error(
@@ -83,6 +89,7 @@ class AuthViewModel : ViewModel() {
         }
     }
 
+    // Create a new Supabase account after validating the registration details
     fun signUp(
         fullName: String,
         email: String,
@@ -126,15 +133,19 @@ class AuthViewModel : ViewModel() {
             _uiState.value = AuthUiState.Loading
 
             try {
+                // Register a new user using Supabase email authentication
                 supabase.auth.signUpWith(Email) {
                     this.email = email.trim()
                     this.password = password
 
+                    // Store the user's full name as Supabase user metadata
                     data = buildJsonObject {
                         put("full_name", fullName.trim())
                     }
                 }
 
+                // ** Check the purpose of this
+                // Check whether Supabase logged the user in immediately or requires email confirmation
                 _uiState.value =
                     if (supabase.auth.currentSessionOrNull() != null) {
                         AuthUiState.Authenticated
@@ -143,7 +154,7 @@ class AuthViewModel : ViewModel() {
                     }
             } catch (exception: Exception) {
                 _uiState.value = AuthUiState.Error(
-                    "Unable to update your password. Please request a new reset link."
+                    "Unable to Sign Up. Please try again."
                 )
             }
         }
@@ -168,8 +179,10 @@ class AuthViewModel : ViewModel() {
             _uiState.value = AuthUiState.Loading
 
             try {
+                // Send a password recovery email through Supabase
                 supabase.auth.resetPasswordForEmail(
                     email = email.trim(),
+                    // Redirect the user back to the app after opening the reset link
                     redirectUrl = "aistudybuddy://reset-password"
                 )
 
@@ -209,6 +222,7 @@ class AuthViewModel : ViewModel() {
             _uiState.value = AuthUiState.Loading
 
             try {
+                // Update the authenticated user's password after password recovery
                 supabase.auth.updateUser {
                     password = newPassword
                 }
@@ -233,8 +247,10 @@ class AuthViewModel : ViewModel() {
             _uiState.value = AuthUiState.Loading
 
             try {
+                // Sign out the current user and remove the active Supabase session
                 supabase.auth.signOut()
 
+                // Update the UI to shows currently no user is logged in
                 _uiState.value = AuthUiState.NotAuthenticated
                 onSuccess()
             } catch (exception: Exception) {
@@ -245,6 +261,10 @@ class AuthViewModel : ViewModel() {
         }
     }
 
+    // Password Requirement:
+    // 1. Must at least 8 char
+    // 2. Must 1 upper and 1 lower
+    // 3. Must contain a number
     private fun passwordValidationMessage(
         password: String
     ): String? {

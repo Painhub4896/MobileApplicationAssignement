@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsNone
 import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material3.Icon
@@ -21,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun AppHeader() {
+fun AppHeader(onClickNotification: () -> Unit) {
 
     Row(
         modifier = Modifier
@@ -66,13 +67,9 @@ fun AppHeader() {
         }
 
         IconButton(
-            onClick = { }
+            onClick = onClickNotification
         ) {
-            Icon(
-                imageVector = Icons.Default.NotificationsNone,
-                contentDescription = "Notifications",
-                tint = Color(0xFF353744)
-            )
+            Icon(Icons.Default.Notifications, contentDescription = "Notification")
         }
     }
 }

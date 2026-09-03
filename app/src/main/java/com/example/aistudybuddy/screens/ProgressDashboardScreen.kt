@@ -37,12 +37,24 @@ import com.example.aistudybuddy.components.BottomNavigationBar
 
 
 @Composable
-fun ProgressDashboardScreen() {
+fun ProgressDashboardScreen(
+    onHomeClick: () -> Unit = {},
+    onAssignmentClick: () -> Unit = {},
+    onPlannerClick: () -> Unit = {},
+    onProgressClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {}
+) {
 
     Scaffold(
         bottomBar = {
             BottomNavigationBar(
-                selectedItem = "Progress"
+                selectedItem = "Progress",
+
+                onHomeClick = onHomeClick,
+                onAssignmentClick = onAssignmentClick,
+                onPlannerClick = onPlannerClick,
+                onProgressClick = onProgressClick,
+                onProfileClick = onProfileClick
             )
         }
     ) { innerPadding ->
@@ -54,8 +66,6 @@ fun ProgressDashboardScreen() {
                 .background(Color.White)
         ) {
 
-            // Top header
-            AppHeader()
 
             Column(
                 modifier = Modifier

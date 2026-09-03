@@ -33,13 +33,25 @@ import com.example.aistudybuddy.components.WeekSelector
 @Composable
 fun StudyPlannerScreen(
     onTimetableSetupClick: () -> Unit = {},
-    onWeeklyTimetableClick: () -> Unit = {}
+    onWeeklyTimetableClick: () -> Unit = {},
+
+    onHomeClick: () -> Unit = {},
+    onAssignmentClick: () -> Unit = {},
+    onPlannerClick: () -> Unit = {},
+    onProgressClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {}
 ) {
 
     Scaffold(
         bottomBar = {
             BottomNavigationBar(
-                selectedItem = "Planner"
+                selectedItem = "Planner",
+
+                onHomeClick = onHomeClick,
+                onAssignmentClick = onAssignmentClick,
+                onPlannerClick = onPlannerClick,
+                onProgressClick = onProgressClick,
+                onProfileClick = onProfileClick
             )
         }
     ) { innerPadding ->
@@ -51,8 +63,6 @@ fun StudyPlannerScreen(
                 .background(Color.White)
                 .padding(innerPadding)
         ) {
-
-            AppHeader()
 
 
             LazyColumn(

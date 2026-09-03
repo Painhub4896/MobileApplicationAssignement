@@ -16,10 +16,13 @@ import com.example.aistudybuddy.auth.AuthUiState
 import com.example.aistudybuddy.auth.AuthViewModel
 import com.example.aistudybuddy.data.TimetableEntry
 import com.example.aistudybuddy.screens.AIRoutineSetupScreen
+import com.example.aistudybuddy.screens.AssignmentTrackerScreen
 import com.example.aistudybuddy.screens.FocusTimerScreen
 import com.example.aistudybuddy.screens.GeneratedRoutineScreen
 import com.example.aistudybuddy.screens.HomeScreen
 import com.example.aistudybuddy.screens.LoginScreen
+import com.example.aistudybuddy.screens.NotificationScreen
+import com.example.aistudybuddy.screens.ProfileScreen
 import com.example.aistudybuddy.screens.ProgressDashboardScreen
 import com.example.aistudybuddy.screens.ResetPasswordScreen
 import com.example.aistudybuddy.screens.SignUpScreen
@@ -239,14 +242,13 @@ fun AppNavigation(incomingDeepLink: Uri?) {
         composable(Routes.Home) {
 
             HomeScreen(
-
-                onStudyPlannerClick = {
-
-                    navController.navigate(
-                        Routes.StudyPlanner
-                    )
-                },
-
+                onHomeClick = {navController.navigate(Routes.Home){launchSingleTop} },
+                onPlannerClick = {navController.navigate(Routes.StudyPlanner){launchSingleTop}},
+                onAssignmentClick = {navController.navigate(Routes.AssignmentTracker){launchSingleTop}},
+                onProgressClick = {navController.navigate(Routes.ProgressDashboard){launchSingleTop} },
+                onProfileClick = {navController.navigate(Routes.Profile){launchSingleTop} },
+                onNotificationClick = {navController.navigate(Routes.Notification){launchSingleTop}},
+                onTimerClick = {navController.navigate(Routes.FocusTimer){launchSingleTop} },
                 onLogoutClick = {
 
                     authViewModel.logout(
@@ -271,7 +273,20 @@ fun AppNavigation(incomingDeepLink: Uri?) {
         }
 
         // =========================================================
-        // STUDY PLANNER
+        // Assignment Tracker
+        // =========================================================
+        composable(Routes.AssignmentTracker){
+            AssignmentTrackerScreen(
+                onHomeClick = {navController.navigate(Routes.Home){launchSingleTop} },
+                onPlannerClick = {navController.navigate(Routes.StudyPlanner){launchSingleTop}},
+                onAssignmentClick = {navController.navigate(Routes.AssignmentTracker){launchSingleTop}},
+                onProgressClick = {navController.navigate(Routes.ProgressDashboard){launchSingleTop} },
+                onProfileClick = {navController.navigate(Routes.Profile){launchSingleTop} }
+            )
+        }
+
+        // =========================================================
+        // Study Planner
         // =========================================================
 
         composable(Routes.StudyPlanner) {
@@ -290,7 +305,12 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                     navController.navigate(
                         Routes.WeeklyTimetable
                     )
-                }
+                },
+                onHomeClick = {navController.navigate(Routes.Home){launchSingleTop} },
+                onPlannerClick = {navController.navigate(Routes.StudyPlanner){launchSingleTop}},
+                onAssignmentClick = {navController.navigate(Routes.AssignmentTracker){launchSingleTop}},
+                onProgressClick = {navController.navigate(Routes.ProgressDashboard){launchSingleTop} },
+                onProfileClick = {navController.navigate(Routes.Profile){launchSingleTop} }
             )
         }
 
@@ -302,6 +322,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
 
             TimetableSetupScreen(
 
+                onBackClick = {navController.navigate(Routes.StudyPlanner){launchSingleTop} },
                 existingEntries =
                     timetableEntries,
 
@@ -328,7 +349,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
         composable(Routes.WeeklyTimetable) {
 
             WeeklyTimetableScreen(
-
+                onBackClick = {navController.navigate(Routes.StudyPlanner){launchSingleTop} },
                 entries =
                     timetableEntries,
 
@@ -414,7 +435,18 @@ fun AppNavigation(incomingDeepLink: Uri?) {
         // =========================================================
 
         composable(Routes.FocusTimer) {
-            FocusTimerScreen()
+            FocusTimerScreen(
+                onBackClick = {navController.navigate(Routes.Home){launchSingleTop} }
+            )
+        }
+
+        // =========================================================
+        // FOCUS TIMER
+        // =========================================================
+        composable(Routes.Notification){
+            NotificationScreen(
+                onBackClick = {navController.navigate(Routes.Home){launchSingleTop} }
+            )
         }
 
         // =========================================================
@@ -424,7 +456,27 @@ fun AppNavigation(incomingDeepLink: Uri?) {
         composable(
             Routes.ProgressDashboard
         ) {
-            ProgressDashboardScreen()
+            ProgressDashboardScreen(
+                onHomeClick = {navController.navigate(Routes.Home){launchSingleTop} },
+                onPlannerClick = {navController.navigate(Routes.StudyPlanner){launchSingleTop}},
+                onAssignmentClick = {navController.navigate(Routes.AssignmentTracker){launchSingleTop}},
+                onProgressClick = {navController.navigate(Routes.ProgressDashboard){launchSingleTop} },
+                onProfileClick = {navController.navigate(Routes.Profile){launchSingleTop} }
+            )
+        }
+
+        // =========================================================
+        // Profile
+        // =========================================================
+
+        composable(Routes.Profile){
+            ProfileScreen(
+                onHomeClick = {navController.navigate(Routes.Home){launchSingleTop} },
+                onPlannerClick = {navController.navigate(Routes.StudyPlanner){launchSingleTop}},
+                onAssignmentClick = {navController.navigate(Routes.AssignmentTracker){launchSingleTop}},
+                onProgressClick = {navController.navigate(Routes.ProgressDashboard){launchSingleTop} },
+                onProfileClick = {navController.navigate(Routes.Profile){launchSingleTop} }
+            )
         }
     }
 }

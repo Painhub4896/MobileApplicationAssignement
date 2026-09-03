@@ -106,8 +106,6 @@ fun AIRoutineSetupScreen(
                 .padding(innerPadding)
         ) {
 
-            AppHeader()
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()

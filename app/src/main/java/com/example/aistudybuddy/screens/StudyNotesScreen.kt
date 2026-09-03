@@ -53,8 +53,6 @@ fun StudyNotesScreen() {
                 .background(Color.White)
         ) {
 
-            // App Header
-            AppHeader()
 
             Column(
                 modifier = Modifier

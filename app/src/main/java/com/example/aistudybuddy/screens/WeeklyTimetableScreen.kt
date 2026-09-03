@@ -19,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -27,6 +28,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -52,6 +54,7 @@ import kotlin.math.min
 
 @Composable
 fun WeeklyTimetableScreen(
+    onBackClick: () -> Unit,
     entries: List<TimetableEntry>,
     onAddClassClick: () -> Unit,
     onGenerateRoutineClick: () -> Unit = {}
@@ -63,11 +66,7 @@ fun WeeklyTimetableScreen(
     val textSecondary = Color(0xFF747984)
 
     Scaffold(
-        bottomBar = {
-            BottomNavigationBar(
-                selectedItem = "Planner"
-            )
-        }
+
     ) { innerPadding ->
 
         Column(
@@ -77,7 +76,6 @@ fun WeeklyTimetableScreen(
                 .padding(innerPadding)
         ) {
 
-            AppHeader()
 
             Column(
                 modifier = Modifier
@@ -95,12 +93,31 @@ fun WeeklyTimetableScreen(
                 // TITLE
                 // =====================================================
 
-                Text(
-                    text = "School Timetable",
-                    fontSize = 27.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = textPrimary
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                ){
+                    IconButton(
+                        onClick = onBackClick,
+                        modifier = Modifier.align(Alignment.CenterStart)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+
+                    // Title
+                    Text(
+                        text = "School Timetable",
+                        fontSize = 27.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = textPrimary,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                    )
+                }
 
                 Spacer(
                     modifier = Modifier.height(4.dp)
@@ -924,67 +941,3 @@ private fun timeToMinutes(
 }
 
 
-// =====================================================================
-// PREVIEW
-// =====================================================================
-
-@Preview(
-    showBackground = true,
-    widthDp = 393,
-    heightDp = 852
-)
-@Composable
-fun WeeklyTimetableScreenPreview() {
-
-    AIStudyBuddyTheme {
-
-        WeeklyTimetableScreen(
-            entries = listOf(
-
-                TimetableEntry(
-                    subject = "Biology",
-                    day = "Monday",
-                    startTime = "9:00 AM",
-                    endTime = "10:00 AM",
-                    room = "Lab 2"
-                ),
-
-                TimetableEntry(
-                    subject = "Mathematics",
-                    day = "Monday",
-                    startTime = "11:00 AM",
-                    endTime = "12:00 PM",
-                    room = "Room 3"
-                ),
-
-                TimetableEntry(
-                    subject = "Physics",
-                    day = "Tuesday",
-                    startTime = "10:00 AM",
-                    endTime = "11:00 AM",
-                    room = "Lab 1"
-                ),
-
-                TimetableEntry(
-                    subject = "English",
-                    day = "Thursday",
-                    startTime = "9:00 AM",
-                    endTime = "10:00 AM",
-                    room = "Room 5"
-                ),
-
-                TimetableEntry(
-                    subject = "Chemistry",
-                    day = "Thursday",
-                    startTime = "11:00 AM",
-                    endTime = "12:00 PM",
-                    room = "Lab 3"
-                )
-            ),
-
-            onAddClassClick = {},
-
-            onGenerateRoutineClick = {}
-        )
-    }
-}

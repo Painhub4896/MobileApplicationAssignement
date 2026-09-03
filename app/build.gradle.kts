@@ -91,6 +91,8 @@ dependencies {
     implementation(
         platform(libs.supabase.bom)
     )
+    implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.material3)
 
     implementation(
         libs.supabase.auth

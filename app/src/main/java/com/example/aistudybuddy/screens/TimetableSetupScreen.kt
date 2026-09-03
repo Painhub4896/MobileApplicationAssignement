@@ -4,6 +4,7 @@ import android.app.TimePickerDialog
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +17,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Image
@@ -32,6 +34,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -63,6 +66,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimetableSetupScreen(
+    onBackClick: () -> Unit,
     existingEntries: List<TimetableEntry> = emptyList(),
     onAddClass: (TimetableEntry) -> Unit,
     onViewTimetable: () -> Unit
@@ -124,11 +128,6 @@ fun TimetableSetupScreen(
             SnackbarHost(snackbarHostState)
         },
 
-        bottomBar = {
-            BottomNavigationBar(
-                selectedItem = "Planner"
-            )
-        }
 
     ) { innerPadding ->
 
@@ -139,8 +138,6 @@ fun TimetableSetupScreen(
                 .padding(innerPadding)
         ) {
 
-            // Header stays at the top
-            AppHeader()
 
             // Everything under header can scroll
             Column(
@@ -161,12 +158,33 @@ fun TimetableSetupScreen(
                 // TITLE
                 // =====================================================
 
-                Text(
-                    text = "Set Up Timetable",
-                    fontSize = 27.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = darkText
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                ){
+                    IconButton(
+                        onClick = onBackClick,
+                        modifier = Modifier.align(Alignment.CenterStart)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = darkText
+                        )
+                    }
+
+
+                    // Title
+                    Text(
+                        text = "Set Up Timetable",
+                        fontSize = 27.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = darkText,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                    )
+                }
 
                 Text(
                     text = "Add your weekly classes and let AIStudyBuddy plan your study time around them.",
@@ -981,28 +999,5 @@ private fun timeToMinutes(
     } catch (e: Exception) {
 
         -1
-    }
-}
-
-
-// =============================================================
-// PREVIEW
-// =============================================================
-
-@Preview(
-    showBackground = true,
-    widthDp = 393,
-    heightDp = 852
-)
-@Composable
-fun TimetableSetupScreenPreview() {
-
-    AIStudyBuddyTheme {
-
-        TimetableSetupScreen(
-            existingEntries = emptyList(),
-            onAddClass = {},
-            onViewTimetable = {}
-        )
     }
 }
