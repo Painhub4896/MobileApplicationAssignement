@@ -55,7 +55,13 @@ import com.example.aistudybuddy.viewmodel.AIRoutineViewModel
 fun AIRoutineSetupScreen(
     timetableEntries: List<TimetableEntry>,
     aiRoutineViewModel: AIRoutineViewModel,
-    onGenerateClick: () -> Unit = {}
+    onGenerateClick: () -> Unit = {},
+    onHomeClick: () -> Unit = {},
+    onAssignmentClick: () -> Unit = {},
+    onPlannerClick: () -> Unit = {},
+    onProgressClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {}
+
 ) {
 
     var availableStart by remember {
@@ -90,7 +96,14 @@ fun AIRoutineSetupScreen(
 
     Scaffold(
         bottomBar = {
-            BottomNavigationBar()
+            BottomNavigationBar(
+                selectedItem = "Planner",
+                onHomeClick = { /* Navigate to Home */ },
+                onAssignmentsClick = { /* Navigate to Assignment */ },
+                onPlannerClick = { /* Navigate to Planner */ },
+                onProgressClick = { /* Navigate to Progress */ },
+                onProfileClick = { /* Navigate to Profile */ }
+            )
         }
     ) { innerPadding ->
 

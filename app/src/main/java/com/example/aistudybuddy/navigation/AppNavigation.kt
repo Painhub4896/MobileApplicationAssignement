@@ -842,6 +842,13 @@ fun AppNavigation(incomingDeepLink: Uri?) {
         composable(Routes.Profile) {
 
             ProfileScreen(
+                authViewModel = authViewModel,
+
+                onNavigateToLogin = {
+                    navController.navigate(Routes.Login) {
+                        popUpTo(Routes.Home) { inclusive = true }
+                    }
+                },
 
                 onHomeClick = {
                     navController.navigate(
@@ -859,7 +866,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                     }
                 },
 
-                onAssignmentClick = {
+                onAssignmentsClick = {
                     navController.navigate(
                         Routes.AssignmentTracker
                     ) {

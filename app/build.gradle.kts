@@ -91,12 +91,15 @@ dependencies {
     implementation(
         platform(libs.supabase.bom)
     )
+    implementation(libs.androidx.compose.remote.creation.core)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.material3)
 
     implementation(
         libs.supabase.auth
     )
+
+
 
     implementation(
         libs.ktor.client.android
