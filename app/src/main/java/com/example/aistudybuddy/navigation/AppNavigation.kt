@@ -8,10 +8,10 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.navDeepLink
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import com.example.aistudybuddy.auth.AuthUiState
 import com.example.aistudybuddy.auth.AuthViewModel
 import com.example.aistudybuddy.data.TimetableEntry
@@ -27,6 +27,7 @@ import com.example.aistudybuddy.screens.ProgressDashboardScreen
 import com.example.aistudybuddy.screens.ResetPasswordScreen
 import com.example.aistudybuddy.screens.SignUpScreen
 import com.example.aistudybuddy.screens.SplashScreen
+import com.example.aistudybuddy.screens.StudyNotesScreen
 import com.example.aistudybuddy.screens.StudyPlannerScreen
 import com.example.aistudybuddy.screens.TimetableSetupScreen
 import com.example.aistudybuddy.screens.WeeklyTimetableScreen
@@ -46,7 +47,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
     val aiRoutineViewModel: AIRoutineViewModel =
         viewModel()
 
-    // Timetable data
+    // Shared timetable data
     val timetableEntries =
         remember {
             mutableStateListOf<TimetableEntry>()
@@ -64,6 +65,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
         }
 
     LaunchedEffect(incomingDeepLink) {
+
         if (
             isPasswordResetLink &&
             navController.currentDestination?.route !=
@@ -200,7 +202,6 @@ fun AppNavigation(incomingDeepLink: Uri?) {
 
         composable(
             route = Routes.ResetPassword,
-
             deepLinks = listOf(
                 navDeepLink {
                     uriPattern =
@@ -242,13 +243,71 @@ fun AppNavigation(incomingDeepLink: Uri?) {
         composable(Routes.Home) {
 
             HomeScreen(
-                onHomeClick = {navController.navigate(Routes.Home){launchSingleTop} },
-                onPlannerClick = {navController.navigate(Routes.StudyPlanner){launchSingleTop}},
-                onAssignmentClick = {navController.navigate(Routes.AssignmentTracker){launchSingleTop}},
-                onProgressClick = {navController.navigate(Routes.ProgressDashboard){launchSingleTop} },
-                onProfileClick = {navController.navigate(Routes.Profile){launchSingleTop} },
-                onNotificationClick = {navController.navigate(Routes.Notification){launchSingleTop}},
-                onTimerClick = {navController.navigate(Routes.FocusTimer){launchSingleTop} },
+
+                onHomeClick = {
+                    navController.navigate(
+                        Routes.Home
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onPlannerClick = {
+                    navController.navigate(
+                        Routes.StudyPlanner
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onAssignmentClick = {
+                    navController.navigate(
+                        Routes.AssignmentTracker
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProgressClick = {
+                    navController.navigate(
+                        Routes.ProgressDashboard
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProfileClick = {
+                    navController.navigate(
+                        Routes.Profile
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onNotificationClick = {
+                    navController.navigate(
+                        Routes.Notification
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onTimerClick = {
+                    navController.navigate(
+                        Routes.FocusTimer
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onStudyNotesClick = {
+                    navController.navigate(
+                        Routes.StudyNotes
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
                 onLogoutClick = {
 
                     authViewModel.logout(
@@ -273,44 +332,125 @@ fun AppNavigation(incomingDeepLink: Uri?) {
         }
 
         // =========================================================
-        // Assignment Tracker
+        // ASSIGNMENT TRACKER
         // =========================================================
-        composable(Routes.AssignmentTracker){
+
+        composable(Routes.AssignmentTracker) {
+
             AssignmentTrackerScreen(
-                onHomeClick = {navController.navigate(Routes.Home){launchSingleTop} },
-                onPlannerClick = {navController.navigate(Routes.StudyPlanner){launchSingleTop}},
-                onAssignmentClick = {navController.navigate(Routes.AssignmentTracker){launchSingleTop}},
-                onProgressClick = {navController.navigate(Routes.ProgressDashboard){launchSingleTop} },
-                onProfileClick = {navController.navigate(Routes.Profile){launchSingleTop} }
+
+                onHomeClick = {
+                    navController.navigate(
+                        Routes.Home
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onPlannerClick = {
+                    navController.navigate(
+                        Routes.StudyPlanner
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onAssignmentClick = {
+                    navController.navigate(
+                        Routes.AssignmentTracker
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProgressClick = {
+                    navController.navigate(
+                        Routes.ProgressDashboard
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProfileClick = {
+                    navController.navigate(
+                        Routes.Profile
+                    ) {
+                        launchSingleTop = true
+                    }
+                }
             )
         }
 
         // =========================================================
-        // Study Planner
+        // STUDY PLANNER
         // =========================================================
 
         composable(Routes.StudyPlanner) {
 
             StudyPlannerScreen(
 
-                onTimetableSetupClick = {
+                // Bottom Navigation
+                onHomeClick = {
+                    navController.navigate(
+                        Routes.Home
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
 
+                onPlannerClick = {
+                    navController.navigate(
+                        Routes.StudyPlanner
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onAssignmentsClick = {
+                    navController.navigate(
+                        Routes.AssignmentTracker
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProgressClick = {
+                    navController.navigate(
+                        Routes.ProgressDashboard
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProfileClick = {
+                    navController.navigate(
+                        Routes.Profile
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                // Focus Timer
+                onFocusTimerClick = {
+                    navController.navigate(
+                        Routes.FocusTimer
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                // Timetable
+                onTimetableSetupClick = {
                     navController.navigate(
                         Routes.TimetableSetup
                     )
                 },
 
                 onWeeklyTimetableClick = {
-
                     navController.navigate(
                         Routes.WeeklyTimetable
                     )
-                },
-                onHomeClick = {navController.navigate(Routes.Home){launchSingleTop} },
-                onPlannerClick = {navController.navigate(Routes.StudyPlanner){launchSingleTop}},
-                onAssignmentClick = {navController.navigate(Routes.AssignmentTracker){launchSingleTop}},
-                onProgressClick = {navController.navigate(Routes.ProgressDashboard){launchSingleTop} },
-                onProfileClick = {navController.navigate(Routes.Profile){launchSingleTop} }
+                }
             )
         }
 
@@ -322,7 +462,14 @@ fun AppNavigation(incomingDeepLink: Uri?) {
 
             TimetableSetupScreen(
 
-                onBackClick = {navController.navigate(Routes.StudyPlanner){launchSingleTop} },
+                onBackClick = {
+                    navController.navigate(
+                        Routes.StudyPlanner
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
                 existingEntries =
                     timetableEntries,
 
@@ -349,7 +496,15 @@ fun AppNavigation(incomingDeepLink: Uri?) {
         composable(Routes.WeeklyTimetable) {
 
             WeeklyTimetableScreen(
-                onBackClick = {navController.navigate(Routes.StudyPlanner){launchSingleTop} },
+
+                onBackClick = {
+                    navController.navigate(
+                        Routes.StudyPlanner
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
                 entries =
                     timetableEntries,
 
@@ -362,8 +517,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
 
                 onGenerateRoutineClick = {
 
-                    aiRoutineViewModel
-                        .clearRoutine()
+                    aiRoutineViewModel.clearRoutine()
 
                     navController.navigate(
                         Routes.AIRoutineSetup
@@ -396,7 +550,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
         }
 
         // =========================================================
-        // GEMINI GENERATED ROUTINE
+        // GENERATED ROUTINE
         // =========================================================
 
         composable(Routes.GeneratedRoutine) {
@@ -404,8 +558,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
             GeneratedRoutineScreen(
 
                 sessions =
-                    aiRoutineViewModel
-                        .generatedSessions,
+                    aiRoutineViewModel.generatedSessions,
 
                 onAcceptClick = {
 
@@ -424,7 +577,6 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onAdjustClick = {
-
                     navController.popBackStack()
                 }
             )
@@ -435,17 +587,70 @@ fun AppNavigation(incomingDeepLink: Uri?) {
         // =========================================================
 
         composable(Routes.FocusTimer) {
+
             FocusTimerScreen(
-                onBackClick = {navController.navigate(Routes.Home){launchSingleTop} }
+
+                onBackClick = {
+                    navController.popBackStack()
+                },
+
+                onHomeClick = {
+                    navController.navigate(
+                        Routes.Home
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onAssignmentsClick = {
+                    navController.navigate(
+                        Routes.AssignmentTracker
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onPlannerClick = {
+                    navController.navigate(
+                        Routes.StudyPlanner
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProgressClick = {
+                    navController.navigate(
+                        Routes.ProgressDashboard
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProfileClick = {
+                    navController.navigate(
+                        Routes.Profile
+                    ) {
+                        launchSingleTop = true
+                    }
+                }
             )
         }
 
         // =========================================================
-        // FOCUS TIMER
+        // NOTIFICATION
         // =========================================================
-        composable(Routes.Notification){
+
+        composable(Routes.Notification) {
+
             NotificationScreen(
-                onBackClick = {navController.navigate(Routes.Home){launchSingleTop} }
+
+                onBackClick = {
+                    navController.navigate(
+                        Routes.Home
+                    ) {
+                        launchSingleTop = true
+                    }
+                }
             )
         }
 
@@ -453,29 +658,149 @@ fun AppNavigation(incomingDeepLink: Uri?) {
         // PROGRESS
         // =========================================================
 
-        composable(
-            Routes.ProgressDashboard
-        ) {
+        composable(Routes.ProgressDashboard) {
+
             ProgressDashboardScreen(
-                onHomeClick = {navController.navigate(Routes.Home){launchSingleTop} },
-                onPlannerClick = {navController.navigate(Routes.StudyPlanner){launchSingleTop}},
-                onAssignmentClick = {navController.navigate(Routes.AssignmentTracker){launchSingleTop}},
-                onProgressClick = {navController.navigate(Routes.ProgressDashboard){launchSingleTop} },
-                onProfileClick = {navController.navigate(Routes.Profile){launchSingleTop} }
+
+                onHomeClick = {
+                    navController.navigate(
+                        Routes.Home
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onAssignmentsClick = {
+                    navController.navigate(
+                        Routes.AssignmentTracker
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onPlannerClick = {
+                    navController.navigate(
+                        Routes.StudyPlanner
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProgressClick = {
+                    navController.navigate(
+                        Routes.ProgressDashboard
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProfileClick = {
+                    navController.navigate(
+                        Routes.Profile
+                    ) {
+                        launchSingleTop = true
+                    }
+                }
             )
         }
 
         // =========================================================
-        // Profile
+        // STUDY NOTES
         // =========================================================
 
-        composable(Routes.Profile){
+        composable(Routes.StudyNotes) {
+
+            StudyNotesScreen(
+
+                onHomeClick = {
+                    navController.navigate(
+                        Routes.Home
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onAssignmentsClick = {
+                    navController.navigate(
+                        Routes.AssignmentTracker
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onPlannerClick = {
+                    navController.navigate(
+                        Routes.StudyPlanner
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProgressClick = {
+                    navController.navigate(
+                        Routes.ProgressDashboard
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProfileClick = {
+                    navController.navigate(
+                        Routes.Profile
+                    ) {
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        // =========================================================
+        // PROFILE
+        // =========================================================
+
+        composable(Routes.Profile) {
+
             ProfileScreen(
-                onHomeClick = {navController.navigate(Routes.Home){launchSingleTop} },
-                onPlannerClick = {navController.navigate(Routes.StudyPlanner){launchSingleTop}},
-                onAssignmentClick = {navController.navigate(Routes.AssignmentTracker){launchSingleTop}},
-                onProgressClick = {navController.navigate(Routes.ProgressDashboard){launchSingleTop} },
-                onProfileClick = {navController.navigate(Routes.Profile){launchSingleTop} }
+
+                onHomeClick = {
+                    navController.navigate(
+                        Routes.Home
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onPlannerClick = {
+                    navController.navigate(
+                        Routes.StudyPlanner
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onAssignmentClick = {
+                    navController.navigate(
+                        Routes.AssignmentTracker
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProgressClick = {
+                    navController.navigate(
+                        Routes.ProgressDashboard
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProfileClick = {
+                    navController.navigate(
+                        Routes.Profile
+                    ) {
+                        launchSingleTop = true
+                    }
+                }
             )
         }
     }

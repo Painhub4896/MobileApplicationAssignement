@@ -117,7 +117,7 @@ fun AssignmentTrackerScreen(
             BottomNavigationBar(
                 selectedItem = "Assignments",
                 onHomeClick = onHomeClick,
-                onAssignmentClick = onAssignmentClick,
+                onAssignmentsClick = onAssignmentClick,
                 onPlannerClick = onPlannerClick,
                 onProgressClick = onProgressClick,
                 onProfileClick = onProfileClick

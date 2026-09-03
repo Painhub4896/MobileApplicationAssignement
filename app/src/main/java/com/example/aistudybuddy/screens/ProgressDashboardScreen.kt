@@ -23,6 +23,8 @@ import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import com.example.aistudybuddy.screens.StudyProgress
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,19 +41,20 @@ import com.example.aistudybuddy.components.BottomNavigationBar
 @Composable
 fun ProgressDashboardScreen(
     onHomeClick: () -> Unit = {},
-    onAssignmentClick: () -> Unit = {},
+    onAssignmentsClick: () -> Unit = {},
     onPlannerClick: () -> Unit = {},
     onProgressClick: () -> Unit = {},
     onProfileClick: () -> Unit = {}
 ) {
 
+    val completedMinutes = StudyProgress.getThisWeekMinutes()
+
     Scaffold(
         bottomBar = {
             BottomNavigationBar(
                 selectedItem = "Progress",
-
                 onHomeClick = onHomeClick,
-                onAssignmentClick = onAssignmentClick,
+                onAssignmentsClick = onAssignmentsClick,
                 onPlannerClick = onPlannerClick,
                 onProgressClick = onProgressClick,
                 onProfileClick = onProfileClick
@@ -66,13 +69,13 @@ fun ProgressDashboardScreen(
                 .background(Color.White)
         ) {
 
+            AppHeader()
 
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 16.dp)
             ) {
-
 
                 // TITLE
 
@@ -88,7 +91,6 @@ fun ProgressDashboardScreen(
                 )
 
 
-
                 // STATISTICS CARDS
 
                 Row(
@@ -100,7 +102,7 @@ fun ProgressDashboardScreen(
                         modifier = Modifier.weight(1f),
                         icon = Icons.Default.Timer,
                         title = "Study Hours",
-                        value = "14 hr 30 m",
+                        value = formatStudyHours(completedMinutes),
                         subtitle = "This Week",
                         cardBackground = Color(0xFFF0F5FF),
                         iconColor = Color(0xFF4169E1)
@@ -130,8 +132,7 @@ fun ProgressDashboardScreen(
                         modifier = Modifier.weight(1f),
                         icon = Icons.Default.FlashOn,
                         title = "Study Streak",
-                        value = "7 Days",
-                        subtitle = "Keep it up !",
+                        value = "${StudyProgress.getStudyStreak()} Days",                        subtitle = "Keep it up!",
                         cardBackground = Color(0xFFF6F0FF),
                         iconColor = Color(0xFF8755D6)
                     )
@@ -147,12 +148,9 @@ fun ProgressDashboardScreen(
                     )
                 }
 
-
-                // MORE SPACE BEFORE WEEKLY CARD
                 Spacer(
                     modifier = Modifier.height(16.dp)
                 )
-
 
 
                 // WEEKLY STUDY HOURS
@@ -164,7 +162,6 @@ fun ProgressDashboardScreen(
                 )
 
 
-
                 // RECENT ACTIVITY
 
                 RecentActivityCard()
@@ -174,9 +171,9 @@ fun ProgressDashboardScreen(
 }
 
 
-
+// =====================================================
 // STATISTICS CARD
-
+// =====================================================
 
 @Composable
 fun ProgressStatCard(
@@ -211,7 +208,6 @@ fun ProgressStatCard(
             modifier = Modifier.fillMaxSize()
         ) {
 
-            // Icon + title
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -235,14 +231,10 @@ fun ProgressStatCard(
                 )
             }
 
-
-            // More space before value
             Spacer(
                 modifier = Modifier.height(9.dp)
             )
 
-
-            // Main value
             Text(
                 text = value,
                 fontSize = 18.sp,
@@ -251,14 +243,10 @@ fun ProgressStatCard(
                 modifier = Modifier.padding(start = 4.dp)
             )
 
-
-            // More space before subtitle
             Spacer(
                 modifier = Modifier.height(5.dp)
             )
 
-
-            // Subtitle
             Text(
                 text = subtitle,
                 fontSize = 9.sp,
@@ -270,21 +258,18 @@ fun ProgressStatCard(
 }
 
 
-
+// =====================================================
 // WEEKLY STUDY HOURS
+// =====================================================
 
 @Composable
 fun WeeklyStudyHoursCard() {
 
-    val hours = listOf(
-        2.5f,
-        3.0f,
-        2.0f,
-        3.5f,
-        1.5f,
-        1.0f,
-        1.0f
-    )
+    val dailyMinutes = StudyProgress.getDailyStudyMinutes()
+
+    val hours = dailyMinutes.map { minutes ->
+        minutes / 60f
+    }
 
     val days = listOf(
         "Mon",
@@ -330,7 +315,6 @@ fun WeeklyStudyHoursCard() {
             verticalAlignment = Alignment.Bottom
         ) {
 
-            // Y-axis labels
             Column(
                 modifier = Modifier
                     .width(22.dp)
@@ -339,13 +323,13 @@ fun WeeklyStudyHoursCard() {
             ) {
 
                 Text(
-                    text = "6h",
+                    text = "4h",
                     fontSize = 7.sp,
                     color = Color(0xFF777983)
                 )
 
                 Text(
-                    text = "4h",
+                    text = "3h",
                     fontSize = 7.sp,
                     color = Color(0xFF777983)
                 )
@@ -357,14 +341,18 @@ fun WeeklyStudyHoursCard() {
                 )
 
                 Text(
-                    text = "0h",
+                    text = "1h",
+                    fontSize = 7.sp,
+                    color = Color(0xFF777983)
+                )
+
+                Text(
+                    text = "0",
                     fontSize = 7.sp,
                     color = Color(0xFF777983)
                 )
             }
 
-
-            // Bars
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -380,27 +368,15 @@ fun WeeklyStudyHoursCard() {
                         verticalArrangement = Arrangement.Bottom
                     ) {
 
-                        Text(
-                            text = "${hour}h",
-                            fontSize = 7.sp,
-                            color = Color(0xFF555863)
-                        )
-
-                        Spacer(
-                            modifier = Modifier.height(2.dp)
-                        )
-
                         Box(
                             modifier = Modifier
-                                .width(13.dp)
-                                .height(
-                                    (hour / 6f * 55f).dp
-                                )
+                                .width(18.dp)
+                                .height((hour / 4f * 75f).dp)
                                 .background(
                                     color = Color(0xFF4169E1),
                                     shape = RoundedCornerShape(
-                                        topStart = 3.dp,
-                                        topEnd = 3.dp
+                                        topStart = 4.dp,
+                                        topEnd = 4.dp
                                     )
                                 )
                         )
@@ -412,7 +388,7 @@ fun WeeklyStudyHoursCard() {
                         Text(
                             text = days[index],
                             fontSize = 7.sp,
-                            color = Color(0xFF555863)
+                            color = Color(0xFF777983)
                         )
                     }
                 }
@@ -422,11 +398,14 @@ fun WeeklyStudyHoursCard() {
 }
 
 
-
+// =====================================================
 // RECENT ACTIVITY
+// =====================================================
 
 @Composable
 fun RecentActivityCard() {
+
+    val activities = StudyProgress.completedStudySessions
 
     Column(
         modifier = Modifier
@@ -440,7 +419,7 @@ fun RecentActivityCard() {
                 color = Color(0xFFE0E0E0),
                 shape = RoundedCornerShape(8.dp)
             )
-            .padding(12.dp)
+            .padding(10.dp)
     ) {
 
         Row(
@@ -464,141 +443,135 @@ fun RecentActivityCard() {
             )
         }
 
-
         Spacer(
             modifier = Modifier.height(10.dp)
         )
 
+        if (activities.isEmpty()) {
 
-        // ACTIVITY 1
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .background(
-                        color = Color(0xFFE5F8E8),
-                        shape = RoundedCornerShape(6.dp)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-
-                Icon(
-                    imageVector = Icons.Default.CheckCircle,
-                    contentDescription = "Completed",
-                    tint = Color(0xFF59B96A),
-                    modifier = Modifier.size(17.dp)
-                )
-            }
-
-            Spacer(
-                modifier = Modifier.width(9.dp)
+            Text(
+                text = "No study activity yet.",
+                fontSize = 10.sp,
+                color = Color(0xFF777983),
+                modifier = Modifier.padding(vertical = 8.dp)
             )
 
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+        } else {
 
-                Text(
-                    text = "Completed Biology Quiz",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF30323D)
-                )
+            activities.take(3).forEachIndexed { index, activity ->
 
-                Spacer(
-                    modifier = Modifier.height(2.dp)
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
-                Text(
-                    text = "Today, 9:15 AM",
-                    fontSize = 8.sp,
-                    color = Color(0xFF777983)
-                )
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .background(
+                                color = Color(0xFFE5F8E8),
+                                shape = RoundedCornerShape(6.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+
+                        Icon(
+                            imageVector = Icons.Default.Timer,
+                            contentDescription = "Study session",
+                            tint = Color(0xFF59B96A),
+                            modifier = Modifier.size(17.dp)
+                        )
+                    }
+
+                    Spacer(
+                        modifier = Modifier.width(9.dp)
+                    )
+
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+
+                        Text(
+                            text = activity.title,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color(0xFF30323D)
+                        )
+
+                        Spacer(
+                            modifier = Modifier.height(2.dp)
+                        )
+
+                        Text(
+                            text = "${activity.minutes} minutes • ${
+                                formatActivityDateTime(activity.dateTime)
+                            }",
+                            fontSize = 8.sp,
+                            color = Color(0xFF777983)
+                        )
+                    }
+
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = "Completed",
+                        tint = Color(0xFF59B96A),
+                        modifier = Modifier.size(14.dp)
+                    )
+                }
+
+                if (index < activities.take(3).size - 1) {
+                    Spacer(
+                        modifier = Modifier.height(10.dp)
+                    )
+                }
             }
-
-            Icon(
-                imageVector = Icons.Default.CheckCircle,
-                contentDescription = "Completed",
-                tint = Color(0xFF59B96A),
-                modifier = Modifier.size(14.dp)
-            )
-        }
-
-
-        Spacer(
-            modifier = Modifier.height(10.dp)
-        )
-
-
-
-        // ACTIVITY 2
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .background(
-                        color = Color(0xFFE9E2FF),
-                        shape = RoundedCornerShape(6.dp)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-
-                Text(
-                    text = "∑",
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF7657D9)
-                )
-            }
-
-            Spacer(
-                modifier = Modifier.width(9.dp)
-            )
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-
-                Text(
-                    text = "Mathematics Assignment Submitted",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF30323D)
-                )
-
-                Spacer(
-                    modifier = Modifier.height(2.dp)
-                )
-
-                Text(
-                    text = "Yesterday, 6:30 PM",
-                    fontSize = 8.sp,
-                    color = Color(0xFF777983)
-                )
-            }
-
-            Icon(
-                imageVector = Icons.Default.CheckCircle,
-                contentDescription = "Completed",
-                tint = Color(0xFF59B96A),
-                modifier = Modifier.size(14.dp)
-            )
         }
     }
 }
 
+private fun formatActivityDateTime(
 
+    dateTime: java.time.LocalDateTime
+
+): String {
+
+    val today = java.time.LocalDate.now()
+    val date = dateTime.toLocalDate()
+
+    val time = dateTime.toLocalTime()
+        .format(
+            java.time.format.DateTimeFormatter.ofPattern("h:mm a")
+        )
+
+    return when {
+        date == today -> "Today, $time"
+
+        date == today.minusDays(1) -> "Yesterday, $time"
+
+        else -> dateTime.format(
+            java.time.format.DateTimeFormatter.ofPattern(
+                "dd MMM, h:mm a"
+            )
+        )
+    }
+}
+
+private fun formatStudyHours(minutes: Int): String {
+
+    val hours = minutes / 60
+    val remainingMinutes = minutes % 60
+
+    return if (hours > 0) {
+        "$hours hr $remainingMinutes m"
+    } else {
+        "$remainingMinutes min"
+    }
+}
+
+
+// =====================================================
 // PREVIEW
+// =====================================================
 
 @Preview(
     showBackground = true,

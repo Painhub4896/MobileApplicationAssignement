@@ -30,9 +30,9 @@ import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun BottomNavigationBar(
-    selectedItem: String,
+    selectedItem: String = "Planner",
     onHomeClick: () -> Unit = {},
-    onAssignmentClick: () -> Unit = {},
+    onAssignmentsClick: () -> Unit = {},
     onPlannerClick: () -> Unit = {},
     onProgressClick: () -> Unit = {},
     onProfileClick: () -> Unit = {}
@@ -78,7 +78,7 @@ fun BottomNavigationBar(
             selected = selectedItem == "Assignments",
             selectedColor = blue,
             unselectedColor = grey,
-            onClick = onAssignmentClick
+            onClick = onAssignmentsClick
         )
 
         // Planner
@@ -128,7 +128,6 @@ fun BottomNavigationBar(
     }
 }
 
-
 @Composable
 private fun BottomNavItem(
     icon: @Composable () -> Unit,
@@ -151,7 +150,6 @@ private fun BottomNavItem(
                 onClick()
             }
             .padding(vertical = 8.dp),
-
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {

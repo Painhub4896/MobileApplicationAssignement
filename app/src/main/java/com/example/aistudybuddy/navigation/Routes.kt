@@ -11,6 +11,8 @@ object Routes {
     const val StudyPlanner = "study-planner"
     const val FocusTimer = "focus-timer"
     const val ProgressDashboard = "progress-dashboard"
+
+    const val StudyNotes = "study-notes"
     const val AssignmentTracker = "assignment-tracker"
 
     // Timetable

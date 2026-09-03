@@ -18,7 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.Refresh
@@ -72,7 +72,14 @@ fun formatTime(seconds: Int): String {
 }
 
 @Composable
-fun FocusTimerScreen(onBackClick: () -> Unit) {
+fun FocusTimerScreen(
+    onBackClick: () -> Unit = {},
+    onHomeClick: () -> Unit = {},
+    onAssignmentsClick: () -> Unit = {},
+    onPlannerClick: () -> Unit = {},
+    onProgressClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {}
+)  {
 
     val blue = Color(0xFF4169E1)
     val darkText = Color(0xFF252838)
@@ -153,7 +160,6 @@ fun FocusTimerScreen(onBackClick: () -> Unit) {
         remainingSeconds
     ) {
 
-
         if (isRunning && remainingSeconds > 0) {
 
             delay(1000L)
@@ -167,6 +173,11 @@ fun FocusTimerScreen(onBackClick: () -> Unit) {
             when (timerMode) {
 
                 TimerMode.FOCUS -> {
+
+                    // Record completed focus session
+                    StudyProgress.addCompletedSession(
+                        minutes = focusMinutes
+                    )
 
                     // Last session completed
                     if (currentSession >= totalSessions) {
@@ -196,7 +207,6 @@ fun FocusTimerScreen(onBackClick: () -> Unit) {
                     }
                 }
 
-
                 TimerMode.BREAK -> {
 
                     // Break finished
@@ -212,370 +222,389 @@ fun FocusTimerScreen(onBackClick: () -> Unit) {
     }
 
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp)
-    ) {
-
-
-
-        // ---------------- MAIN CONTENT ----------------
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
-        ){
-            IconButton(
-                onClick = onBackClick,
-                modifier = Modifier.align(Alignment.CenterStart)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = darkText
-                )
-            }
-
-
-            // Title
-            Text(
-                text = "Focus Timer",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = darkText,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                )
-
-            Spacer(
-                modifier = Modifier.height(32.dp)
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar(
+                selectedItem = "Planner",
+                onHomeClick = onHomeClick,
+                onAssignmentsClick = onAssignmentsClick,
+                onPlannerClick = onPlannerClick,
+                onProgressClick = onProgressClick,
+                onProfileClick = onProfileClick
             )
         }
-
+    ){ innerPadding ->
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(background)
         ) {
 
-            Spacer(
-                modifier = Modifier.height(18.dp)
-            )
-
-
-            // ---------------- TIMER CIRCLE ----------------
-
-            Box(
-                modifier = Modifier
-                    .size(190.dp)
-                    .border(
-                        width = 5.dp,
-                        color = timerColor,
-                        shape = CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-
-                    Text(
-                        text = formatTime(remainingSeconds),
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = darkText
-                    )
-
-                    Spacer(
-                        modifier = Modifier.height(2.dp)
-                    )
-
-                    Text(
-                        text = when {
-                            allSessionsCompleted -> "Completed"
-                            timerMode == TimerMode.FOCUS -> "Focus Time"
-                            else -> "Break Time"
-                        },
-                        fontSize = 10.sp,
-                        color = Color(0xFF70727D)
-                    )
-                }
-            }
-
-
-            Spacer(
-                modifier = Modifier.height(10.dp)
-            )
-
-
-            // ---------------- SESSION COUNT ----------------
-
-            Box(
-                modifier = Modifier
-                    .background(
-                        color = Color.White,
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    .border(
-                        width = 1.dp,
-                        color = Color(0xFFE5E5E5),
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    .padding(
-                        horizontal = 10.dp,
-                        vertical = 4.dp
-                    )
-            ) {
-
-                Text(
-                    text = "Session $currentSession of $totalSessions",
-                    fontSize = 9.sp,
-                    color = Color(0xFF70727D)
-                )
-            }
-
-
-            Spacer(
-                modifier = Modifier.height(6.dp)
-            )
-
-
-            // ---------------- PROGRESS DOTS ----------------
+            // App Header
+            AppHeader()
 
             Row(
-                horizontalArrangement = Arrangement.spacedBy(7.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = 8.dp,
+                        vertical = 4.dp
+                    ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
-                repeat(totalSessions) { index ->
-
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .background(
-                                color =
-                                    if (index < currentSession) {
-                                        blue
-                                    } else {
-                                        Color(0xFFE5E5E5)
-                                    },
-                                shape = CircleShape
-                            )
-                    )
-                }
-            }
-
-
-            Spacer(
-                modifier = Modifier.height(12.dp)
-            )
-
-
-            // ---------------- START FOCUS ----------------
-
-            Button(
-                onClick = {
-                    if (!allSessionsCompleted) {
-                        isRunning = !isRunning
+                IconButton(
+                    onClick = {
+                        onBackClick()
                     }
-                },
+                ) {
+
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back to Study Planner",
+                        tint = darkText
+                    )
+                }
+
+            }
+
+
+            // ---------------- MAIN CONTENT ----------------
+
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(42.dp),
-                shape = RoundedCornerShape(15.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = timerColor,
-                    contentColor = Color.White
-                )
+                    .padding(horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
+                Spacer(
+                    modifier = Modifier.height(18.dp)
+                )
+
+                // Title
                 Text(
-                    text = when {
-
-                        allSessionsCompleted ->
-                            "✓  All Sessions Complete"
-
-                        isRunning && timerMode == TimerMode.FOCUS ->
-                            "Pause Focus"
-
-                        isRunning && timerMode == TimerMode.BREAK ->
-                            "Pause Break"
-
-                        timerMode == TimerMode.FOCUS ->
-                            "▶  Start Focus"
-
-                        else ->
-                            "▶  Start Break"
-                    },
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
+                    text = "Focus Timer",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = darkText
                 )
-            }
 
+                Spacer(
+                    modifier = Modifier.height(32.dp)
+                )
 
-            Spacer(
-                modifier = Modifier.height(14.dp)
-            )
+                // ---------------- TIMER CIRCLE ----------------
 
-
-            // ---------------- RESET / SKIP BREAK ----------------
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(14.dp)
-            ) {
-
-                Button(
-                    onClick = {
-                        isRunning = false
-
-                        currentSession = 1
-
-                        timerMode = TimerMode.FOCUS
-
-                        remainingSeconds =
-                            focusMinutes * 60
-
-                        allSessionsCompleted = false
-                    },
+                Box(
                     modifier = Modifier
-                        .weight(1f)
-                        .height(36.dp),
-                    shape = RoundedCornerShape(15.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White,
-                        contentColor = darkText
-                    ),
-                    border = androidx.compose.foundation.BorderStroke(
-                        width = 1.dp,
-                        color = Color(0xFFC8C8C8)
-                    ),
-                    elevation = ButtonDefaults.buttonElevation(
-                        defaultElevation = 0.dp
-                    )
-                ) {
-
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = "Reset",
-                        modifier = Modifier.size(14.dp)
-                    )
-
-                    Spacer(
-                        modifier = Modifier.width(4.dp)
-                    )
-
-                    Text(
-                        text = "Reset",
-                        fontSize = 10.sp
-                    )
-                }
-
-
-                Button(
-                    onClick = {
-                        openSettings()
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(36.dp),
-                    shape = RoundedCornerShape(15.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White,
-                        contentColor = darkText
-                    ),
-                    border = androidx.compose.foundation.BorderStroke(
-                        width = 1.dp,
-                        color = Color(0xFFC8C8C8)
-                    ),
-                    elevation = ButtonDefaults.buttonElevation(
-                        defaultElevation = 0.dp
-                    )
-                ) {
-
-                    Icon(
-                        imageVector = Icons.Default.Settings,
-                        contentDescription = "Settings",
-                        modifier = Modifier.size(14.dp)
-                    )
-
-                    Spacer(
-                        modifier = Modifier.width(4.dp)
-                    )
-
-                    Text(
-                        text = "Settings",
-                        fontSize = 10.sp
-                    )
-                }
-            }
-
-
-            Spacer(
-                modifier = Modifier.height(14.dp)
-            )
-
-
-            // ---------------- AI TIP ----------------
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = Color(0xFFF6EEFF),
-                        shape = RoundedCornerShape(9.dp)
-                    )
-                    .border(
-                        width = 1.dp,
-                        color = Color(0xFFE1CFFF),
-                        shape = RoundedCornerShape(9.dp)
-                    )
-                    .padding(
-                        horizontal = 10.dp,
-                        vertical = 14.dp
-                    )
-            ) {
-
-                Row(
-                    verticalAlignment = Alignment.Top
+                        .size(190.dp)
+                        .border(
+                            width = 5.dp,
+                            color = timerColor,
+                            shape = CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
                 ) {
 
                     Column(
-                        modifier = Modifier.weight(1f)
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
 
                         Text(
-                            text = "✦ AI Tip",
-                            fontSize = 12.sp,
+                            text = formatTime(remainingSeconds),
+                            fontSize = 32.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF7657D9)
+                            color = darkText
                         )
 
                         Spacer(
-                            modifier = Modifier.height(5.dp)
+                            modifier = Modifier.height(2.dp)
                         )
 
                         Text(
-                            text = "Eliminate distractions and take deep breaths. You've got this!",
+                            text = when {
+                                allSessionsCompleted -> "Completed"
+                                timerMode == TimerMode.FOCUS -> "Focus Time"
+                                else -> "Break Time"
+                            },
                             fontSize = 10.sp,
-                            color = Color(0xFF555863)
+                            color = Color(0xFF70727D)
+                        )
+                    }
+                }
+
+
+                Spacer(
+                    modifier = Modifier.height(10.dp)
+                )
+
+
+                // ---------------- SESSION COUNT ----------------
+
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = Color.White,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .border(
+                            width = 1.dp,
+                            color = Color(0xFFE5E5E5),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(
+                            horizontal = 10.dp,
+                            vertical = 4.dp
+                        )
+                ) {
+
+                    Text(
+                        text = "Session $currentSession of $totalSessions",
+                        fontSize = 9.sp,
+                        color = Color(0xFF70727D)
+                    )
+                }
+
+
+                Spacer(
+                    modifier = Modifier.height(6.dp)
+                )
+
+
+                // ---------------- PROGRESS DOTS ----------------
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(7.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    repeat(totalSessions) { index ->
+
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(
+                                    color =
+                                        if (index < currentSession) {
+                                            blue
+                                        } else {
+                                            Color(0xFFE5E5E5)
+                                        },
+                                    shape = CircleShape
+                                )
+                        )
+                    }
+                }
+
+
+                Spacer(
+                    modifier = Modifier.height(12.dp)
+                )
+
+
+                // ---------------- START FOCUS ----------------
+
+                Button(
+                    onClick = {
+                        if (!allSessionsCompleted) {
+                            isRunning = !isRunning
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(42.dp),
+                    shape = RoundedCornerShape(15.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = timerColor,
+                        contentColor = Color.White
+                    )
+                ) {
+
+                    Text(
+                        text = when {
+
+                            allSessionsCompleted ->
+                                "✓  All Sessions Complete"
+
+                            isRunning && timerMode == TimerMode.FOCUS ->
+                                "Pause Focus"
+
+                            isRunning && timerMode == TimerMode.BREAK ->
+                                "Pause Break"
+
+                            timerMode == TimerMode.FOCUS ->
+                                "▶  Start Focus"
+
+                            else ->
+                                "▶  Start Break"
+                        },
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+
+                Spacer(
+                    modifier = Modifier.height(14.dp)
+                )
+
+
+                // ---------------- RESET / SKIP BREAK ----------------
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(14.dp)
+                ) {
+
+                    Button(
+                        onClick = {
+                            isRunning = false
+
+                            currentSession = 1
+
+                            timerMode = TimerMode.FOCUS
+
+                            remainingSeconds =
+                                focusMinutes * 60
+
+                            allSessionsCompleted = false
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(36.dp),
+                        shape = RoundedCornerShape(15.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White,
+                            contentColor = darkText
+                        ),
+                        border = androidx.compose.foundation.BorderStroke(
+                            width = 1.dp,
+                            color = Color(0xFFC8C8C8)
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(
+                            defaultElevation = 0.dp
+                        )
+                    ) {
+
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = "Reset",
+                            modifier = Modifier.size(14.dp)
+                        )
+
+                        Spacer(
+                            modifier = Modifier.width(4.dp)
+                        )
+
+                        Text(
+                            text = "Reset",
+                            fontSize = 10.sp
                         )
                     }
 
-                    Text(
-                        text = "›",
-                        fontSize = 18.sp,
-                        color = Color(0xFF7657D9)
-                    )
+
+                    Button(
+                        onClick = {
+                            openSettings()
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(36.dp),
+                        shape = RoundedCornerShape(15.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White,
+                            contentColor = darkText
+                        ),
+                        border = androidx.compose.foundation.BorderStroke(
+                            width = 1.dp,
+                            color = Color(0xFFC8C8C8)
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(
+                            defaultElevation = 0.dp
+                        )
+                    ) {
+
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Settings",
+                            modifier = Modifier.size(14.dp)
+                        )
+
+                        Spacer(
+                            modifier = Modifier.width(4.dp)
+                        )
+
+                        Text(
+                            text = "Settings",
+                            fontSize = 10.sp
+                        )
+                    }
+                }
+
+
+                Spacer(
+                    modifier = Modifier.height(14.dp)
+                )
+
+
+                // ---------------- AI TIP ----------------
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = Color(0xFFF6EEFF),
+                            shape = RoundedCornerShape(9.dp)
+                        )
+                        .border(
+                            width = 1.dp,
+                            color = Color(0xFFE1CFFF),
+                            shape = RoundedCornerShape(9.dp)
+                        )
+                        .padding(
+                            horizontal = 10.dp,
+                            vertical = 14.dp
+                        )
+                ) {
+
+                    Row(
+                        verticalAlignment = Alignment.Top
+                    ) {
+
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+
+                            Text(
+                                text = "✦ AI Tip",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF7657D9)
+                            )
+
+                            Spacer(
+                                modifier = Modifier.height(5.dp)
+                            )
+
+                            Text(
+                                text = "Eliminate distractions and take deep breaths. You've got this!",
+                                fontSize = 10.sp,
+                                color = Color(0xFF555863)
+                            )
+                        }
+
+                        Text(
+                            text = "›",
+                            fontSize = 18.sp,
+                            color = Color(0xFF7657D9)
+                        )
+                    }
                 }
             }
         }
     }
-
     if (showSettings) {
 
         val sessionValue =
@@ -754,4 +783,17 @@ fun FocusTimerScreen(onBackClick: () -> Unit) {
             }
         )
     }
+}
+
+
+// ---------------- PREVIEW ----------------
+
+@Preview(
+    showBackground = true,
+    showSystemUi = true,
+    device = "spec:width=412dp,height=915dp,dpi=420"
+)
+@Composable
+fun FocusTimerScreenPreview() {
+    FocusTimerScreen()
 }

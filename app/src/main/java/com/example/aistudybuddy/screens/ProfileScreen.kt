@@ -96,7 +96,7 @@ fun ProfileScreen(
             BottomNavigationBar(
                 selectedItem = "Profile",
                 onHomeClick = onHomeClick,
-                onAssignmentClick = onAssignmentClick,
+                onAssignmentsClick = onAssignmentClick,
                 onPlannerClick = onPlannerClick,
                 onProgressClick = onProgressClick,
                 onProfileClick = onProfileClick

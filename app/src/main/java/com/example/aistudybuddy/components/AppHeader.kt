@@ -1,14 +1,14 @@
 package com.example.aistudybuddy.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.NotificationsNone
 import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -17,18 +17,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import com.example.aistudybuddy.R
 
 @Composable
-fun AppHeader(onClickNotification: () -> Unit) {
+fun AppHeader(
+    onClickNotification: () -> Unit = {}
+) {
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .statusBarsPadding()
             .padding(
                 start = 16.dp,
                 end = 8.dp,
@@ -44,10 +49,9 @@ fun AppHeader(onClickNotification: () -> Unit) {
         ) {
 
             // AI robot icon
-            Icon(
-                imageVector = Icons.Default.SmartToy,
-                contentDescription = "AI StudyBuddy",
-                tint = Color(0xFF4169E1)
+            Image(
+                painter = painterResource(R.drawable.ic_launcher_foreground),                contentDescription = "AI StudyBuddy",
+                modifier = Modifier.size(24.dp)
             )
 
             Text(
@@ -69,7 +73,11 @@ fun AppHeader(onClickNotification: () -> Unit) {
         IconButton(
             onClick = onClickNotification
         ) {
-            Icon(Icons.Default.Notifications, contentDescription = "Notification")
+            Icon(
+                imageVector = Icons.Default.Notifications,
+                contentDescription = "Notification",
+                tint = Color(0xFF353744)
+            )
         }
     }
 }

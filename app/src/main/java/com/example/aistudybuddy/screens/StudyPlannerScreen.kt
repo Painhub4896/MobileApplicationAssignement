@@ -1,61 +1,69 @@
 package com.example.aistudybuddy.screens
 
-import androidx.compose.runtime.Composable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChatBubble
-import androidx.compose.material.icons.filled.Eco
-import androidx.compose.material.icons.filled.Functions
-import androidx.compose.material.icons.filled.Science
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import com.example.aistudybuddy.components.AddSessionDialog
 import com.example.aistudybuddy.components.AppHeader
 import com.example.aistudybuddy.components.BottomNavigationBar
 import com.example.aistudybuddy.components.PlannerActionButtons
 import com.example.aistudybuddy.components.StudySessionCard
 import com.example.aistudybuddy.components.WeekSelector
+import com.example.aistudybuddy.data.StudyPlannerData
+import com.example.aistudybuddy.data.StudySession
+import java.time.LocalDate
 
 @Composable
 fun StudyPlannerScreen(
-    onTimetableSetupClick: () -> Unit = {},
-    onWeeklyTimetableClick: () -> Unit = {},
-
     onHomeClick: () -> Unit = {},
-    onAssignmentClick: () -> Unit = {},
+    onAssignmentsClick: () -> Unit = {},
     onPlannerClick: () -> Unit = {},
     onProgressClick: () -> Unit = {},
-    onProfileClick: () -> Unit = {}
+    onProfileClick: () -> Unit = {},
+    onTimetableSetupClick: () -> Unit = {},
+    onWeeklyTimetableClick: () -> Unit = {},
+    onFocusTimerClick: () -> Unit = {}
 ) {
+
+    var editingIndex by remember { mutableStateOf<Int?>(null) }
+    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+
+    val selectedDaySessions =
+        StudyPlannerData.sessions.filter {
+            it.date == selectedDate
+        }
 
     Scaffold(
         bottomBar = {
             BottomNavigationBar(
                 selectedItem = "Planner",
-
                 onHomeClick = onHomeClick,
-                onAssignmentClick = onAssignmentClick,
+                onAssignmentsClick = onAssignmentsClick,
                 onPlannerClick = onPlannerClick,
                 onProgressClick = onProgressClick,
                 onProfileClick = onProfileClick
             )
         }
     ) { innerPadding ->
-
 
         Column(
             modifier = Modifier
@@ -64,102 +72,171 @@ fun StudyPlannerScreen(
                 .padding(innerPadding)
         ) {
 
+            AppHeader()
+
 
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(bottom = 24.dp)
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
                 item {
-
                     Text(
                         text = "Study Planner",
                         fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF252838)
                     )
+                }
 
-                    Spacer(
-                        modifier = Modifier.height(10.dp)
+                item {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    WeekSelector(
+                        onDateSelected = { date ->
+                            selectedDate = date
+                        }
                     )
+                    Spacer(modifier = Modifier.height(14.dp))
+                }
 
-                    WeekSelector()
+                items(
+                    items = selectedDaySessions,
+                    key = { session -> session.id }
+                ) { session ->
 
-                    Spacer(
-                        modifier = Modifier.height(14.dp)
-                    )
+                    val index = StudyPlannerData.sessions.indexOf(session)
 
                     StudySessionCard(
-                        title = "Mathematics",
-                        time = "10:00 AM – 11:00 AM",
-                        icon = Icons.Default.Functions,
-                        iconBackground = Color(0xFFFFDCEB),
-                        iconColor = Color(0xFFFF3D8D),
-                        cardBackground = Color(0xFFFFF0F5),
-                        titleColor = Color(0xFFFF3D8D)
-                    )
+                        title = session.subject,
+                        time = session.time,
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                        cardBackground = sessionColors[session.colorIndex],
 
-                    StudySessionCard(
-                        title = "Physics",
-                        time = "12:00 PM – 1:00 PM",
-                        icon = Icons.Default.Science,
-                        iconBackground = Color(0xFFE8D7FF),
-                        iconColor = Color(0xFFB565F5),
-                        cardBackground = Color(0xFFF6EDFF),
-                        titleColor = Color(0xFFB565F5)
-                    )
+                        titleColor = sessionTitleColors[session.colorIndex],
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                        aiSuggested = session.subject.equals(
+                            "Biology Revision",
+                            true
+                        ),
 
-                    StudySessionCard(
-                        title = "Bahasa Melayu",
-                        time = "5:00 PM – 6:00 PM",
-                        icon = Icons.Default.ChatBubble,
-                        iconBackground = Color(0xFFD5F7DF),
-                        iconColor = Color(0xFF45D878),
-                        cardBackground = Color(0xFFECFFF0),
-                        titleColor = Color(0xFF45D878)
-                    )
+                        onEdit = {
+                            editingIndex = index
+                        },
 
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    StudySessionCard(
-                        title = "Biology Revision",
-                        time = "8:00 PM – 9:00 PM",
-                        icon = Icons.Default.Eco,
-                        iconBackground = Color(0xFFF2F2B8),
-                        iconColor = Color(0xFFD9D900),
-                        cardBackground = Color(0xFFFFFFE8),
-                        titleColor = Color(0xFFD9D900),
-                        aiSuggested = true
-                    )
-
-                    Spacer(
-                        modifier = Modifier.height(17.dp)
-                    )
-
-                    PlannerActionButtons(
-                        onGenerateWithAiClick = onWeeklyTimetableClick,
-                        onAddSessionClick = onTimetableSetupClick
+                        onDelete = {
+                            StudyPlannerData.sessions.removeAt(index)
+                        }
                     )
                 }
-            }
 
+                item {
+                    Spacer(modifier = Modifier.height(9.dp))
+
+                    PlannerActionButtons(
+                        onAddSession = { subject, time ->
+                            StudyPlannerData.sessions.add(
+                                StudySession(
+                                    id = StudyPlannerData.generateId(),
+                                    date = selectedDate,
+                                    subject = subject,
+                                    time = time,
+                                    colorIndex = getNextAvailableColor(selectedDate)
+                                )
+                            )
+                        },
+
+                        onGenerateWithAI = {
+                            // AI generation will be added later
+                        },
+
+
+                        onViewTimetableClick = {
+                            onWeeklyTimetableClick()
+                        },
+
+                        existingSessions = selectedDaySessions
+                    )
+
+                    Spacer(modifier = Modifier.height(80.dp))
+                }
+            }
         }
+    }
+
+    // Edit Session Dialog
+    editingIndex?.let { index ->
+
+        val session = StudyPlannerData.sessions[index]
+
+        AddSessionDialog(
+            onDismiss = {
+                editingIndex = null
+            },
+
+            existingSubject = session.subject,
+            existingTime = session.time,
+
+            existingSessions = selectedDaySessions,
+            currentSessionIndex = selectedDaySessions.indexOf(session),
+
+            isEditing = true,
+
+            onAddSession = { subject, time ->
+                StudyPlannerData.sessions[index] =
+                    StudySession(
+                        id = session.id,
+                        date = session.date,
+                        subject = subject,
+                        time = time,
+                        colorIndex = session.colorIndex
+                    )
+
+                editingIndex = null
+            }
+        )
     }
 }
 
-@Preview(
-    showBackground = true,
-    showSystemUi = true,
-    device = "spec:width=412dp,height=915dp,dpi=420"
+
+
+private val sessionColors = listOf(
+    Color(0xFFFFF0F5),
+    Color(0xFFF6EDFF),
+    Color(0xFFECFFF0),
+    Color(0xFFFFFFE8),
+    Color(0xFFEAF7FF),
+    Color(0xFFFFF1E6),
+    Color(0xFFF0F0FF),
+    Color(0xFFEFFFF7),
+    Color(0xFFFFF0E8),
+    Color(0xFFEFF7FF)
 )
-@Composable
-fun StudyPlannerScreenPreview() {
-    StudyPlannerScreen()
+
+private val sessionTitleColors = listOf(
+    Color(0xFFFF3D8D),
+    Color(0xFFB565F5),
+    Color(0xFF45D878),
+    Color(0xFFD0D000),
+    Color(0xFF2997D6),
+    Color(0xFFFF8A3D),
+    Color(0xFF6565D8),
+    Color(0xFF22AA77),
+    Color(0xFFE56B4A),
+    Color(0xFF4285D4)
+)
+
+private fun getNextAvailableColor(date: LocalDate): Int {
+    val usedColors = StudyPlannerData.sessions
+        .filter { it.date == date }
+        .map { it.colorIndex }
+        .toSet()
+
+    return sessionColors.indices.firstOrNull {
+        it !in usedColors
+    } ?: 0
 }
+
+

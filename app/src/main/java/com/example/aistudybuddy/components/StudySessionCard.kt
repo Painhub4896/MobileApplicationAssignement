@@ -9,34 +9,38 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun StudySessionCard(
     title: String,
     time: String,
-    icon: ImageVector,
-    iconBackground: Color,
-    iconColor: Color = Color(0xFF4169E1),
     cardBackground: Color = Color.White,
     titleColor: Color = Color(0xFF30323D),
-    aiSuggested: Boolean = false
+    aiSuggested: Boolean = false,
+    onEdit: () -> Unit = {},
+    onDelete: () -> Unit = {}
 ) {
+    var showMenu by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -51,44 +55,17 @@ fun StudySessionCard(
                 shape = RoundedCornerShape(10.dp)
             )
             .padding(
-                horizontal = 10.dp,
-                vertical =18.dp
+                horizontal = 14.dp,
+                vertical = 18.dp
             )
     ) {
-
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.fillMaxWidth()
         ) {
 
-            // Subject icon
-            Box(
-                modifier = Modifier
-                    .size(42.dp)
-                    .background(
-                        color = iconBackground,
-                        shape = RoundedCornerShape(7.dp)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-
-                Icon(
-                    imageVector = icon,
-                    contentDescription = title,
-                    tint = iconColor,
-                    modifier = Modifier.size(22.dp)
-                )
-            }
-
-            Spacer(
-                modifier = Modifier.width(12.dp)
-            )
-
-            // Subject information
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-
                 Text(
                     text = title,
                     fontSize = 18.sp,
@@ -96,9 +73,7 @@ fun StudySessionCard(
                     color = titleColor
                 )
 
-                Spacer(
-                    modifier = Modifier.height(2.dp)
-                )
+                Spacer(modifier = Modifier.height(2.dp))
 
                 Text(
                     text = time,
@@ -108,10 +83,7 @@ fun StudySessionCard(
                 )
 
                 if (aiSuggested) {
-
-                    Spacer(
-                        modifier = Modifier.height(2.dp)
-                    )
+                    Spacer(modifier = Modifier.height(2.dp))
 
                     Text(
                         text = "✦ AI suggested",
@@ -121,18 +93,55 @@ fun StudySessionCard(
                 }
             }
 
-            // Three-dot menu
-            IconButton(
-                onClick = { },
-                modifier = Modifier.size(28.dp)
-            ) {
+            Box {
+                IconButton(
+                    onClick = { showMenu = true }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "More options",
+                        tint = Color(0xFF70727D)
+                    )
+                }
 
-                Icon(
-                    imageVector = Icons.Default.MoreVert,
-                    contentDescription = "More options",
-                    tint = Color(0xFF70727D),
-                    modifier = Modifier.size(18.dp)
-                )
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = {
+                        showMenu = false
+                    }
+                ) {
+                    DropdownMenuItem(
+                        text = {
+                            Text("Edit")
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Edit,
+                                contentDescription = "Edit"
+                            )
+                        },
+                        onClick = {
+                            showMenu = false
+                            onEdit()
+                        }
+                    )
+
+                    DropdownMenuItem(
+                        text = {
+                            Text("Delete")
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Delete"
+                            )
+                        },
+                        onClick = {
+                            showMenu = false
+                            onDelete()
+                        }
+                    )
+                }
             }
         }
     }
