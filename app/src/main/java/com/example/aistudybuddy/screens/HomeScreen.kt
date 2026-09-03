@@ -67,7 +67,7 @@ fun HomeScreen(
                 onAssignmentsClick = onAssignmentClick,
                 onPlannerClick = onPlannerClick,
                 onProgressClick = onProgressClick,
-                onProfileClick = onProfileClick
+                onProfileClick = onProfileClick,
             )
         }
 

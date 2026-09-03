@@ -23,8 +23,6 @@ import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.getValue
-import com.example.aistudybuddy.screens.StudyProgress
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,7 +55,7 @@ fun ProgressDashboardScreen(
                 onAssignmentsClick = onAssignmentsClick,
                 onPlannerClick = onPlannerClick,
                 onProgressClick = onProgressClick,
-                onProfileClick = onProfileClick
+                onProfileClick = onProfileClick,
             )
         }
     ) { innerPadding ->

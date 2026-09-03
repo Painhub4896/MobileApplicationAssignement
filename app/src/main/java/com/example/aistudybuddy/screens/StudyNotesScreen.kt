@@ -245,7 +245,7 @@ fun StudyNotesScreen(
 
                 onProgressClick = onProgressClick,
 
-                onProfileClick = onProfileClick
+                onProfileClick = onProfileClick,
             )
         }
 

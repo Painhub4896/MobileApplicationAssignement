@@ -38,7 +38,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.aistudybuddy.components.AppHeader
 import com.example.aistudybuddy.components.BottomNavigationBar
 import com.example.aistudybuddy.ui.theme.AIStudyBuddyTheme
 import com.example.aistudybuddy.data.GeneratedStudySession
@@ -69,9 +68,7 @@ fun GeneratedRoutineScreen(
 
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(
-                selectedItem = "Planner"
-            )
+            BottomNavigationBar()
         }
     ) { innerPadding ->
 

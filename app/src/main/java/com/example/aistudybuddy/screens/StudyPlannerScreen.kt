@@ -55,12 +55,11 @@ fun StudyPlannerScreen(
     Scaffold(
         bottomBar = {
             BottomNavigationBar(
-                selectedItem = "Planner",
                 onHomeClick = onHomeClick,
                 onAssignmentsClick = onAssignmentsClick,
                 onPlannerClick = onPlannerClick,
                 onProgressClick = onProgressClick,
-                onProfileClick = onProfileClick
+                onProfileClick = onProfileClick,
             )
         }
     ) { innerPadding ->

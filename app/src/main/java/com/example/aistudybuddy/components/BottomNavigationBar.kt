@@ -35,7 +35,7 @@ fun BottomNavigationBar(
     onAssignmentsClick: () -> Unit = {},
     onPlannerClick: () -> Unit = {},
     onProgressClick: () -> Unit = {},
-    onProfileClick: () -> Unit = {}
+    onProfileClick: () -> Unit = {},
 ) {
 
     val blue = Color(0xFF4169E1)

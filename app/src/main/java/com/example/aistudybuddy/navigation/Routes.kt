@@ -8,6 +8,7 @@ object Routes {
     const val Home = "home"
     const val Profile = "profile"
     const val Notification = "notification"
+    const val AddAssignment = "add-assignment"
     const val StudyPlanner = "study-planner"
     const val FocusTimer = "focus-timer"
     const val ProgressDashboard = "progress-dashboard"

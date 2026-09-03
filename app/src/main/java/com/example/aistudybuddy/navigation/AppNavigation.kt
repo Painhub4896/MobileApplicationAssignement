@@ -5,7 +5,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -16,6 +18,8 @@ import com.example.aistudybuddy.auth.AuthUiState
 import com.example.aistudybuddy.auth.AuthViewModel
 import com.example.aistudybuddy.data.TimetableEntry
 import com.example.aistudybuddy.screens.AIRoutineSetupScreen
+import com.example.aistudybuddy.screens.AddAssignmentScreen
+import com.example.aistudybuddy.screens.AssignmentItem
 import com.example.aistudybuddy.screens.AssignmentTrackerScreen
 import com.example.aistudybuddy.screens.FocusTimerScreen
 import com.example.aistudybuddy.screens.GeneratedRoutineScreen
@@ -43,6 +47,8 @@ fun AppNavigation(incomingDeepLink: Uri?) {
     val authViewModel: AuthViewModel =
         viewModel()
 
+    val assignments = remember { mutableStateListOf<AssignmentItem>() }
+    var editingAssignmentIndex by remember { mutableStateOf<Int?>(null) }
     // Shared Gemini ViewModel
     val aiRoutineViewModel: AIRoutineViewModel =
         viewModel()
@@ -338,7 +344,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
         composable(Routes.AssignmentTracker) {
 
             AssignmentTrackerScreen(
-
+                assignments = assignments,
                 onHomeClick = {
                     navController.navigate(
                         Routes.Home
@@ -377,7 +383,82 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                     ) {
                         launchSingleTop = true
                     }
+                } ,
+
+                onAddClick = {navController.navigate(Routes.AddAssignment){launchSingleTop} },
+                onEditClick = { assignment ->
+                    editingAssignmentIndex = assignments.indexOf(assignment)
+                    navController.navigate(Routes.AddAssignment)
+                },
+                onDeleteClick = { assignment ->
+                    assignments.remove(assignment)
                 }
+            )
+        }
+
+        // =========================================================
+        // Add Assignment
+        // =========================================================
+        composable(Routes.AddAssignment) {
+
+            val editingAssignment =
+                editingAssignmentIndex?.let { index ->
+                    assignments.getOrNull(index)
+                }
+
+
+            AddAssignmentScreen(
+
+                onCancelClick = {
+                    editingAssignmentIndex = null
+                    navController.popBackStack()
+                },
+
+                onAddClick = { title, subject, difficulty, dueDate ->
+
+                    val updatedAssignment = AssignmentItem(
+                        title = title,
+                        subject = subject,
+                        dueDate = dueDate,
+                        difficulty = difficulty
+                    )
+
+
+                    if (editingAssignmentIndex != null) {
+
+                        val index = editingAssignmentIndex!!
+
+                        if (index in assignments.indices) {
+                            assignments[index] = updatedAssignment
+                        }
+
+                    } else {
+
+                        assignments.add(updatedAssignment)
+                    }
+
+
+                    editingAssignmentIndex = null
+
+                    navController.popBackStack()
+                },
+
+                initialTitle = editingAssignment?.title ?: "",
+                initialSubject = editingAssignment?.subject ?: "",
+                initialDifficulty = editingAssignment?.difficulty ?: "",
+                initialDate = editingAssignment?.dueDate ?: "",
+
+                screenTitle =
+                    if (editingAssignment != null)
+                        "Edit Assignment"
+                    else
+                        "Add Assignment",
+
+                buttonText =
+                    if (editingAssignment != null)
+                        "Save"
+                    else
+                        "Add"
             )
         }
 
