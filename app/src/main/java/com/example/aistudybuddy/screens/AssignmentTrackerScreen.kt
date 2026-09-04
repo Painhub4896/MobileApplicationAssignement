@@ -82,7 +82,9 @@ fun AssignmentTrackerScreen(
 ) {
 
     // Selected Assignment
-    var selectedAssignment by remember { mutableStateOf<AssignmentItem?>(null) }
+    var selectedAssignment by remember {
+        mutableStateOf<AssignmentItem?>(null)
+    }
 
     // Count all assignments
     val taskCount = assignments.size
@@ -97,6 +99,7 @@ fun AssignmentTrackerScreen(
         containerColor = Color(0xFFF9FAFC),
 
         bottomBar = {
+
             BottomNavigationBar(
                 selectedItem = "Assignments",
                 onHomeClick = onHomeClick,
@@ -106,12 +109,22 @@ fun AssignmentTrackerScreen(
                 onProfileClick = onProfileClick
             )
         }
-    ) { paddingValues ->
 
-        Column(
+    ) { innerPadding ->
+
+
+        // =====================================================
+        // SCROLLABLE SCREEN CONTENT
+        // =====================================================
+
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .background(Color(0xFFF9FAFC))
+                .padding(innerPadding),
+            contentPadding = PaddingValues(
+                bottom = 16.dp
+            )
         ) {
 
 
@@ -119,48 +132,54 @@ fun AssignmentTrackerScreen(
             // TOP HEADER
             // =====================================================
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        start = 24.dp,
-                        end = 24.dp,
-                        top = 26.dp,
-                        bottom = 18.dp
-                    ),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            item {
 
-                Text(
-                    text = "Assignment Tracker",
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = AssignTextDark
-                )
-
-                Spacer(
-                    modifier = Modifier.weight(1f)
-                )
-
-
-                // Add Assignment Button
-                Box(
+                Row(
                     modifier = Modifier
-                        .size(52.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(AssignPrimaryBlue),
-                    contentAlignment = Alignment.Center
+                        .fillMaxWidth()
+                        .padding(
+                            start = 16.dp,
+                            end = 16.dp,
+                            top = 16.dp,
+                            bottom = 14.dp
+                        ),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    IconButton(
-                        onClick = onAddClick
+                    Text(
+                        text = "Assignment Tracker",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = AssignTextDark
+                    )
+
+                    Spacer(
+                        modifier = Modifier.weight(1f)
+                    )
+
+
+                    // Add Assignment Button
+                    Box(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(
+                                RoundedCornerShape(12.dp)
+                            )
+                            .background(AssignPrimaryBlue),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Add Assignment",
-                            tint = Color.White,
-                            modifier = Modifier.size(30.dp)
-                        )
+
+                        IconButton(
+                            onClick = onAddClick
+                        ) {
+
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Add Assignment",
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -170,144 +189,156 @@ fun AssignmentTrackerScreen(
             // SUMMARY CARDS
             // =====================================================
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
+            item {
 
-
-                // Tasks Card
-                Card(
+                Row(
                     modifier = Modifier
-                        .weight(1f)
-                        .height(96.dp),
-                    shape = RoundedCornerShape(18.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    ),
-                    border = BorderStroke(
-                        width = 1.dp,
-                        color = Color(0xFFE4E8F0)
-                    )
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = 16.dp
+                        ),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
 
-                    Row(
+
+                    // Tasks Card
+                    Card(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(14.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .weight(1f)
+                            .height(88.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.White
+                        ),
+                        border = BorderStroke(
+                            width = 1.dp,
+                            color = Color(0xFFE4E8F0)
+                        )
                     ) {
 
-                        Box(
+                        Row(
                             modifier = Modifier
-                                .size(44.dp)
-                                .background(
-                                    color = Color(0xFFEFF3FF),
-                                    shape = CircleShape
-                                ),
-                            contentAlignment = Alignment.Center
+                                .fillMaxSize()
+                                .padding(10.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
 
-                            Icon(
-                                imageVector = Icons.Default.Assignment,
-                                contentDescription = "Tasks",
-                                tint = AssignPrimaryBlue,
-                                modifier = Modifier.size(24.dp)
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .background(
+                                        color = Color(0xFFEFF3FF),
+                                        shape = CircleShape
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+
+                                Icon(
+                                    imageVector = Icons.Default.Assignment,
+                                    contentDescription = "Tasks",
+                                    tint = AssignPrimaryBlue,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+
+
+                            Spacer(
+                                modifier = Modifier.width(10.dp)
                             )
-                        }
 
-                        Spacer(
-                            modifier = Modifier.width(12.dp)
-                        )
 
-                        Column {
+                            Column {
 
-                            Text(
-                                text = taskCount.toString(),
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = AssignPrimaryBlue
-                            )
+                                Text(
+                                    text = taskCount.toString(),
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = AssignPrimaryBlue
+                                )
 
-                            Text(
-                                text = "Tasks",
-                                fontSize = 13.sp,
-                                color = AssignTextGrey
-                            )
+                                Text(
+                                    text = "Tasks",
+                                    fontSize = 11.sp,
+                                    color = AssignTextGrey
+                                )
+                            }
                         }
                     }
-                }
 
 
-                // Due Soon Card
-                Card(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(96.dp),
-                    shape = RoundedCornerShape(18.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    ),
-                    border = BorderStroke(
-                        width = 1.dp,
-                        color = Color(0xFFE4E8F0)
-                    )
-                ) {
-
-                    Row(
+                    // Due Soon Card
+                    Card(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(14.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .weight(1f)
+                            .height(88.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.White
+                        ),
+                        border = BorderStroke(
+                            width = 1.dp,
+                            color = Color(0xFFE4E8F0)
+                        )
                     ) {
 
-                        Box(
+                        Row(
                             modifier = Modifier
-                                .size(44.dp)
-                                .background(
-                                    color = Color(0xFFFFF3E3),
-                                    shape = CircleShape
-                                ),
-                            contentAlignment = Alignment.Center
+                                .fillMaxSize()
+                                .padding(10.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
 
-                            Icon(
-                                imageVector = Icons.Default.DateRange,
-                                contentDescription = "Due Soon",
-                                tint = Color(0xFFFF8500),
-                                modifier = Modifier.size(24.dp)
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .background(
+                                        color = Color(0xFFFFF3E3),
+                                        shape = CircleShape
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+
+                                Icon(
+                                    imageVector = Icons.Default.DateRange,
+                                    contentDescription = "Due Soon",
+                                    tint = Color(0xFFFF8500),
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+
+
+                            Spacer(
+                                modifier = Modifier.width(10.dp)
                             )
-                        }
 
-                        Spacer(
-                            modifier = Modifier.width(12.dp)
-                        )
 
-                        Column {
+                            Column {
 
-                            Text(
-                                text = dueSoonCount.toString(),
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFFFF8500)
-                            )
+                                Text(
+                                    text = dueSoonCount.toString(),
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFFFF8500)
+                                )
 
-                            Text(
-                                text = "Due Soon",
-                                fontSize = 13.sp,
-                                color = AssignTextGrey
-                            )
+                                Text(
+                                    text = "Due Soon",
+                                    fontSize = 11.sp,
+                                    color = AssignTextGrey
+                                )
+                            }
                         }
                     }
                 }
             }
 
 
-            Spacer(
-                modifier = Modifier.height(22.dp)
-            )
+            item {
+
+                Spacer(
+                    modifier = Modifier.height(14.dp)
+                )
+            }
 
 
             // =====================================================
@@ -316,70 +347,82 @@ fun AssignmentTrackerScreen(
 
             if (assignments.isEmpty()) {
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 60.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                item {
 
-                    Box(
+                    Column(
                         modifier = Modifier
-                            .size(70.dp)
-                            .background(
-                                color = AssignLightBlue,
-                                shape = CircleShape
+                            .fillMaxWidth()
+                            .padding(
+                                top = 50.dp,
+                                bottom = 50.dp
                             ),
-                        contentAlignment = Alignment.Center
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
 
-                        Icon(
-                            imageVector = Icons.Default.Assignment,
-                            contentDescription = "No Assignment",
-                            tint = AssignPrimaryBlue,
-                            modifier = Modifier.size(36.dp)
+                        Box(
+                            modifier = Modifier
+                                .size(58.dp)
+                                .background(
+                                    color = AssignLightBlue,
+                                    shape = CircleShape
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+
+                            Icon(
+                                imageVector = Icons.Default.Assignment,
+                                contentDescription = "No Assignment",
+                                tint = AssignPrimaryBlue,
+                                modifier = Modifier.size(30.dp)
+                            )
+                        }
+
+
+                        Spacer(
+                            modifier = Modifier.height(14.dp)
+                        )
+
+
+                        Text(
+                            text = "No assignments yet",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = AssignTextDark
+                        )
+
+
+                        Spacer(
+                            modifier = Modifier.height(5.dp)
+                        )
+
+
+                        Text(
+                            text = "Tap + to create your first assignment",
+                            fontSize = 12.sp,
+                            color = AssignTextGrey
                         )
                     }
-
-                    Spacer(
-                        modifier = Modifier.height(16.dp)
-                    )
-
-                    Text(
-                        text = "No assignments yet",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = AssignTextDark
-                    )
-
-                    Spacer(
-                        modifier = Modifier.height(6.dp)
-                    )
-
-                    Text(
-                        text = "Tap + to create your first assignment",
-                        fontSize = 14.sp,
-                        color = AssignTextGrey
-                    )
                 }
 
             } else {
 
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(
-                        start = 24.dp,
-                        end = 24.dp,
-                        bottom = 20.dp
-                    ),
-                    verticalArrangement = Arrangement.spacedBy(14.dp)
-                ) {
+                items(assignments) { assignment ->
 
-                    items(assignments) { assignment ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                start = 16.dp,
+                                end = 16.dp,
+                                bottom = 10.dp
+                            )
+                    ) {
 
                         AssignmentCard(
                             item = assignment,
-                            onClick = { selectedAssignment = assignment }
+                            onClick = {
+                                selectedAssignment = assignment
+                            }
                         )
                     }
                 }
@@ -395,9 +438,12 @@ fun AssignmentTrackerScreen(
     selectedAssignment?.let { assignment ->
 
         AlertDialog(
-            onDismissRequest = { selectedAssignment = null },
+            onDismissRequest = {
+                selectedAssignment = null
+            },
 
             title = {
+
                 Text(
                     text = assignment.title,
                     fontWeight = FontWeight.Bold
@@ -405,6 +451,7 @@ fun AssignmentTrackerScreen(
             },
 
             text = {
+
                 Text(
                     text = "What would you like to do with this assignment?"
                 )
@@ -414,10 +461,13 @@ fun AssignmentTrackerScreen(
 
                 TextButton(
                     onClick = {
+
                         selectedAssignment = null
+
                         onEditClick(assignment)
                     }
                 ) {
+
                     Text(
                         text = "Edit",
                         color = AssignPrimaryBlue,
@@ -430,10 +480,13 @@ fun AssignmentTrackerScreen(
 
                 TextButton(
                     onClick = {
+
                         selectedAssignment = null
+
                         onDeleteClick(assignment)
                     }
                 ) {
+
                     Text(
                         text = "Remove",
                         color = AssignRed,
@@ -455,8 +508,10 @@ fun AssignmentCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() },
-        shape = RoundedCornerShape(22.dp),
+            .clickable {
+                onClick()
+            },
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         ),
@@ -469,7 +524,7 @@ fun AssignmentCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(18.dp),
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
@@ -480,8 +535,10 @@ fun AssignmentCard(
 
             Box(
                 modifier = Modifier
-                    .size(68.dp)
-                    .clip(RoundedCornerShape(18.dp))
+                    .size(48.dp)
+                    .clip(
+                        RoundedCornerShape(12.dp)
+                    )
                     .background(AssignLightBlue),
                 contentAlignment = Alignment.Center
             ) {
@@ -490,13 +547,13 @@ fun AssignmentCard(
                     imageVector = Icons.Default.Assignment,
                     contentDescription = "Assignment",
                     tint = AssignPrimaryBlue,
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(24.dp)
                 )
             }
 
 
             Spacer(
-                modifier = Modifier.width(18.dp)
+                modifier = Modifier.width(12.dp)
             )
 
 
@@ -514,7 +571,7 @@ fun AssignmentCard(
 
                     Text(
                         text = item.title,
-                        fontSize = 18.sp,
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
                         color = AssignTextDark,
                         modifier = Modifier.weight(1f)
@@ -525,20 +582,29 @@ fun AssignmentCard(
                     val badgeColor: Color
                     val badgeBg: Color
 
+
                     when (item.difficulty) {
 
                         "Hard" -> {
+
                             badgeColor = AssignRed
+
                             badgeBg = Color(0xFFFFE4E6)
                         }
 
+
                         "Medium" -> {
+
                             badgeColor = AssignYellow
+
                             badgeBg = Color(0xFFFFF3D7)
                         }
 
+
                         else -> {
+
                             badgeColor = AssignGreen
+
                             badgeBg = Color(0xFFE0F8EC)
                         }
                     }
@@ -546,36 +612,38 @@ fun AssignmentCard(
 
                     Text(
                         text = item.difficulty,
-                        fontSize = 12.sp,
+                        fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
                         color = badgeColor,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
-                            .clip(RoundedCornerShape(10.dp))
+                            .clip(
+                                RoundedCornerShape(8.dp)
+                            )
                             .background(badgeBg)
                             .padding(
-                                horizontal = 8.dp,
-                                vertical = 6.dp
+                                horizontal = 7.dp,
+                                vertical = 4.dp
                             )
                     )
                 }
 
 
                 Spacer(
-                    modifier = Modifier.height(6.dp)
+                    modifier = Modifier.height(4.dp)
                 )
 
 
                 // Subject
                 Text(
                     text = item.subject,
-                    fontSize = 13.sp,
+                    fontSize = 12.sp,
                     color = AssignPrimaryBlue
                 )
 
 
                 Spacer(
-                    modifier = Modifier.height(8.dp)
+                    modifier = Modifier.height(6.dp)
                 )
 
 
@@ -588,16 +656,18 @@ fun AssignmentCard(
                         imageVector = Icons.Default.DateRange,
                         contentDescription = "Due Date",
                         tint = Color(0xFF9CA3AF),
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(15.dp)
                     )
 
+
                     Spacer(
-                        modifier = Modifier.width(6.dp)
+                        modifier = Modifier.width(5.dp)
                     )
+
 
                     Text(
                         text = "Due: ${item.dueDate}",
-                        fontSize = 14.sp,
+                        fontSize = 12.sp,
                         color = AssignTextGrey
                     )
                 }
@@ -611,7 +681,9 @@ fun AssignmentCard(
 // CHECK WHETHER ASSIGNMENT IS DUE WITHIN 5 DAYS
 // =====================================================
 
-fun isDueSoon(dueDate: String): Boolean {
+fun isDueSoon(
+    dueDate: String
+): Boolean {
 
     return try {
 
@@ -620,35 +692,78 @@ fun isDueSoon(dueDate: String): Boolean {
             Locale.getDefault()
         )
 
+
         formatter.isLenient = false
 
-        val dueDateValue = formatter.parse(dueDate) ?: return false
+
+        val dueDateValue =
+            formatter.parse(dueDate) ?: return false
 
 
-        val today = Calendar.getInstance()
-
-        today.set(Calendar.HOUR_OF_DAY, 0)
-        today.set(Calendar.MINUTE, 0)
-        today.set(Calendar.SECOND, 0)
-        today.set(Calendar.MILLISECOND, 0)
+        val today =
+            Calendar.getInstance()
 
 
-        val due = Calendar.getInstance()
+        today.set(
+            Calendar.HOUR_OF_DAY,
+            0
+        )
 
-        due.time = dueDateValue
+        today.set(
+            Calendar.MINUTE,
+            0
+        )
 
-        due.set(Calendar.HOUR_OF_DAY, 0)
-        due.set(Calendar.MINUTE, 0)
-        due.set(Calendar.SECOND, 0)
-        due.set(Calendar.MILLISECOND, 0)
+        today.set(
+            Calendar.SECOND,
+            0
+        )
+
+        today.set(
+            Calendar.MILLISECOND,
+            0
+        )
 
 
-        val difference = due.timeInMillis - today.timeInMillis
+        val due =
+            Calendar.getInstance()
 
-        val fiveDays = 5L * 24 * 60 * 60 * 1000
+
+        due.time =
+            dueDateValue
 
 
-        difference >= 0 && difference <= fiveDays
+        due.set(
+            Calendar.HOUR_OF_DAY,
+            0
+        )
+
+        due.set(
+            Calendar.MINUTE,
+            0
+        )
+
+        due.set(
+            Calendar.SECOND,
+            0
+        )
+
+        due.set(
+            Calendar.MILLISECOND,
+            0
+        )
+
+
+        val difference =
+            due.timeInMillis - today.timeInMillis
+
+
+        val fiveDays =
+            5L * 24 * 60 * 60 * 1000
+
+
+        difference >= 0 &&
+                difference <= fiveDays
 
     } catch (e: Exception) {
 

@@ -4,14 +4,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -50,6 +52,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddAssignmentScreen(
@@ -62,16 +65,22 @@ fun AddAssignmentScreen(
     screenTitle: String = "Add Assignment",
     buttonText: String = "Add",
 ) {
+
     val blue = Color(0xFF4169E1)
     val darkText = Color(0xFF252838)
     val greyText = Color(0xFF767987)
     val backgroundColor = Color(0xFFF9FAFC)
 
+
     // Assignment Title " "
-    var assignmentTitle by remember { mutableStateOf(initialTitle) }
+    var assignmentTitle by remember {
+        mutableStateOf(initialTitle)
+    }
+
 
     // SubjectListExample
     val subjectList = remember {
+
         mutableStateListOf(
             "Networking",
             "Database",
@@ -81,8 +90,10 @@ fun AddAssignmentScreen(
         )
     }
 
+
     // 3-Difficulty level
     val difficultyList = remember {
+
         mutableStateListOf(
             "Easy",
             "Medium",
@@ -90,564 +101,775 @@ fun AddAssignmentScreen(
         )
     }
 
+
     // Selected Subject
-    var selectedSubject by remember { mutableStateOf(initialSubject) }
+    var selectedSubject by remember {
+        mutableStateOf(initialSubject)
+    }
+
 
     // Dropdown
-    var subjectMenuExpended by remember { mutableStateOf(false) }
+    var subjectMenuExpended by remember {
+        mutableStateOf(false)
+    }
+
 
     // Add New Subject
-    var showNewSubjectField by remember { mutableStateOf(false) }
-    var newSubject by remember { mutableStateOf("") }
+    var showNewSubjectField by remember {
+        mutableStateOf(false)
+    }
+
+    var newSubject by remember {
+        mutableStateOf("")
+    }
+
 
     // Selected Difficulty Level
-    var selectedDifficulty by remember { mutableStateOf(initialDifficulty) }
+    var selectedDifficulty by remember {
+        mutableStateOf(initialDifficulty)
+    }
+
 
     // Dropdown
-    var difficultyMenuExpended by remember { mutableStateOf(false) }
+    var difficultyMenuExpended by remember {
+        mutableStateOf(false)
+    }
+
 
     // Selected Due Date
-    var selectedDate by remember { mutableStateOf(initialDate) }
-
-// Date Picker
-    var showDatePicker by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
+    var selectedDate by remember {
+        mutableStateOf(initialDate)
+    }
 
 
-    Column(
+    // Date Picker
+    var showDatePicker by remember {
+        mutableStateOf(false)
+    }
+
+    val datePickerState =
+        rememberDatePickerState()
+
+
+
+    // =====================================================
+    // SCROLLABLE SCREEN CONTENT
+    // =====================================================
+
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
-            .padding(
-                start = 24.dp,
-                end = 24.dp,
-                top = 28.dp,
-                bottom = 20.dp
-            )
+            .statusBarsPadding(),
+        contentPadding = PaddingValues(
+            start = 16.dp,
+            end = 16.dp,
+            top = 12.dp,
+            bottom = 16.dp
+        )
     ) {
+
 
         // =====================================================
         // PAGE TITLE
         // =====================================================
 
-        Text(
-            text = screenTitle,
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold,
-            color = darkText
-        )
+        item {
 
-        Spacer(
-            modifier = Modifier.height(34.dp)
-        )
+            Text(
+                text = screenTitle,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = darkText
+            )
+
+
+            Spacer(
+                modifier = Modifier.height(20.dp)
+            )
+        }
+
 
 
         // =====================================================
         // ASSIGNMENT TITLE
         // =====================================================
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .background(
-                        color = Color(0xFFF0F2FF),
-                        shape = CircleShape
-                    )
-                    .padding(10.dp)
+        item {
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Default.Assignment,
-                    contentDescription = "Assignment",
-                    tint = blue
-                )
-            }
 
-            Spacer(
-                modifier = Modifier.width(12.dp)
-            )
-
-            Text(
-                text = "Assignment Title",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = darkText
-            )
-        }
-
-        Spacer(
-            modifier = Modifier.height(10.dp)
-        )
-
-        OutlinedTextField(
-            value = assignmentTitle,
-            onValueChange = { assignmentTitle = it },
-            placeholder = {
-                Text(
-                    text = "Enter assignment title",
-                    color = greyText
-                )
-            },
-            singleLine = true,
-            shape = RoundedCornerShape(16.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = blue,
-                unfocusedBorderColor = Color(0xFFD6D9E2),
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White
-            ),
-            modifier = Modifier.fillMaxWidth()
-        )
-
-
-        Spacer(
-            modifier = Modifier.height(28.dp)
-        )
-
-
-        // =====================================================
-        // SELECT SUBJECT
-        // =====================================================
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .background(
-                        color = Color(0xFFF0F2FF),
-                        shape = CircleShape
-                    )
-                    .padding(10.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.MenuBook,
-                    contentDescription = "Subject",
-                    tint = blue
-                )
-            }
-
-            Spacer(
-                modifier = Modifier.width(12.dp)
-            )
-
-            Text(
-                text = "Select a Subject",
-                fontSize = 17.sp,
-                fontWeight = FontWeight.Bold,
-                color = darkText
-            )
-        }
-
-        Spacer(
-            modifier = Modifier.height(12.dp)
-        )
-
-        ExposedDropdownMenuBox(
-            expanded = subjectMenuExpended,
-            onExpandedChange = { subjectMenuExpended = !subjectMenuExpended }
-        ) {
-            OutlinedTextField(
-                value = selectedSubject,
-                onValueChange = {},
-                readOnly = true,
-                placeholder = {
-                    Text(
-                        text = "Select a subject",
-                        color = greyText
-                    )
-                },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(
-                        expanded = subjectMenuExpended
-                    )
-                },
-                shape = RoundedCornerShape(16.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = blue,
-                    unfocusedBorderColor = Color(0xFFD6D9E2),
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
-                ),
-                modifier = Modifier
-                    .menuAnchor()
-                    .fillMaxWidth()
-            )
-
-            ExposedDropdownMenu(
-                expanded = subjectMenuExpended,
-                onDismissRequest = { subjectMenuExpended = false }
-            ) {
-                subjectList.forEach { subject ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = subject,
-                                fontSize = 15.sp
-                            )
-                        },
-                        onClick = {
-                            selectedSubject = subject
-                            subjectMenuExpended = false
-                        }
-                    )
-                }
-
-                // Add New Subject option
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = "+ Add New Subject",
-                            color = blue,
-                            fontWeight = FontWeight.Bold
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = Color(0xFFF0F2FF),
+                            shape = CircleShape
                         )
-                    },
-                    onClick = {
-                        showNewSubjectField = true
-                    }
-                )
+                        .padding(7.dp)
+                ) {
 
-                if (showNewSubjectField) {
-
-                    Spacer(
-                        modifier = Modifier.height(12.dp)
-                    )
-
-                    OutlinedTextField(
-                        value = newSubject,
-                        onValueChange = { newSubject = it },
-                        label = {
-                            Text("New Subject")
-                        },
-                        placeholder = {
-                            Text("Eg. Software Engineering")
-                        },
-                        singleLine = true,
-                        shape = RoundedCornerShape(14.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = blue,
-                            unfocusedBorderColor = Color(0xFFD6D9E2),
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                    )
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        TextButton(
-                            onClick = {
-                                showNewSubjectField = false
-                                newSubject = ""
-                            }
-                        ) {
-                            Text(
-                                text = "Cancel",
-                                color = greyText
-                            )
-                        }
-
-                        TextButton(
-                            enabled = newSubject.isNotBlank(),
-                            onClick = {
-                                val subject = newSubject.trim()
-
-                                if (!subjectList.contains(subject)) {
-                                    subjectList.add(subject)
-                                }
-
-                                selectedSubject = subject
-                                newSubject = ""
-                                showNewSubjectField = false
-                            }
-                        ) {
-                            Text(
-                                text = "Save Subject",
-                                color = blue,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        Spacer(
-            modifier = Modifier.height(28.dp)
-        )
-
-
-        // =====================================================
-        // SELECT DIFFICULTY LEVEL
-        // =====================================================
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .background(
-                        color = Color(0xFFE8F8F0),
-                        shape = CircleShape
-                    )
-                    .padding(10.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.BarChart,
-                    contentDescription = "Difficulty",
-                    tint = Color(0xFF27B56E)
-                )
-            }
-
-            Spacer(
-                modifier = Modifier.width(12.dp)
-            )
-
-            Text(
-                text = "Select Difficulty Level",
-                fontSize = 17.sp,
-                fontWeight = FontWeight.Bold,
-                color = darkText
-            )
-        }
-
-        Spacer(
-            modifier = Modifier.height(12.dp)
-        )
-
-        ExposedDropdownMenuBox(
-            expanded = difficultyMenuExpended,
-            onExpandedChange = { difficultyMenuExpended = !difficultyMenuExpended }
-        ) {
-            OutlinedTextField(
-                value = selectedDifficulty,
-                onValueChange = {},
-                readOnly = true,
-                placeholder = {
-                    Text(
-                        text = "Select difficulty level",
-                        color = greyText
-                    )
-                },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(
-                        expanded = difficultyMenuExpended
-                    )
-                },
-                shape = RoundedCornerShape(16.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = blue,
-                    unfocusedBorderColor = Color(0xFFD6D9E2),
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
-                ),
-                modifier = Modifier
-                    .menuAnchor()
-                    .fillMaxWidth()
-            )
-
-            ExposedDropdownMenu(
-                expanded = difficultyMenuExpended,
-                onDismissRequest = { difficultyMenuExpended = false }
-            ) {
-                difficultyList.forEach { difficulty ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = difficulty,
-                                fontSize = 15.sp
-                            )
-                        },
-                        onClick = {
-                            selectedDifficulty = difficulty
-                            difficultyMenuExpended = false
-                        }
-                    )
-                }
-            }
-        }
-
-        Spacer(
-            modifier = Modifier.height(28.dp)
-        )
-
-        // =====================================================
-        // SELECT DUE DATE
-        // =====================================================
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .background(
-                        color = Color(0xFFFFF3E8),
-                        shape = CircleShape
-                    )
-                    .padding(10.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.DateRange,
-                    contentDescription = "Due Date",
-                    tint = Color(0xFFFF8A3D)
-                )
-            }
-
-            Spacer(
-                modifier = Modifier.width(12.dp)
-            )
-
-            Text(
-                text = "Select Due Date",
-                fontSize = 17.sp,
-                fontWeight = FontWeight.Bold,
-                color = darkText
-            )
-        }
-
-        Spacer(
-            modifier = Modifier.height(12.dp)
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { showDatePicker = true }
-        ) {
-            OutlinedTextField(
-                value = selectedDate,
-                onValueChange = {},
-                readOnly = true,
-                enabled = false,
-                placeholder = {
-                    Text(
-                        text = "Select due date",
-                        color = greyText
-                    )
-                },
-                trailingIcon = {
                     Icon(
-                        imageVector = Icons.Default.DateRange,
-                        contentDescription = "Select Date",
+                        imageVector = Icons.Default.Assignment,
+                        contentDescription = "Assignment",
                         tint = blue
                     )
-                },
-                shape = RoundedCornerShape(16.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    disabledBorderColor = Color(0xFFD6D9E2),
-                    disabledContainerColor = Color.White,
-                    disabledTextColor = darkText,
-                    disabledPlaceholderColor = greyText,
-                    disabledTrailingIconColor = blue
-                ),
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-
-        // Push buttons to bottom
-        Spacer(
-            modifier = Modifier.weight(1f)
-        )
+                }
 
 
-        // =====================================================
-        // CANCEL + ADD BUTTON
-        // =====================================================
+                Spacer(
+                    modifier = Modifier.width(9.dp)
+                )
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(14.dp)
-        ) {
 
-            OutlinedButton(
-                onClick = onCancelClick,
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier
-                    .weight(1f)
-                    .height(56.dp)
-            ) {
                 Text(
-                    text = "Cancel",
-                    fontSize = 16.sp,
+                    text = "Assignment Title",
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     color = darkText
                 )
             }
 
 
-            Button(
-                onClick = {
-                    onAddClick(
-                        assignmentTitle.trim(),
-                        selectedSubject,
-                        selectedDifficulty,
-                        selectedDate
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
+
+
+            OutlinedTextField(
+                value = assignmentTitle,
+                onValueChange = {
+                    assignmentTitle = it
+                },
+                placeholder = {
+
+                    Text(
+                        text = "Enter assignment title",
+                        fontSize = 13.sp,
+                        color = greyText
                     )
                 },
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = blue,
-                    contentColor = Color.White
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = blue,
+                    unfocusedBorderColor = Color(0xFFD6D9E2),
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White
                 ),
                 modifier = Modifier
-                    .weight(1f)
-                    .height(56.dp)
+                    .fillMaxWidth()
+                    .height(54.dp)
+            )
+
+
+            Spacer(
+                modifier = Modifier.height(18.dp)
+            )
+        }
+
+
+
+        // =====================================================
+        // SELECT SUBJECT
+        // =====================================================
+
+        item {
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
+
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = Color(0xFFF0F2FF),
+                            shape = CircleShape
+                        )
+                        .padding(7.dp)
+                ) {
+
+                    Icon(
+                        imageVector = Icons.Default.MenuBook,
+                        contentDescription = "Subject",
+                        tint = blue
+                    )
+                }
+
+
+                Spacer(
+                    modifier = Modifier.width(9.dp)
+                )
+
+
                 Text(
-                    text = buttonText,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
+                    text = "Select a Subject",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = darkText
                 )
             }
-        }
-        if (showDatePicker) {
 
-            DatePickerDialog(
-                onDismissRequest = { showDatePicker = false },
 
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            datePickerState.selectedDateMillis?.let { milliseconds ->
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
 
-                                val formatter = SimpleDateFormat(
-                                    "dd MMM yyyy",
-                                    Locale.getDefault()
-                                )
 
-                                selectedDate = formatter.format(
-                                    Date(milliseconds)
-                                )
-                            }
-
-                            showDatePicker = false
-                        }
-                    ) {
-                        Text(
-                            text = "OK",
-                            color = blue
-                        )
-                    }
-                },
-
-                dismissButton = {
-                    TextButton(
-                        onClick = { showDatePicker = false }
-                    ) {
-                        Text("Cancel")
-                    }
+            ExposedDropdownMenuBox(
+                expanded = subjectMenuExpended,
+                onExpandedChange = {
+                    subjectMenuExpended =
+                        !subjectMenuExpended
                 }
             ) {
-                DatePicker(
-                    state = datePickerState
+
+                OutlinedTextField(
+                    value = selectedSubject,
+                    onValueChange = {},
+                    readOnly = true,
+                    placeholder = {
+
+                        Text(
+                            text = "Select a subject",
+                            fontSize = 13.sp,
+                            color = greyText
+                        )
+                    },
+                    trailingIcon = {
+
+                        ExposedDropdownMenuDefaults.TrailingIcon(
+                            expanded = subjectMenuExpended
+                        )
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = blue,
+                        unfocusedBorderColor = Color(0xFFD6D9E2),
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
+                    ),
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                        .height(54.dp)
+                )
+
+
+                ExposedDropdownMenu(
+                    expanded = subjectMenuExpended,
+                    onDismissRequest = {
+                        subjectMenuExpended = false
+                    }
+                ) {
+
+                    subjectList.forEach { subject ->
+
+                        DropdownMenuItem(
+                            text = {
+
+                                Text(
+                                    text = subject,
+                                    fontSize = 13.sp
+                                )
+                            },
+                            onClick = {
+
+                                selectedSubject = subject
+
+                                subjectMenuExpended = false
+                            }
+                        )
+                    }
+
+
+                    // Add New Subject option
+                    DropdownMenuItem(
+                        text = {
+
+                            Text(
+                                text = "+ Add New Subject",
+                                fontSize = 13.sp,
+                                color = blue,
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
+                        onClick = {
+
+                            subjectMenuExpended = false
+
+                            showNewSubjectField = true
+                        }
+                    )
+                }
+            }
+        }
+
+
+
+        // =====================================================
+        // ADD NEW SUBJECT
+        // =====================================================
+
+        if (showNewSubjectField) {
+
+            item {
+
+                Spacer(
+                    modifier = Modifier.height(8.dp)
+                )
+
+
+                OutlinedTextField(
+                    value = newSubject,
+                    onValueChange = {
+                        newSubject = it
+                    },
+                    label = {
+
+                        Text(
+                            text = "New Subject",
+                            fontSize = 12.sp
+                        )
+                    },
+                    placeholder = {
+
+                        Text(
+                            text = "Eg. Software Engineering",
+                            fontSize = 12.sp
+                        )
+                    },
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = blue,
+                        unfocusedBorderColor = Color(0xFFD6D9E2),
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp)
+                )
+
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+
+                    TextButton(
+                        onClick = {
+
+                            showNewSubjectField = false
+
+                            newSubject = ""
+                        }
+                    ) {
+
+                        Text(
+                            text = "Cancel",
+                            fontSize = 12.sp,
+                            color = greyText
+                        )
+                    }
+
+
+                    TextButton(
+                        enabled = newSubject.isNotBlank(),
+                        onClick = {
+
+                            val subject =
+                                newSubject.trim()
+
+
+                            if (!subjectList.contains(subject)) {
+
+                                subjectList.add(subject)
+                            }
+
+
+                            selectedSubject = subject
+
+                            newSubject = ""
+
+                            showNewSubjectField = false
+                        }
+                    ) {
+
+                        Text(
+                            text = "Save Subject",
+                            fontSize = 12.sp,
+                            color = blue,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+        }
+
+
+
+        item {
+
+            Spacer(
+                modifier = Modifier.height(18.dp)
+            )
+        }
+
+
+
+        // =====================================================
+        // SELECT DIFFICULTY LEVEL
+        // =====================================================
+
+        item {
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = Color(0xFFE8F8F0),
+                            shape = CircleShape
+                        )
+                        .padding(7.dp)
+                ) {
+
+                    Icon(
+                        imageVector = Icons.Default.BarChart,
+                        contentDescription = "Difficulty",
+                        tint = Color(0xFF27B56E)
+                    )
+                }
+
+
+                Spacer(
+                    modifier = Modifier.width(9.dp)
+                )
+
+
+                Text(
+                    text = "Select Difficulty Level",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = darkText
                 )
             }
+
+
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
+
+
+            ExposedDropdownMenuBox(
+                expanded = difficultyMenuExpended,
+                onExpandedChange = {
+                    difficultyMenuExpended =
+                        !difficultyMenuExpended
+                }
+            ) {
+
+                OutlinedTextField(
+                    value = selectedDifficulty,
+                    onValueChange = {},
+                    readOnly = true,
+                    placeholder = {
+
+                        Text(
+                            text = "Select difficulty level",
+                            fontSize = 13.sp,
+                            color = greyText
+                        )
+                    },
+                    trailingIcon = {
+
+                        ExposedDropdownMenuDefaults.TrailingIcon(
+                            expanded = difficultyMenuExpended
+                        )
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = blue,
+                        unfocusedBorderColor = Color(0xFFD6D9E2),
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
+                    ),
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                        .height(54.dp)
+                )
+
+
+                ExposedDropdownMenu(
+                    expanded = difficultyMenuExpended,
+                    onDismissRequest = {
+                        difficultyMenuExpended = false
+                    }
+                ) {
+
+                    difficultyList.forEach { difficulty ->
+
+                        DropdownMenuItem(
+                            text = {
+
+                                Text(
+                                    text = difficulty,
+                                    fontSize = 13.sp
+                                )
+                            },
+                            onClick = {
+
+                                selectedDifficulty = difficulty
+
+                                difficultyMenuExpended = false
+                            }
+                        )
+                    }
+                }
+            }
+
+
+            Spacer(
+                modifier = Modifier.height(18.dp)
+            )
+        }
+
+
+
+        // =====================================================
+        // SELECT DUE DATE
+        // =====================================================
+
+        item {
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = Color(0xFFFFF3E8),
+                            shape = CircleShape
+                        )
+                        .padding(7.dp)
+                ) {
+
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = "Due Date",
+                        tint = Color(0xFFFF8A3D)
+                    )
+                }
+
+
+                Spacer(
+                    modifier = Modifier.width(9.dp)
+                )
+
+
+                Text(
+                    text = "Select Due Date",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = darkText
+                )
+            }
+
+
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
+
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        showDatePicker = true
+                    }
+            ) {
+
+                OutlinedTextField(
+                    value = selectedDate,
+                    onValueChange = {},
+                    readOnly = true,
+                    enabled = false,
+                    placeholder = {
+
+                        Text(
+                            text = "Select due date",
+                            fontSize = 13.sp,
+                            color = greyText
+                        )
+                    },
+                    trailingIcon = {
+
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = "Select Date",
+                            tint = blue
+                        )
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        disabledBorderColor = Color(0xFFD6D9E2),
+                        disabledContainerColor = Color.White,
+                        disabledTextColor = darkText,
+                        disabledPlaceholderColor = greyText,
+                        disabledTrailingIconColor = blue
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(54.dp)
+                )
+            }
+
+
+            Spacer(
+                modifier = Modifier.height(24.dp)
+            )
+        }
+
+
+
+        // =====================================================
+        // CANCEL + ADD BUTTON
+        // =====================================================
+
+        item {
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement =
+                    Arrangement.spacedBy(10.dp)
+            ) {
+
+
+                OutlinedButton(
+                    onClick = onCancelClick,
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp)
+                ) {
+
+                    Text(
+                        text = "Cancel",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = darkText
+                    )
+                }
+
+
+
+                Button(
+                    onClick = {
+
+                        onAddClick(
+                            assignmentTitle.trim(),
+                            selectedSubject,
+                            selectedDifficulty,
+                            selectedDate
+                        )
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = blue,
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp)
+                ) {
+
+                    Text(
+                        text = buttonText,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+
+            Spacer(
+                modifier = Modifier.height(16.dp)
+            )
         }
     }
 
+
+
+    // =====================================================
+    // DATE PICKER
+    // =====================================================
+
+    if (showDatePicker) {
+
+        DatePickerDialog(
+            onDismissRequest = {
+                showDatePicker = false
+            },
+
+            confirmButton = {
+
+                TextButton(
+                    onClick = {
+
+                        datePickerState
+                            .selectedDateMillis
+                            ?.let { milliseconds ->
+
+                                val formatter =
+                                    SimpleDateFormat(
+                                        "dd MMM yyyy",
+                                        Locale.getDefault()
+                                    )
+
+
+                                selectedDate =
+                                    formatter.format(
+                                        Date(milliseconds)
+                                    )
+                            }
+
+
+                        showDatePicker = false
+                    }
+                ) {
+
+                    Text(
+                        text = "OK",
+                        color = blue
+                    )
+                }
+            },
+
+            dismissButton = {
+
+                TextButton(
+                    onClick = {
+                        showDatePicker = false
+                    }
+                ) {
+
+                    Text(
+                        text = "Cancel"
+                    )
+                }
+            }
+        ) {
+
+            DatePicker(
+                state = datePickerState
+            )
+        }
+    }
 }

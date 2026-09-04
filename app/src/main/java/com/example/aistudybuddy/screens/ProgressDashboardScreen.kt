@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -47,8 +49,12 @@ fun ProgressDashboardScreen(
 
     val completedMinutes = StudyProgress.getThisWeekMinutes()
 
+
     Scaffold(
+        containerColor = Color.White,
+
         bottomBar = {
+
             BottomNavigationBar(
                 selectedItem = "Progress",
                 onHomeClick = onHomeClick,
@@ -58,41 +64,64 @@ fun ProgressDashboardScreen(
                 onProfileClick = onProfileClick,
             )
         }
+
     ) { innerPadding ->
 
-        Column(
+
+        // =====================================================
+        // SCROLLABLE SCREEN CONTENT
+        // =====================================================
+
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
                 .background(Color.White)
+                .padding(innerPadding),
+
+            contentPadding = PaddingValues(
+                bottom = 16.dp
+            )
         ) {
 
-            AppHeader()
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
-            ) {
+            // =====================================================
+            // TITLE
+            // =====================================================
 
-                // TITLE
+            item {
 
                 Text(
                     text = "Progress Dashboard",
-                    fontSize = 17.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF252838)
+                    color = Color(0xFF252838),
+                    modifier = Modifier.padding(
+                        start = 16.dp,
+                        end = 16.dp,
+                        top = 16.dp
+                    )
                 )
+
 
                 Spacer(
                     modifier = Modifier.height(14.dp)
                 )
+            }
 
 
-                // STATISTICS CARDS
+            // =====================================================
+            // STATISTICS CARDS - FIRST ROW
+            // =====================================================
+
+            item {
 
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            start = 16.dp,
+                            end = 16.dp
+                        ),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
 
@@ -106,6 +135,7 @@ fun ProgressDashboardScreen(
                         iconColor = Color(0xFF4169E1)
                     )
 
+
                     ProgressStatCard(
                         modifier = Modifier.weight(1f),
                         icon = Icons.Default.CheckCircle,
@@ -117,12 +147,26 @@ fun ProgressDashboardScreen(
                     )
                 }
 
+
                 Spacer(
                     modifier = Modifier.height(10.dp)
                 )
+            }
+
+
+            // =====================================================
+            // STATISTICS CARDS - SECOND ROW
+            // =====================================================
+
+            item {
 
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            start = 16.dp,
+                            end = 16.dp
+                        ),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
 
@@ -130,10 +174,12 @@ fun ProgressDashboardScreen(
                         modifier = Modifier.weight(1f),
                         icon = Icons.Default.FlashOn,
                         title = "Study Streak",
-                        value = "${StudyProgress.getStudyStreak()} Days",                        subtitle = "Keep it up!",
+                        value = "${StudyProgress.getStudyStreak()} Days",
+                        subtitle = "Keep it up!",
                         cardBackground = Color(0xFFF6F0FF),
                         iconColor = Color(0xFF8755D6)
                     )
+
 
                     ProgressStatCard(
                         modifier = Modifier.weight(1f),
@@ -146,23 +192,55 @@ fun ProgressDashboardScreen(
                     )
                 }
 
+
                 Spacer(
                     modifier = Modifier.height(16.dp)
                 )
+            }
 
 
-                // WEEKLY STUDY HOURS
+            // =====================================================
+            // WEEKLY STUDY HOURS
+            // =====================================================
 
-                WeeklyStudyHoursCard()
+            item {
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            start = 16.dp,
+                            end = 16.dp
+                        )
+                ) {
+
+                    WeeklyStudyHoursCard()
+                }
+
 
                 Spacer(
                     modifier = Modifier.height(18.dp)
                 )
+            }
 
 
-                // RECENT ACTIVITY
+            // =====================================================
+            // RECENT ACTIVITY
+            // =====================================================
 
-                RecentActivityCard()
+            item {
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            start = 16.dp,
+                            end = 16.dp
+                        )
+                ) {
+
+                    RecentActivityCard()
+                }
             }
         }
     }
@@ -217,9 +295,11 @@ fun ProgressStatCard(
                     modifier = Modifier.size(15.dp)
                 )
 
+
                 Spacer(
                     modifier = Modifier.width(5.dp)
                 )
+
 
                 Text(
                     text = title,
@@ -229,9 +309,11 @@ fun ProgressStatCard(
                 )
             }
 
+
             Spacer(
                 modifier = Modifier.height(9.dp)
             )
+
 
             Text(
                 text = value,
@@ -241,9 +323,11 @@ fun ProgressStatCard(
                 modifier = Modifier.padding(start = 4.dp)
             )
 
+
             Spacer(
                 modifier = Modifier.height(5.dp)
             )
+
 
             Text(
                 text = subtitle,
@@ -265,9 +349,12 @@ fun WeeklyStudyHoursCard() {
 
     val dailyMinutes = StudyProgress.getDailyStudyMinutes()
 
+
     val hours = dailyMinutes.map { minutes ->
+
         minutes / 60f
     }
+
 
     val days = listOf(
         "Mon",
@@ -278,6 +365,7 @@ fun WeeklyStudyHoursCard() {
         "Sat",
         "Sun"
     )
+
 
     Column(
         modifier = Modifier
@@ -302,9 +390,11 @@ fun WeeklyStudyHoursCard() {
             color = Color(0xFF30323D)
         )
 
+
         Spacer(
             modifier = Modifier.height(5.dp)
         )
+
 
         Row(
             modifier = Modifier
@@ -326,11 +416,13 @@ fun WeeklyStudyHoursCard() {
                     color = Color(0xFF777983)
                 )
 
+
                 Text(
                     text = "3h",
                     fontSize = 7.sp,
                     color = Color(0xFF777983)
                 )
+
 
                 Text(
                     text = "2h",
@@ -338,11 +430,13 @@ fun WeeklyStudyHoursCard() {
                     color = Color(0xFF777983)
                 )
 
+
                 Text(
                     text = "1h",
                     fontSize = 7.sp,
                     color = Color(0xFF777983)
                 )
+
 
                 Text(
                     text = "0",
@@ -350,6 +444,7 @@ fun WeeklyStudyHoursCard() {
                     color = Color(0xFF777983)
                 )
             }
+
 
             Row(
                 modifier = Modifier
@@ -379,9 +474,11 @@ fun WeeklyStudyHoursCard() {
                                 )
                         )
 
+
                         Spacer(
                             modifier = Modifier.height(3.dp)
                         )
+
 
                         Text(
                             text = days[index],
@@ -404,6 +501,7 @@ fun WeeklyStudyHoursCard() {
 fun RecentActivityCard() {
 
     val activities = StudyProgress.completedStudySessions
+
 
     Column(
         modifier = Modifier
@@ -433,6 +531,7 @@ fun RecentActivityCard() {
                 color = Color(0xFF30323D)
             )
 
+
             Text(
                 text = "View All",
                 fontSize = 9.sp,
@@ -441,9 +540,11 @@ fun RecentActivityCard() {
             )
         }
 
+
         Spacer(
             modifier = Modifier.height(10.dp)
         )
+
 
         if (activities.isEmpty()) {
 
@@ -481,9 +582,11 @@ fun RecentActivityCard() {
                         )
                     }
 
+
                     Spacer(
                         modifier = Modifier.width(9.dp)
                     )
+
 
                     Column(
                         modifier = Modifier.weight(1f)
@@ -496,9 +599,11 @@ fun RecentActivityCard() {
                             color = Color(0xFF30323D)
                         )
 
+
                         Spacer(
                             modifier = Modifier.height(2.dp)
                         )
+
 
                         Text(
                             text = "${activity.minutes} minutes • ${
@@ -509,6 +614,7 @@ fun RecentActivityCard() {
                         )
                     }
 
+
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = "Completed",
@@ -517,7 +623,9 @@ fun RecentActivityCard() {
                     )
                 }
 
+
                 if (index < activities.take(3).size - 1) {
+
                     Spacer(
                         modifier = Modifier.height(10.dp)
                     )
@@ -527,6 +635,7 @@ fun RecentActivityCard() {
     }
 }
 
+
 private fun formatActivityDateTime(
 
     dateTime: java.time.LocalDateTime
@@ -534,17 +643,23 @@ private fun formatActivityDateTime(
 ): String {
 
     val today = java.time.LocalDate.now()
+
     val date = dateTime.toLocalDate()
+
 
     val time = dateTime.toLocalTime()
         .format(
             java.time.format.DateTimeFormatter.ofPattern("h:mm a")
         )
 
+
     return when {
+
         date == today -> "Today, $time"
 
+
         date == today.minusDays(1) -> "Yesterday, $time"
+
 
         else -> dateTime.format(
             java.time.format.DateTimeFormatter.ofPattern(
@@ -554,14 +669,22 @@ private fun formatActivityDateTime(
     }
 }
 
-private fun formatStudyHours(minutes: Int): String {
+
+private fun formatStudyHours(
+    minutes: Int
+): String {
 
     val hours = minutes / 60
+
     val remainingMinutes = minutes % 60
 
+
     return if (hours > 0) {
+
         "$hours hr $remainingMinutes m"
+
     } else {
+
         "$remainingMinutes min"
     }
 }
@@ -578,5 +701,6 @@ private fun formatStudyHours(minutes: Int): String {
 )
 @Composable
 fun ProgressDashboardScreenPreview() {
+
     ProgressDashboardScreen()
 }

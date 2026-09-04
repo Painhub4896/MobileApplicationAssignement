@@ -47,37 +47,46 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+
 val NotificationPrimaryBlue = Color(0xFF4C6FFF)
 val NotificationLightBlue = Color(0xFFE8F0FE)
 val NotificationTextDark = Color(0xFF2C3E50)
 
+
 // Enum for filter categories
 enum class NotificationFilter {
     ALL,
-    UNREAD,
-    REMINDER,
-    UPDATES
+    UNREAD
 }
+
 
 data class NotificationItem(
     val icon: ImageVector,
     val title: String,
     val message: String,
     val time: String,
-    var isUnread: Boolean,  // ← Changed to var so it can be updated
+    var isUnread: Boolean,
     val iconColor: Color,
-    val iconBg: Color,
-    val category: NotificationFilter
+    val iconBg: Color
 )
 
+
 @Composable
-fun NotificationScreen(onBackClick: () -> Unit) {
+fun NotificationScreen(
+    onBackClick: () -> Unit
+) {
+
     // State for selected filter
-    var selectedFilter by remember { mutableStateOf(NotificationFilter.ALL) }
+    var selectedFilter by remember {
+        mutableStateOf(NotificationFilter.ALL)
+    }
+
 
     // Sample Data with categories - Using mutableStateListOf so we can modify items
     val allNotifications = remember {
+
         mutableStateListOf(
+
             NotificationItem(
                 icon = Icons.Outlined.Assignment,
                 title = "Assignment Reminder",
@@ -85,9 +94,9 @@ fun NotificationScreen(onBackClick: () -> Unit) {
                 time = "10.30 AM",
                 isUnread = true,
                 iconColor = NotificationPrimaryBlue,
-                iconBg = NotificationLightBlue,
-                category = NotificationFilter.REMINDER
+                iconBg = NotificationLightBlue
             ),
+
             NotificationItem(
                 icon = Icons.Outlined.AutoAwesome,
                 title = "AI Routine Is Ready",
@@ -95,9 +104,9 @@ fun NotificationScreen(onBackClick: () -> Unit) {
                 time = "9.00 AM",
                 isUnread = true,
                 iconColor = NotificationPrimaryBlue,
-                iconBg = NotificationLightBlue,
-                category = NotificationFilter.UPDATES
+                iconBg = NotificationLightBlue
             ),
+
             NotificationItem(
                 icon = Icons.Outlined.Notifications,
                 title = "Study Reminder",
@@ -105,9 +114,9 @@ fun NotificationScreen(onBackClick: () -> Unit) {
                 time = "Yesterday",
                 isUnread = true,
                 iconColor = Color(0xFF22C55E),
-                iconBg = Color(0xFFDCFCE7),
-                category = NotificationFilter.REMINDER
+                iconBg = Color(0xFFDCFCE7)
             ),
+
             NotificationItem(
                 icon = Icons.Outlined.EmojiEvents,
                 title = "Focus Session Complete",
@@ -115,9 +124,9 @@ fun NotificationScreen(onBackClick: () -> Unit) {
                 time = "Yesterday",
                 isUnread = false,
                 iconColor = Color(0xFFF59E0B),
-                iconBg = Color(0xFFFEF3C7),
-                category = NotificationFilter.UPDATES
+                iconBg = Color(0xFFFEF3C7)
             ),
+
             NotificationItem(
                 icon = Icons.Outlined.CalendarMonth,
                 title = "Upcoming Exam",
@@ -125,9 +134,9 @@ fun NotificationScreen(onBackClick: () -> Unit) {
                 time = "14 Sep",
                 isUnread = false,
                 iconColor = Color(0xFFEF4444),
-                iconBg = Color(0xFFFEE2E2),
-                category = NotificationFilter.REMINDER
+                iconBg = Color(0xFFFEE2E2)
             ),
+
             NotificationItem(
                 icon = Icons.Outlined.BarChart,
                 title = "Weekly Progress",
@@ -135,61 +144,106 @@ fun NotificationScreen(onBackClick: () -> Unit) {
                 time = "30 Aug",
                 isUnread = false,
                 iconColor = Color(0xFF10B981),
-                iconBg = Color(0xFFD1FAE5),
-                category = NotificationFilter.UPDATES
+                iconBg = Color(0xFFD1FAE5)
             )
         )
     }
 
+
     // Filter notifications based on selected filter
     val filteredNotifications = when (selectedFilter) {
-        NotificationFilter.ALL -> allNotifications
-        NotificationFilter.UNREAD -> allNotifications.filter { it.isUnread }
-        NotificationFilter.REMINDER -> allNotifications.filter { it.category == NotificationFilter.REMINDER }
-        NotificationFilter.UPDATES -> allNotifications.filter { it.category == NotificationFilter.UPDATES }
+
+        NotificationFilter.ALL ->
+            allNotifications
+
+        NotificationFilter.UNREAD ->
+            allNotifications.filter {
+                it.isUnread
+            }
     }
 
+
     Scaffold(
-        containerColor = Color.White,
+        containerColor = Color.White
     ) { padding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .background(Color.White)
+                .padding(padding)
         ) {
-            // Top Header
+
+
+            // =====================================================
+            // TOP HEADER
+            // =====================================================
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(48.dp)
+                    .padding(
+                        start = 8.dp,
+                        end = 16.dp,
+                        top = 8.dp,
+                        bottom = 8.dp
+                    )
+                    .height(42.dp)
             ) {
+
                 IconButton(
                     onClick = onBackClick,
-                    modifier = Modifier.align(Alignment.CenterStart)
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .size(42.dp)
                 ) {
+
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back"
+                        contentDescription = "Back",
+                        modifier = Modifier.size(22.dp)
                     )
                 }
+
+
                 Text(
                     text = "Notification",
-                    fontSize = 24.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
+                    color = NotificationTextDark,
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
 
-            // Filter Tabs
+
+            // =====================================================
+            // FILTER TABS
+            // =====================================================
+
             Row(
                 modifier = Modifier
-                    .padding(horizontal = 20.dp)
+                    .padding(
+                        start = 16.dp,
+                        end = 16.dp
+                    )
                     .fillMaxWidth()
             ) {
+
+
+                // All
                 FilterChip(
                     selected = selectedFilter == NotificationFilter.ALL,
-                    onClick = { selectedFilter = NotificationFilter.ALL },
-                    label = { Text("All", fontSize = 10.sp, fontWeight = FontWeight.Bold) },
+                    onClick = {
+                        selectedFilter = NotificationFilter.ALL
+                    },
+                    label = {
+
+                        Text(
+                            text = "All",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     colors = FilterChipDefaults.filterChipColors(
                         selectedContainerColor = NotificationPrimaryBlue,
                         selectedLabelColor = Color.White,
@@ -198,40 +252,26 @@ fun NotificationScreen(onBackClick: () -> Unit) {
                     )
                 )
 
-                Spacer(modifier = Modifier.width(8.dp))
 
+                Spacer(
+                    modifier = Modifier.width(8.dp)
+                )
+
+
+                // Unread
                 FilterChip(
                     selected = selectedFilter == NotificationFilter.UNREAD,
-                    onClick = { selectedFilter = NotificationFilter.UNREAD },
-                    label = { Text("Unread", fontSize = 10.sp) },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = NotificationPrimaryBlue,
-                        selectedLabelColor = Color.White,
-                        containerColor = NotificationLightBlue,
-                        labelColor = NotificationTextDark
-                    )
-                )
+                    onClick = {
+                        selectedFilter = NotificationFilter.UNREAD
+                    },
+                    label = {
 
-                Spacer(modifier = Modifier.width(8.dp))
-
-                FilterChip(
-                    selected = selectedFilter == NotificationFilter.REMINDER,
-                    onClick = { selectedFilter = NotificationFilter.REMINDER },
-                    label = { Text("Reminder", fontSize = 10.sp) },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = NotificationPrimaryBlue,
-                        selectedLabelColor = Color.White,
-                        containerColor = NotificationLightBlue,
-                        labelColor = NotificationTextDark
-                    )
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                FilterChip(
-                    selected = selectedFilter == NotificationFilter.UPDATES,
-                    onClick = { selectedFilter = NotificationFilter.UPDATES },
-                    label = { Text("Updates", fontSize = 10.sp) },
+                        Text(
+                            text = "Unread",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     colors = FilterChipDefaults.filterChipColors(
                         selectedContainerColor = NotificationPrimaryBlue,
                         selectedLabelColor = Color.White,
@@ -241,38 +281,62 @@ fun NotificationScreen(onBackClick: () -> Unit) {
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
 
-            // Notification List
+            Spacer(
+                modifier = Modifier.height(10.dp)
+            )
+
+
+            // =====================================================
+            // NOTIFICATION LIST
+            // =====================================================
+
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp)
+                contentPadding = PaddingValues(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = 6.dp,
+                    bottom = 16.dp
+                )
             ) {
+
                 if (filteredNotifications.isEmpty()) {
+
                     item {
+
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(50.dp),
+                                .padding(40.dp),
                             contentAlignment = Alignment.Center
                         ) {
+
                             Text(
-                                text = "No notifications in this category",
-                                fontSize = 16.sp,
+                                text = "No unread notifications",
+                                fontSize = 12.sp,
                                 color = Color.Gray
                             )
                         }
                     }
+
                 } else {
+
                     items(filteredNotifications) { notification ->
+
                         NotificationItemRow(
                             item = notification,
                             onItemClick = {
+
                                 // Mark as read when clicked
                                 notification.isUnread = false
                             }
                         )
-                        Spacer(modifier = Modifier.height(20.dp))
+
+
+                        Spacer(
+                            modifier = Modifier.height(14.dp)
+                        )
                     }
                 }
             }
@@ -280,70 +344,114 @@ fun NotificationScreen(onBackClick: () -> Unit) {
     }
 }
 
+
+// =====================================================
+// NOTIFICATION ITEM
+// =====================================================
+
 @Composable
 fun NotificationItemRow(
     item: NotificationItem,
     onItemClick: () -> Unit
 ) {
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onItemClick() },  // ← Click to mark as read
+            .clickable {
+                onItemClick()
+            },
         verticalAlignment = Alignment.Top
     ) {
+
+
         Box(
             modifier = Modifier
-                .size(48.dp)
-                .clip(RoundedCornerShape(12.dp))
+                .size(42.dp)
+                .clip(
+                    RoundedCornerShape(10.dp)
+                )
                 .background(item.iconBg),
             contentAlignment = Alignment.Center
         ) {
+
             Icon(
                 imageVector = item.icon,
                 contentDescription = null,
                 tint = item.iconColor,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(21.dp)
             )
         }
 
-        Spacer(modifier = Modifier.width(16.dp))
+
+        Spacer(
+            modifier = Modifier.width(12.dp)
+        )
+
 
         // Content
         Column(
             modifier = Modifier.weight(1f)
         ) {
+
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
                 Text(
                     text = item.title,
-                    fontSize = 16.sp,
-                    fontWeight = if (item.isUnread) FontWeight.Bold else FontWeight.Normal,
+                    fontSize = 14.sp,
+                    fontWeight =
+                        if (item.isUnread) {
+                            FontWeight.Bold
+                        } else {
+                            FontWeight.Normal
+                        },
                     color = NotificationTextDark,
                     modifier = Modifier.weight(1f)
                 )
+
+
+                Spacer(
+                    modifier = Modifier.width(8.dp)
+                )
+
+
                 Text(
                     text = item.time,
-                    fontSize = 12.sp,
+                    fontSize = 10.sp,
                     color = Color.Gray
                 )
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
+
+            Spacer(
+                modifier = Modifier.height(3.dp)
+            )
+
 
             Text(
                 text = item.message,
-                fontSize = 14.sp,
+                fontSize = 12.sp,
                 color = Color.Gray
             )
 
+
             // Blue dot - only shows if unread
             if (item.isUnread) {
-                Spacer(modifier = Modifier.height(8.dp))
+
+                Spacer(
+                    modifier = Modifier.height(6.dp)
+                )
+
+
                 Box(
                     modifier = Modifier
-                        .size(8.dp)
-                        .background(NotificationPrimaryBlue, CircleShape)
+                        .size(6.dp)
+                        .background(
+                            NotificationPrimaryBlue,
+                            CircleShape
+                        )
                 )
             }
         }

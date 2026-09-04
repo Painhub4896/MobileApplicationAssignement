@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.SmartToy
@@ -34,6 +35,7 @@ fun AppHeader(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
+            .statusBarsPadding()
             .padding(
                 start = 16.dp,
                 end = 8.dp,
@@ -50,7 +52,8 @@ fun AppHeader(
 
             // AI robot icon
             Image(
-                painter = painterResource(R.drawable.ic_launcher_foreground),                contentDescription = "AI StudyBuddy",
+                painter = painterResource(R.drawable.ic_launcher_foreground),
+                contentDescription = "AI StudyBuddy",
                 modifier = Modifier.size(24.dp)
             )
 
@@ -73,6 +76,7 @@ fun AppHeader(
         IconButton(
             onClick = onClickNotification
         ) {
+
             Icon(
                 imageVector = Icons.Default.Notifications,
                 contentDescription = "Notification",

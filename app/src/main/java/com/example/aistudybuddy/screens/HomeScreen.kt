@@ -120,6 +120,7 @@ fun HomeScreen(
     )
 
     Scaffold(
+        containerColor = Color(0xFFF5F5F5),
         topBar = {
             AppHeader(onNotificationClick)
         },
@@ -137,11 +138,12 @@ fun HomeScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .background(Color(0xFFF5F5F5)),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .background(Color(0xFFF5F5F5))
+                .padding(paddingValues),
+            contentPadding = PaddingValues(12.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
+
             // ==================== GREETING CARD ====================
             item {
                 Card(
@@ -149,44 +151,46 @@ fun HomeScreen(
                     colors = CardDefaults.cardColors(
                         containerColor = Color.White
                     ),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(10.dp)
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
                             Icons.Default.Person,
                             contentDescription = "Profile Picture",
                             modifier = Modifier
-                                .size(60.dp)
+                                .size(48.dp)
                                 .clip(CircleShape)
                                 .background(Color(0xFFE8E8E8)),
                             tint = Color(0xFF6C63FF)
                         )
 
-                        Spacer(modifier = Modifier.width(16.dp))
+                        Spacer(modifier = Modifier.width(12.dp))
 
                         Column(
                             verticalArrangement = Arrangement.Center
                         ) {
                             Text(
                                 "Hi Alex!",
-                                fontSize = 22.sp,
+                                fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.Black
                             )
+
                             Text(
                                 "Let's make Today Productive 👋",
-                                fontSize = 14.sp,
+                                fontSize = 12.sp,
                                 color = Color.Gray
                             )
                         }
                     }
                 }
             }
+
 
             // ==================== TODAY'S SCHEDULE ====================
             item {
@@ -195,18 +199,20 @@ fun HomeScreen(
                     colors = CardDefaults.cardColors(
                         containerColor = Color.White
                     ),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(10.dp)
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
+                            .padding(12.dp)
                     ) {
+
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
@@ -214,51 +220,63 @@ fun HomeScreen(
                                     Icons.Default.Today,
                                     contentDescription = "Today",
                                     tint = Color(0xFF4C6FFF),
-                                    modifier = Modifier.size(20.dp)
+                                    modifier = Modifier.size(18.dp)
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Spacer(modifier = Modifier.width(6.dp))
+
                                 Text(
                                     text = "Today's Schedule",
-                                    fontSize = 16.sp,
+                                    fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color(0xFF252838)
                                 )
                             }
+
                             Box(
                                 modifier = Modifier
                                     .background(
                                         Color(0xFF4C6FFF),
-                                        RoundedCornerShape(8.dp)
+                                        RoundedCornerShape(7.dp)
                                     )
-                                    .padding(horizontal = 10.dp, vertical = 4.dp)
+                                    .padding(
+                                        horizontal = 8.dp,
+                                        vertical = 3.dp
+                                    )
                             ) {
                                 Text(
                                     text = "${todaySessions.size} classes",
-                                    fontSize = 10.sp,
+                                    fontSize = 9.sp,
                                     color = Color.White,
                                     fontWeight = FontWeight.Medium
                                 )
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(9.dp))
 
                         if (todaySessions.isEmpty()) {
+
                             Text(
                                 "No classes scheduled for today 📚",
-                                fontSize = 14.sp,
+                                fontSize = 12.sp,
                                 color = Color.Gray,
-                                modifier = Modifier.padding(vertical = 12.dp)
+                                modifier = Modifier.padding(vertical = 10.dp)
                             )
+
                         } else {
+
                             todaySessions.forEach { session ->
+
                                 StudySessionCard(session = session)
-                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Spacer(modifier = Modifier.height(6.dp))
                             }
                         }
                     }
                 }
             }
+
 
             // ==================== CALENDAR CARD ====================
             item {
@@ -267,69 +285,83 @@ fun HomeScreen(
                     colors = CardDefaults.cardColors(
                         containerColor = Color.White
                     ),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(10.dp)
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
+                            .padding(12.dp)
                     ) {
+
                         // Month/Year Header with Navigation
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+
                             Text(
                                 text = currentMonth.value.format(
                                     DateTimeFormatter.ofPattern("MMMM yyyy")
                                 ),
-                                fontSize = 16.sp,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFF252838)
                             )
 
                             Row {
+
                                 IconButton(
                                     onClick = {
                                         currentMonth.value = currentMonth.value.minusMonths(1)
                                     },
-                                    modifier = Modifier.size(28.dp)
+                                    modifier = Modifier.size(26.dp)
                                 ) {
                                     Icon(
                                         Icons.Default.ChevronLeft,
                                         contentDescription = "Previous Month",
                                         tint = Color(0xFF252838),
-                                        modifier = Modifier.size(20.dp)
+                                        modifier = Modifier.size(18.dp)
                                     )
                                 }
+
                                 IconButton(
                                     onClick = {
                                         currentMonth.value = currentMonth.value.plusMonths(1)
                                     },
-                                    modifier = Modifier.size(28.dp)
+                                    modifier = Modifier.size(26.dp)
                                 ) {
                                     Icon(
                                         Icons.Default.ChevronRight,
                                         contentDescription = "Next Month",
                                         tint = Color(0xFF252838),
-                                        modifier = Modifier.size(20.dp)
+                                        modifier = Modifier.size(18.dp)
                                     )
                                 }
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
+
 
                         // Day Headers
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat").forEach { day ->
+                            listOf(
+                                "Sun",
+                                "Mon",
+                                "Tue",
+                                "Wed",
+                                "Thu",
+                                "Fri",
+                                "Sat"
+                            ).forEach { day ->
+
                                 Text(
                                     text = day,
-                                    fontSize = 10.sp,
+                                    fontSize = 9.sp,
                                     fontWeight = FontWeight.Medium,
                                     color = Color.Gray,
                                     modifier = Modifier.weight(1f),
@@ -338,7 +370,8 @@ fun HomeScreen(
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(6.dp))
+                        Spacer(modifier = Modifier.height(5.dp))
+
 
                         // Calendar Grid
                         val firstDayOfMonth = currentMonth.value.withDayOfMonth(1)
@@ -346,19 +379,26 @@ fun HomeScreen(
                         val startingDayOfWeek = firstDayOfMonth.dayOfWeek.value % 7
 
                         var dayCounter = 1
+
                         for (week in 0..5) {
+
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
+
                                 for (dayOfWeek in 0..6) {
-                                    val dayNumber = if (week == 0 && dayOfWeek < startingDayOfWeek) {
-                                        null
-                                    } else if (dayCounter > daysInMonth) {
-                                        null
-                                    } else {
-                                        dayCounter
-                                    }
+
+                                    val dayNumber =
+                                        if (week == 0 && dayOfWeek < startingDayOfWeek) {
+                                            null
+
+                                        } else if (dayCounter > daysInMonth) {
+                                            null
+
+                                        } else {
+                                            dayCounter
+                                        }
 
                                     val isToday = dayNumber != null &&
                                             dayNumber == today.dayOfMonth &&
@@ -373,13 +413,15 @@ fun HomeScreen(
                                     Box(
                                         modifier = Modifier
                                             .weight(1f)
-                                            .padding(2.dp),
+                                            .padding(1.dp),
                                         contentAlignment = Alignment.Center
                                     ) {
+
                                         if (dayNumber != null) {
+
                                             Box(
                                                 modifier = Modifier
-                                                    .size(28.dp)
+                                                    .size(25.dp)
                                                     .clip(CircleShape)
                                                     .background(
                                                         when {
@@ -390,10 +432,16 @@ fun HomeScreen(
                                                     ),
                                                 contentAlignment = Alignment.Center
                                             ) {
+
                                                 Text(
                                                     text = dayNumber.toString(),
-                                                    fontSize = 11.sp,
-                                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                                    fontSize = 10.sp,
+                                                    fontWeight =
+                                                        if (isSelected) {
+                                                            FontWeight.Bold
+                                                        } else {
+                                                            FontWeight.Normal
+                                                        },
                                                     color = when {
                                                         isSelected -> Color.White
                                                         isToday -> Color(0xFFFF3D8D)
@@ -401,21 +449,27 @@ fun HomeScreen(
                                                     }
                                                 )
                                             }
+
                                         } else {
+
                                             Text(
                                                 text = "",
-                                                fontSize = 11.sp,
-                                                modifier = Modifier.size(28.dp)
+                                                fontSize = 10.sp,
+                                                modifier = Modifier.size(25.dp)
                                             )
                                         }
                                     }
-                                    if (dayNumber != null) dayCounter++
+
+                                    if (dayNumber != null) {
+                                        dayCounter++
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+
 
             // ==================== UPCOMING ASSIGNMENT ====================
             item {
@@ -424,99 +478,116 @@ fun HomeScreen(
                     colors = CardDefaults.cardColors(
                         containerColor = Color.White
                     ),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(10.dp)
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
+                            .padding(12.dp)
                     ) {
+
                         Text(
                             "Upcoming Assignment",
-                            fontSize = 12.sp,
+                            fontSize = 10.sp,
                             color = Color.Gray
                         )
+
                         Text(
                             "Database Project",
-                            fontSize = 18.sp,
+                            fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.Black
                         )
+
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+
                                 Icon(
                                     Icons.Default.Assignment,
                                     contentDescription = "Due Date",
-                                    modifier = Modifier.size(14.dp),
+                                    modifier = Modifier.size(13.dp),
                                     tint = Color.Red
                                 )
+
                                 Spacer(modifier = Modifier.width(4.dp))
+
                                 Text(
                                     "Due in 3 days - May 25, 2025",
-                                    fontSize = 13.sp,
+                                    fontSize = 11.sp,
                                     color = Color.Red
                                 )
                             }
+
                             Icon(
                                 Icons.Default.ChevronRight,
                                 contentDescription = "View",
-                                tint = Color.Gray
+                                tint = Color.Gray,
+                                modifier = Modifier.size(18.dp)
                             )
                         }
                     }
                 }
             }
 
+
             // ==================== EXAM COUNTDOWN & ASSIGNMENT REMINDER ====================
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
+
                     // Exam Countdown
                     Card(
                         modifier = Modifier.weight(1f),
                         colors = CardDefaults.cardColors(
                             containerColor = Color.White
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(10.dp)
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
+                                .padding(12.dp)
                         ) {
+
                             Text(
                                 "Exam Countdown",
-                                fontSize = 12.sp,
+                                fontSize = 10.sp,
                                 color = Color.Gray
                             )
+
                             Text(
                                 "Midterm Exams",
-                                fontSize = 15.sp,
+                                fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.Black
                             )
+
                             Text(
                                 "Jun 5 - Jun 12, 2025",
-                                fontSize = 12.sp,
+                                fontSize = 10.sp,
                                 color = Color.Gray
                             )
+
                             Spacer(modifier = Modifier.height(4.dp))
+
                             Text(
                                 "12 days left",
-                                fontSize = 14.sp,
+                                fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFF4CAF50)
                             )
                         }
                     }
+
 
                     // Assignment Reminder
                     Card(
@@ -524,28 +595,31 @@ fun HomeScreen(
                         colors = CardDefaults.cardColors(
                             containerColor = Color.White
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(10.dp)
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
+                                .padding(12.dp)
                         ) {
+
                             Text(
                                 "Assignment Reminder",
-                                fontSize = 12.sp,
+                                fontSize = 10.sp,
                                 color = Color.Gray
                             )
+
                             Text(
                                 "Database Project is due in 3 days",
-                                fontSize = 13.sp,
+                                fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color.Black,
                                 maxLines = 2
                             )
+
                             Text(
                                 "May 25, 2025",
-                                fontSize = 12.sp,
+                                fontSize = 10.sp,
                                 color = Color(0xFFFF9800)
                             )
                         }
@@ -553,35 +627,39 @@ fun HomeScreen(
                 }
             }
 
+
             // ==================== FOCUS TIMER BUTTON ====================
             item {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp),
+                        .padding(vertical = 2.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = Color(0xFF4C6FFF)
                     ),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(10.dp),
                     onClick = onTimerClick
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(13.dp),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+
                         Icon(
                             Icons.Default.Today,
                             contentDescription = "Focus Timer",
                             tint = Color.White,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Spacer(modifier = Modifier.width(6.dp))
+
                         Text(
                             "Start Focus Timer",
-                            fontSize = 16.sp,
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
@@ -589,41 +667,46 @@ fun HomeScreen(
                 }
             }
 
+
             // ==================== STUDY NOTES BUTTON ====================
             item {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp),
+                        .padding(vertical = 2.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFF7C3AED)  // Purple color
+                        containerColor = Color(0xFF7C3AED)
                     ),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(10.dp),
                     onClick = onStudyNotesClick
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(13.dp),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+
                         Icon(
                             Icons.Default.School,
                             contentDescription = "Study Notes",
                             tint = Color.White,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Spacer(modifier = Modifier.width(6.dp))
+
                         Text(
                             "Study Notes",
-                            fontSize = 16.sp,
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
                     }
                 }
             }
+
 
             // ==================== WEEKLY PROGRESS ====================
             item {
@@ -632,31 +715,36 @@ fun HomeScreen(
                     colors = CardDefaults.cardColors(
                         containerColor = Color.White
                     ),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(10.dp)
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+
                         Icon(
                             Icons.Default.StackedBarChart,
                             contentDescription = "Progress",
                             tint = Color(0xFF4C6FFF),
-                            modifier = Modifier.size(28.dp)
+                            modifier = Modifier.size(24.dp)
                         )
-                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Spacer(modifier = Modifier.width(10.dp))
+
                         Column {
+
                             Text(
                                 "Weekly Progress",
-                                fontSize = 14.sp,
+                                fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color.Black
                             )
+
                             Text(
                                 "You've improved 20% in problem solving this week! 🎉",
-                                fontSize = 13.sp,
+                                fontSize = 11.sp,
                                 color = Color.Gray
                             )
                         }
@@ -667,61 +755,70 @@ fun HomeScreen(
     }
 }
 
+
 // ==================== STUDY SESSION CARD ====================
 @Composable
-fun StudySessionCard(session: StudySessionItem) {
+fun StudySessionCard(
+    session: StudySessionItem
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = session.cardColor
         ),
-        shape = RoundedCornerShape(10.dp)
+        shape = RoundedCornerShape(8.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(9.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+
             // Icon
             Box(
                 modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(10.dp))
+                    .size(34.dp)
+                    .clip(RoundedCornerShape(8.dp))
                     .background(session.iconBg),
                 contentAlignment = Alignment.Center
             ) {
+
                 Icon(
                     imageVector = session.icon,
                     contentDescription = null,
                     tint = session.iconColor,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(18.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(9.dp))
+
 
             // Content
             Column(
                 modifier = Modifier.weight(1f)
             ) {
+
                 Text(
                     text = session.title,
-                    fontSize = 14.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = session.textColor
                 )
+
                 Text(
                     text = session.time,
-                    fontSize = 12.sp,
+                    fontSize = 10.sp,
                     color = Color.Gray
                 )
             }
 
+
             // Arrow indicator
             Text(
                 text = "→",
-                fontSize = 14.sp,
+                fontSize = 13.sp,
                 color = Color.Gray
             )
         }
