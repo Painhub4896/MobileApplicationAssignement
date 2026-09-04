@@ -1165,6 +1165,11 @@ fun StudyNotesScreen(
                                 uri.toString()
                         )
                     )
+
+                    StudyProgress.addRecentActivity(
+                        title = "PDF Note Added",
+                        description = finalName
+                    )
                 }
 
 

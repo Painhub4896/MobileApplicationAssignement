@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.material.icons.filled.PictureAsPdf
 import com.example.aistudybuddy.components.BottomNavigationBar
 
 
@@ -694,7 +695,7 @@ fun WeeklyStudyHoursCard() {
 fun RecentActivityCard() {
 
     val activities =
-        StudyProgress.completedStudySessions
+        StudyProgress.recentActivities
 
 
     Column(
@@ -714,55 +715,35 @@ fun RecentActivityCard() {
 
     ) {
 
+        // =================================================
+        // TITLE
+        // =================================================
 
-        Row(
+        Text(
 
-            modifier =
-                Modifier.fillMaxWidth(),
+            text =
+                "Recent Activity",
 
-            horizontalArrangement =
-                Arrangement.SpaceBetween,
+            fontSize =
+                13.sp,
 
-            verticalAlignment =
-                Alignment.CenterVertically
+            fontWeight =
+                FontWeight.Bold,
 
-        ) {
-
-            Text(
-
-                text =
-                    "Recent Activity",
-
-                fontSize = 13.sp,
-
-                fontWeight =
-                    FontWeight.Bold,
-
-                color =
-                    Color(0xFF30323D)
-            )
-
-
-            Text(
-
-                text =
-                    "View All",
-
-                fontSize = 9.sp,
-
-                fontWeight =
-                    FontWeight.Bold,
-
-                color =
-                    Color(0xFF4169E1)
-            )
-        }
+            color =
+                Color(0xFF30323D)
+        )
 
 
         Spacer(
-            modifier = Modifier.height(10.dp)
+            modifier =
+                Modifier.height(10.dp)
         )
 
+
+        // =================================================
+        // NO ACTIVITY
+        // =================================================
 
         if (activities.isEmpty()) {
 
@@ -771,7 +752,8 @@ fun RecentActivityCard() {
                 text =
                     "No study activity yet.",
 
-                fontSize = 10.sp,
+                fontSize =
+                    10.sp,
 
                 color =
                     Color(0xFF777983),
@@ -784,9 +766,86 @@ fun RecentActivityCard() {
 
         } else {
 
+            // Show latest 5 activities
+
             activities
-                .take(3)
+                .take(5)
                 .forEachIndexed { index, activity ->
+
+
+                    // =========================================
+                    // ACTIVITY ICON
+                    // =========================================
+
+                    val activityIcon =
+                        when {
+
+                            activity.title.contains(
+                                "Assignment",
+                                ignoreCase = true
+                            ) ->
+                                Icons.Default.Assignment
+
+
+                            activity.title.contains(
+                                "PDF",
+                                ignoreCase = true
+                            ) ->
+                                Icons.Default.PictureAsPdf
+
+
+                            else ->
+                                Icons.Default.Timer
+                        }
+
+
+                    val activityIconColor =
+                        when {
+
+                            activity.title.contains(
+                                "Assignment",
+                                ignoreCase = true
+                            ) ->
+                                Color(0xFF4169E1)
+
+
+                            activity.title.contains(
+                                "PDF",
+                                ignoreCase = true
+                            ) ->
+                                Color(0xFFD32F2F)
+
+
+                            else ->
+                                Color(0xFF59B96A)
+                        }
+
+
+                    val activityBackground =
+                        when {
+
+                            activity.title.contains(
+                                "Assignment",
+                                ignoreCase = true
+                            ) ->
+                                Color(0xFFEAF0FF)
+
+
+                            activity.title.contains(
+                                "PDF",
+                                ignoreCase = true
+                            ) ->
+                                Color(0xFFFFEEEE)
+
+
+                            else ->
+                                Color(0xFFE5F8E8)
+                        }
+
+
+                    // =========================================
+                    // ACTIVITY ROW
+                    // =========================================
 
                     Row(
 
@@ -798,17 +857,18 @@ fun RecentActivityCard() {
 
                     ) {
 
-
                         Box(
 
                             modifier = Modifier
                                 .size(32.dp)
                                 .background(
                                     color =
-                                        Color(0xFFE5F8E8),
+                                        activityBackground,
 
                                     shape =
-                                        RoundedCornerShape(6.dp)
+                                        RoundedCornerShape(
+                                            6.dp
+                                        )
                                 ),
 
                             contentAlignment =
@@ -819,13 +879,13 @@ fun RecentActivityCard() {
                             Icon(
 
                                 imageVector =
-                                    Icons.Default.Timer,
+                                    activityIcon,
 
                                 contentDescription =
-                                    "Study session",
+                                    activity.title,
 
                                 tint =
-                                    Color(0xFF59B96A),
+                                    activityIconColor,
 
                                 modifier =
                                     Modifier.size(17.dp)
@@ -851,7 +911,8 @@ fun RecentActivityCard() {
                                 text =
                                     activity.title,
 
-                                fontSize = 10.sp,
+                                fontSize =
+                                    10.sp,
 
                                 fontWeight =
                                     FontWeight.Medium,
@@ -870,13 +931,14 @@ fun RecentActivityCard() {
                             Text(
 
                                 text =
-                                    "${activity.minutes} minutes • ${
+                                    "${activity.description} • ${
                                         formatActivityDateTime(
                                             activity.dateTime
                                         )
                                     }",
 
-                                fontSize = 8.sp,
+                                fontSize =
+                                    8.sp,
 
                                 color =
                                     Color(0xFF777983)
@@ -901,9 +963,13 @@ fun RecentActivityCard() {
                     }
 
 
+                    // =========================================
+                    // SPACE BETWEEN ACTIVITIES
+                    // =========================================
+
                     if (
                         index <
-                        activities.take(3).size - 1
+                        activities.take(5).size - 1
                     ) {
 
                         Spacer(

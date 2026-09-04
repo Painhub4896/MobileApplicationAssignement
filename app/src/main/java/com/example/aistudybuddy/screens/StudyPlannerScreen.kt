@@ -28,7 +28,10 @@ import com.example.aistudybuddy.components.StudySessionCard
 import com.example.aistudybuddy.components.WeekSelector
 import com.example.aistudybuddy.data.StudyPlannerData
 import com.example.aistudybuddy.data.StudySession
+import com.example.aistudybuddy.notification.NotificationData
 import java.time.LocalDate
+import com.example.aistudybuddy.notification.NotificationHelper
+import androidx.compose.ui.platform.LocalContext
 
 
 @Composable
@@ -42,6 +45,8 @@ fun StudyPlannerScreen(
     onViewRoutineClick: () -> Unit = {},
     onFocusTimerClick: () -> Unit = {}
 ) {
+
+    val context = LocalContext.current
 
     var editingIndex by remember {
         mutableStateOf<Int?>(null)
@@ -287,6 +292,21 @@ fun StudyPlannerScreen(
                                         )
                                 )
                             )
+
+                        NotificationData.addNotification(
+                            title = "Study Session Added",
+                            message = "$subject • $startTime - $endTime"
+                        )
+                        StudyProgress.addRecentActivity(
+                            title = "Study Session Added",
+                            description = "$subject • $startTime - $endTime"
+                        )
+
+                        NotificationHelper.showAssignmentNotification(
+                            context = context,
+                            assignmentTitle = subject,
+                            message = "$subject • $startTime - $endTime"
+                        )
                     },
 
 

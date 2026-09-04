@@ -12,6 +12,12 @@ data class CompletedStudySession(
     val dateTime: LocalDateTime
 )
 
+data class StudyActivity(
+    val title: String,
+    val description: String,
+    val dateTime: LocalDateTime
+)
+
 object StudyProgress {
 
     var completedSessions = mutableStateOf(0)
@@ -21,21 +27,39 @@ object StudyProgress {
     val completedStudySessions =
         mutableStateListOf<CompletedStudySession>()
 
-    private val malaysiaZone = ZoneId.of("Asia/Kuala_Lumpur")
+    // ==========================================
+    // RECENT ACTIVITY
+    // ==========================================
+
+    val recentActivities =
+        mutableStateListOf<StudyActivity>()
+
+    private val malaysiaZone =
+        ZoneId.of("Asia/Kuala_Lumpur")
+
+
+    // ==========================================
+    // ADD COMPLETED STUDY SESSION
+    // ==========================================
 
     fun addCompletedSession(
         minutes: Int,
         title: String = "Focus Study Session"
     ) {
+
         completedSessions.value++
+
         completedMinutes.value += minutes
+
+        val dateTime =
+            LocalDateTime.now(malaysiaZone)
 
         completedStudySessions.add(
             0,
             CompletedStudySession(
                 title = title,
                 minutes = minutes,
-                dateTime = LocalDateTime.now(malaysiaZone)
+                dateTime = dateTime
             )
         )
 
@@ -44,11 +68,54 @@ object StudyProgress {
                 completedStudySessions.size - 1
             )
         }
+
+
+        // Add to Recent Activity
+        addRecentActivity(
+            title = "Focus Study Session",
+            description = "$minutes minutes"
+        )
     }
+
+
+    // ==========================================
+    // ADD RECENT ACTIVITY
+    // ==========================================
+
+    fun addRecentActivity(
+        title: String,
+        description: String
+    ) {
+
+        recentActivities.add(
+            0,
+            StudyActivity(
+                title = title,
+                description = description,
+                dateTime =
+                    LocalDateTime.now(
+                        malaysiaZone
+                    )
+            )
+        )
+
+        // Keep only the latest 5 activities
+        if (recentActivities.size > 5) {
+            recentActivities.removeAt(
+                recentActivities.size - 1
+            )
+        }
+    }
+
+
+    // ==========================================
+    // THIS WEEK'S STUDY MINUTES
+    // ==========================================
 
     fun getThisWeekMinutes(): Int {
 
-        val today = LocalDate.now(malaysiaZone)
+        val today =
+            LocalDate.now(malaysiaZone)
 
         val startOfWeek =
             today.minusDays(
@@ -57,19 +124,31 @@ object StudyProgress {
 
         return completedStudySessions
             .filter { session ->
-                val sessionDate = session.dateTime.toLocalDate()
 
-                !sessionDate.isBefore(startOfWeek) &&
-                        !sessionDate.isAfter(today)
+                val sessionDate =
+                    session.dateTime.toLocalDate()
+
+                !sessionDate.isBefore(
+                    startOfWeek
+                ) &&
+                        !sessionDate.isAfter(
+                            today
+                        )
             }
             .sumOf { session ->
                 session.minutes
             }
     }
 
+
+    // ==========================================
+    // DAILY STUDY MINUTES
+    // ==========================================
+
     fun getDailyStudyMinutes(): List<Int> {
 
-        val today = LocalDate.now()
+        val today =
+            LocalDate.now(malaysiaZone)
 
         val startOfWeek =
             today.minusDays(
@@ -78,17 +157,27 @@ object StudyProgress {
 
         return (0..6).map { dayOffset ->
 
-            val date = startOfWeek.plusDays(dayOffset.toLong())
+            val date =
+                startOfWeek.plusDays(
+                    dayOffset.toLong()
+                )
 
             completedStudySessions
                 .filter { session ->
-                    session.dateTime.toLocalDate() == date
+
+                    session.dateTime
+                        .toLocalDate() == date
                 }
                 .sumOf { session ->
                     session.minutes
                 }
         }
     }
+
+
+    // ==========================================
+    // STUDY STREAK
+    // ==========================================
 
     fun getStudyStreak(): Int {
 
@@ -98,11 +187,14 @@ object StudyProgress {
 
         val studyDates =
             completedStudySessions
-                .map { it.dateTime.toLocalDate() }
+                .map {
+                    it.dateTime.toLocalDate()
+                }
                 .distinct()
                 .sortedDescending()
 
-        val today = LocalDate.now(malaysiaZone)
+        val today =
+            LocalDate.now(malaysiaZone)
 
         // If the user has not studied today,
         // start checking from yesterday.
@@ -118,9 +210,16 @@ object StudyProgress {
         for (date in studyDates) {
 
             if (date == checkDate) {
+
                 streak++
-                checkDate = checkDate.minusDays(1)
-            } else if (date.isBefore(checkDate)) {
+
+                checkDate =
+                    checkDate.minusDays(1)
+
+            } else if (
+                date.isBefore(checkDate)
+            ) {
+
                 break
             }
         }
@@ -128,12 +227,21 @@ object StudyProgress {
         return streak
     }
 
+
+    // ==========================================
+    // STUDY HOURS TEXT
+    // ==========================================
+
     fun getStudyHoursText(): String {
 
-        val minutes = completedMinutes.value
+        val minutes =
+            completedMinutes.value
 
-        val hours = minutes / 60
-        val remainingMinutes = minutes % 60
+        val hours =
+            minutes / 60
+
+        val remainingMinutes =
+            minutes % 60
 
         return if (hours > 0) {
             "$hours hr $remainingMinutes m"

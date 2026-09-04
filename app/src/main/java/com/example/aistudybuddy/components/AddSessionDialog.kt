@@ -406,6 +406,8 @@ fun AddSessionDialog(
                     }
 
 
+
+
                     // ==========================================
                     // START TIME VALIDATION
                     // ==========================================
@@ -457,6 +459,40 @@ fun AddSessionDialog(
 
                         errorMessage =
                             "End time must be later than start time."
+
+                        return@Button
+                    }
+
+                    // ==========================================
+// CHECK FOR OVERLAPPING SESSIONS
+// ==========================================
+
+                    val hasTimeConflict =
+                        existingSessions
+                            .filterIndexed { index, _ ->
+                                index != currentSessionIndex
+                            }
+                            .any { existingSession ->
+
+                                val existingStart =
+                                    convertTimeToMinutes(
+                                        existingSession.startTime
+                                    )
+
+                                val existingEnd =
+                                    convertTimeToMinutes(
+                                        existingSession.endTime
+                                    )
+
+                                startMinutes < existingEnd &&
+                                        endMinutes > existingStart
+                            }
+
+
+                    if (hasTimeConflict) {
+
+                        errorMessage =
+                            "This time overlaps with another study session."
 
                         return@Button
                     }

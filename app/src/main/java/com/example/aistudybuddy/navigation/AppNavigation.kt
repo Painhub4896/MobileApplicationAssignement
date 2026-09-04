@@ -1,6 +1,9 @@
 package com.example.aistudybuddy.navigation
 
+import com.example.aistudybuddy.notification.NotificationData
 import android.net.Uri
+import androidx.compose.ui.platform.LocalContext
+import com.example.aistudybuddy.notification.NotificationHelper
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -14,7 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
-
+import com.example.aistudybuddy.screens.StudyProgress
 import com.example.aistudybuddy.auth.AuthUiState
 import com.example.aistudybuddy.auth.AuthViewModel
 
@@ -51,6 +54,8 @@ import kotlin.time.Duration.Companion.milliseconds
 fun AppNavigation(incomingDeepLink: Uri?) {
 
     val navController = rememberNavController()
+
+    val context = LocalContext.current
 
     val authViewModel: AuthViewModel =
         viewModel()
@@ -601,12 +606,28 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                                 updatedAssignment
                         }
 
-                    } else {
+                    }  else {
 
                         assignments.add(
                             updatedAssignment
                         )
-                    }
+                        StudyProgress.addRecentActivity(
+                            title = "Assignment Added",
+                            description = title
+                        )
+
+                        NotificationData.addNotification(
+                            title = "Assignment Reminder",
+                            message = "$title has been added successfully."
+                        )
+
+                        NotificationHelper.showAssignmentNotification(
+                            context = context,
+                            assignmentTitle = title,
+                            message = "$title has been added successfully."
+                        )
+
+            }
 
                     editingAssignmentIndex = null
 
