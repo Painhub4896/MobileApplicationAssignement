@@ -16,21 +16,23 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -45,23 +47,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.aistudybuddy.components.BottomNavigationBar
-import com.example.aistudybuddy.data.TimetableEntry
 import com.example.aistudybuddy.viewmodel.AIRoutineViewModel
+
+val darkText = Color(0xFF252838)
 
 @Composable
 fun AIRoutineSetupScreen(
-    timetableEntries: List<TimetableEntry>,
     aiRoutineViewModel: AIRoutineViewModel,
     onGenerateClick: () -> Unit = {},
     onHomeClick: () -> Unit = {},
     onAssignmentClick: () -> Unit = {},
     onPlannerClick: () -> Unit = {},
     onProgressClick: () -> Unit = {},
-    onProfileClick: () -> Unit = {}
-
+    onProfileClick: () -> Unit = {},
+    onBackClick: () -> Unit = {}
 ) {
 
     var availableStart by remember {
@@ -88,31 +91,53 @@ fun AIRoutineSetupScreen(
         mutableStateOf("")
     }
 
-    val primaryBlue = Color(0xFF4169E1)
-    val purple = Color(0xFF7C3AED)
-    val pageBackground = Color(0xFFF7F8FC)
-    val textPrimary = Color(0xFF171A24)
-    val textSecondary = Color(0xFF747984)
+    var upcomingWorkError by remember {
+        mutableStateOf<String?>(null)
+    }
+
+
+    val primaryBlue =
+        Color(0xFF4169E1)
+
+    val purple =
+        Color(0xFF7C3AED)
+
+    val pageBackground =
+        Color(0xFFF7F8FC)
+
+    val textPrimary =
+        Color(0xFF171A24)
+
+    val textSecondary =
+        Color(0xFF747984)
+
 
     Scaffold(
         bottomBar = {
+
             BottomNavigationBar(
                 selectedItem = "Planner",
-                onHomeClick = { /* Navigate to Home */ },
-                onAssignmentsClick = { /* Navigate to Assignment */ },
-                onPlannerClick = { /* Navigate to Planner */ },
-                onProgressClick = { /* Navigate to Progress */ },
-                onProfileClick = { /* Navigate to Profile */ }
+                onHomeClick = onHomeClick,
+                onAssignmentsClick = onAssignmentClick,
+                onPlannerClick = onPlannerClick,
+                onProgressClick = onProgressClick,
+                onProfileClick = onProfileClick
             )
         }
     ) { innerPadding ->
 
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(pageBackground)
-                .padding(innerPadding)
+                .background(
+                    pageBackground
+                )
+                .padding(
+                    innerPadding
+                )
         ) {
+
 
             Column(
                 modifier = Modifier
@@ -124,105 +149,67 @@ fun AIRoutineSetupScreen(
                         horizontal = 18.dp,
                         vertical = 16.dp
                     ),
+
                 verticalArrangement =
-                    Arrangement.spacedBy(14.dp)
+                    Arrangement.spacedBy(
+                        14.dp
+                    ),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
 
                 // =====================================================
                 // TITLE
                 // =====================================================
-
-                Text(
-                    text = "Create My AI Routine",
-                    fontSize = 27.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = textPrimary
-                )
-
-                Text(
-                    text = "Tell us your preferences and AIStudyBuddy will build a personalized study plan.",
-                    fontSize = 13.sp,
-                    lineHeight = 19.sp,
-                    color = textSecondary
-                )
-
-
-                // =====================================================
-                // TIMETABLE SYNC CARD
-                // =====================================================
-
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFF0F4FF)
-                    ),
-                    border = BorderStroke(
-                        1.dp,
-                        Color(0xFFDDE5FF)
-                    )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = 2.dp,
+                            vertical = 4.dp
+                        ),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(14.dp),
-                        verticalAlignment =
-                            Alignment.CenterVertically
+                    IconButton(
+                        onClick = {
+                            onBackClick()
+                        }
                     ) {
 
-                        Card(
-                            shape = RoundedCornerShape(10.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color.White
-                            )
-                        ) {
-
-                            Icon(
-                                imageVector =
-                                    Icons.Default.CalendarMonth,
-                                contentDescription = null,
-                                tint = primaryBlue,
-                                modifier = Modifier
-                                    .padding(9.dp)
-                                    .size(22.dp)
-                            )
-                        }
-
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(start = 12.dp)
-                        ) {
-
-                            Text(
-                                text = "Timetable",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 14.sp,
-                                color = textPrimary
-                            )
-
-                            Text(
-                                text =
-                                    if (timetableEntries.isEmpty()) {
-                                        "No classes found"
-                                    } else {
-                                        "${timetableEntries.size} classes synced successfully"
-                                    },
-                                fontSize = 11.sp,
-                                color = textSecondary
-                            )
-                        }
-
                         Icon(
-                            imageVector =
-                                Icons.Default.CheckCircle,
-                            contentDescription = null,
-                            tint = Color(0xFF35A853),
-                            modifier = Modifier.size(24.dp)
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back to Study Planner",
+                            tint = darkText
                         )
                     }
+
+                    Spacer(
+                        modifier = Modifier.height(18.dp)
+                    )
+
                 }
+
+                // Title
+                Text(
+                    text = "Create AI Routine",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = darkText
+                )
+
+                Text(
+                    text =
+                        "Tell us your preferences and AIStudyBuddy will build a personalized study plan.",
+
+                    fontSize =
+                        13.sp,
+
+                    lineHeight =
+                        19.sp,
+
+                    color =
+                        textSecondary
+                )
 
 
                 // =====================================================
@@ -230,85 +217,261 @@ fun AIRoutineSetupScreen(
                 // =====================================================
 
                 Text(
-                    text = "Upcoming Work",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = textPrimary
+                    text =
+                        "Upcoming Work",
+
+                    fontSize =
+                        16.sp,
+
+                    fontWeight =
+                        FontWeight.Bold,
+
+                    color =
+                        textPrimary
                 )
 
 
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(18.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    ),
-                    border = BorderStroke(
-                        1.dp,
-                        Color(0xFFE6E8EF)
-                    )
+                    modifier =
+                        Modifier.fillMaxWidth(),
+
+                    shape =
+                        RoundedCornerShape(
+                            18.dp
+                        ),
+
+                    colors =
+                        CardDefaults.cardColors(
+                            containerColor =
+                                Color.White
+                        ),
+
+                    border =
+                        BorderStroke(
+                            1.dp,
+                            Color(0xFFE6E8EF)
+                        )
                 ) {
+
 
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(
+                                16.dp
+                            ),
+
                         verticalArrangement =
-                            Arrangement.spacedBy(12.dp)
+                            Arrangement.spacedBy(
+                                12.dp
+                            )
                     ) {
 
+
+                        // ---------------------------------------------
+                        // UPCOMING TEST
+                        // ---------------------------------------------
+
                         OutlinedTextField(
-                            value = upcomingTest,
+                            value =
+                                upcomingTest,
+
                             onValueChange = {
-                                upcomingTest = it
+
+                                upcomingTest =
+                                    it
+
+
+                                upcomingWorkError =
+                                    when {
+
+                                        upcomingTest.isBlank() &&
+                                                assignment.isBlank() ->
+
+                                            "Please enter either an Upcoming Test or an Assignment / Project."
+
+
+                                        upcomingTest.isNotBlank() &&
+                                                assignment.isNotBlank() ->
+
+                                            "Please enter only one: Upcoming Test OR Assignment / Project."
+
+
+                                        else ->
+                                            null
+                                    }
+
+
+                                aiRoutineViewModel
+                                    .clearError()
                             },
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true,
+
+                            modifier =
+                                Modifier.fillMaxWidth(),
+
+                            singleLine =
+                                true,
+
                             label = {
-                                Text("Upcoming Test")
+
+                                Text(
+                                    "Upcoming Test"
+                                )
                             },
+
                             placeholder = {
+
                                 Text(
                                     "e.g. Biology Test"
                                 )
                             },
+
                             leadingIcon = {
+
                                 Icon(
                                     imageVector =
                                         Icons.Default.School,
-                                    contentDescription = null,
-                                    tint = primaryBlue
+
+                                    contentDescription =
+                                        null,
+
+                                    tint =
+                                        primaryBlue
                                 )
                             },
-                            shape = RoundedCornerShape(12.dp)
+
+                            shape =
+                                RoundedCornerShape(
+                                    12.dp
+                                )
                         )
 
 
+                        // ---------------------------------------------
+                        // OR
+                        // ---------------------------------------------
+
+                        Text(
+                            text =
+                                "OR",
+
+                            modifier =
+                                Modifier.fillMaxWidth(),
+
+                            textAlign =
+                                TextAlign.Center,
+
+                            fontSize =
+                                12.sp,
+
+                            fontWeight =
+                                FontWeight.Bold,
+
+                            color =
+                                textSecondary
+                        )
+
+
+                        // ---------------------------------------------
+                        // ASSIGNMENT / PROJECT
+                        // ---------------------------------------------
+
                         OutlinedTextField(
-                            value = assignment,
+                            value =
+                                assignment,
+
                             onValueChange = {
-                                assignment = it
+
+                                assignment =
+                                    it
+
+
+                                upcomingWorkError =
+                                    when {
+
+                                        upcomingTest.isBlank() &&
+                                                assignment.isBlank() ->
+
+                                            "Please enter either an Upcoming Test or an Assignment / Project."
+
+
+                                        upcomingTest.isNotBlank() &&
+                                                assignment.isNotBlank() ->
+
+                                            "Please enter only one: Upcoming Test OR Assignment / Project."
+
+
+                                        else ->
+                                            null
+                                    }
+
+
+                                aiRoutineViewModel
+                                    .clearError()
                             },
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true,
+
+                            modifier =
+                                Modifier.fillMaxWidth(),
+
+                            singleLine =
+                                true,
+
                             label = {
-                                Text("Assignment / Project")
+
+                                Text(
+                                    "Assignment / Project"
+                                )
                             },
+
                             placeholder = {
+
                                 Text(
                                     "e.g. Database Project"
                                 )
                             },
+
                             leadingIcon = {
+
                                 Icon(
                                     imageVector =
                                         Icons.Default.Assignment,
-                                    contentDescription = null,
-                                    tint = Color(0xFFFF9800)
+
+                                    contentDescription =
+                                        null,
+
+                                    tint =
+                                        Color(0xFFFF9800)
                                 )
                             },
-                            shape = RoundedCornerShape(12.dp)
+
+                            shape =
+                                RoundedCornerShape(
+                                    12.dp
+                                )
                         )
+
+
+                        // ---------------------------------------------
+                        // UPCOMING WORK ERROR
+                        // ---------------------------------------------
+
+                        upcomingWorkError
+                            ?.let { message ->
+
+
+                                Text(
+                                    text =
+                                        message,
+
+                                    fontSize =
+                                        12.sp,
+
+                                    color =
+                                        MaterialTheme
+                                            .colorScheme
+                                            .error
+                                )
+                            }
                     }
                 }
 
@@ -318,42 +481,75 @@ fun AIRoutineSetupScreen(
                 // =====================================================
 
                 Text(
-                    text = "Your Preferences",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = textPrimary
+                    text =
+                        "Your Preferences",
+
+                    fontSize =
+                        16.sp,
+
+                    fontWeight =
+                        FontWeight.Bold,
+
+                    color =
+                        textPrimary
                 )
 
 
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(18.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    ),
-                    border = BorderStroke(
-                        1.dp,
-                        Color(0xFFE6E8EF)
-                    )
+                    modifier =
+                        Modifier.fillMaxWidth(),
+
+                    shape =
+                        RoundedCornerShape(
+                            18.dp
+                        ),
+
+                    colors =
+                        CardDefaults.cardColors(
+                            containerColor =
+                                Color.White
+                        ),
+
+                    border =
+                        BorderStroke(
+                            1.dp,
+                            Color(0xFFE6E8EF)
+                        )
                 ) {
+
 
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(
+                                16.dp
+                            ),
+
                         verticalArrangement =
-                            Arrangement.spacedBy(13.dp)
+                            Arrangement.spacedBy(
+                                13.dp
+                            )
                     ) {
+
 
                         // ---------------------------------------------
                         // AVAILABLE START
                         // ---------------------------------------------
 
                         RoutineTimeField(
-                            label = "Available From",
-                            selectedTime = availableStart,
+                            label =
+                                "Available From",
+
+                            selectedTime =
+                                availableStart,
+
                             onTimeSelected = {
-                                availableStart = it
+
+                                availableStart =
+                                    it
+
+                                aiRoutineViewModel
+                                    .clearError()
                             }
                         )
 
@@ -363,10 +559,19 @@ fun AIRoutineSetupScreen(
                         // ---------------------------------------------
 
                         RoutineTimeField(
-                            label = "Available Until",
-                            selectedTime = availableEnd,
+                            label =
+                                "Available Until",
+
+                            selectedTime =
+                                availableEnd,
+
                             onTimeSelected = {
-                                availableEnd = it
+
+                                availableEnd =
+                                    it
+
+                                aiRoutineViewModel
+                                    .clearError()
                             }
                         )
 
@@ -376,17 +581,28 @@ fun AIRoutineSetupScreen(
                         // ---------------------------------------------
 
                         RoutineDropdown(
-                            label = "Session Length",
-                            selected = sessionLength,
-                            options = listOf(
-                                "25 minutes",
-                                "30 minutes",
-                                "45 minutes",
-                                "60 minutes",
-                                "90 minutes"
-                            ),
+                            label =
+                                "Session Length",
+
+                            selected =
+                                sessionLength,
+
+                            options =
+                                listOf(
+                                    "25 minutes",
+                                    "30 minutes",
+                                    "45 minutes",
+                                    "60 minutes",
+                                    "90 minutes"
+                                ),
+
                             onSelected = {
-                                sessionLength = it
+
+                                sessionLength =
+                                    it
+
+                                aiRoutineViewModel
+                                    .clearError()
                             }
                         )
 
@@ -396,15 +612,26 @@ fun AIRoutineSetupScreen(
                         // ---------------------------------------------
 
                         RoutineDropdown(
-                            label = "Difficulty",
-                            selected = difficulty,
-                            options = listOf(
-                                "Light",
-                                "Balanced",
-                                "Intensive"
-                            ),
+                            label =
+                                "Difficulty",
+
+                            selected =
+                                difficulty,
+
+                            options =
+                                listOf(
+                                    "Light",
+                                    "Balanced",
+                                    "Intensive"
+                                ),
+
                             onSelected = {
-                                difficulty = it
+
+                                difficulty =
+                                    it
+
+                                aiRoutineViewModel
+                                    .clearError()
                             }
                         )
                     }
@@ -412,55 +639,97 @@ fun AIRoutineSetupScreen(
 
 
                 // =====================================================
-                // SMALL AI INFORMATION CARD
+                // SMART SCHEDULING
                 // =====================================================
 
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFF7F3FF)
-                    ),
-                    border = BorderStroke(
-                        1.dp,
-                        Color(0xFFE8DCFF)
-                    )
+                    modifier =
+                        Modifier.fillMaxWidth(),
+
+                    shape =
+                        RoundedCornerShape(
+                            14.dp
+                        ),
+
+                    colors =
+                        CardDefaults.cardColors(
+                            containerColor =
+                                Color(0xFFF7F3FF)
+                        ),
+
+                    border =
+                        BorderStroke(
+                            1.dp,
+                            Color(0xFFE8DCFF)
+                        )
                 ) {
+
 
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(13.dp),
+                            .padding(
+                                13.dp
+                            ),
+
                         verticalAlignment =
                             Alignment.CenterVertically
                     ) {
 
+
                         Icon(
                             imageVector =
                                 Icons.Default.AutoAwesome,
-                            contentDescription = null,
-                            tint = purple,
-                            modifier = Modifier.size(22.dp)
+
+                            contentDescription =
+                                null,
+
+                            tint =
+                                purple,
+
+                            modifier =
+                                Modifier.size(
+                                    22.dp
+                                )
                         )
 
+
                         Column(
-                            modifier = Modifier.padding(
-                                start = 10.dp
-                            )
+                            modifier =
+                                Modifier.padding(
+                                    start =
+                                        10.dp
+                                )
                         ) {
 
-                            Text(
-                                text = "Smart Scheduling",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp,
-                                color = textPrimary
-                            )
 
                             Text(
-                                text = "Your timetable and preferences will be used to avoid class-time clashes.",
-                                fontSize = 11.sp,
-                                lineHeight = 16.sp,
-                                color = textSecondary
+                                text =
+                                    "Smart Scheduling",
+
+                                fontWeight =
+                                    FontWeight.Bold,
+
+                                fontSize =
+                                    13.sp,
+
+                                color =
+                                    textPrimary
+                            )
+
+
+                            Text(
+                                text =
+                                    "Your upcoming work and preferences will be used to create your personalized study routine.",
+
+                                fontSize =
+                                    11.sp,
+
+                                lineHeight =
+                                    16.sp,
+
+                                color =
+                                    textSecondary
                             )
                         }
                     }
@@ -468,48 +737,276 @@ fun AIRoutineSetupScreen(
 
 
                 // =====================================================
+                // GEMINI ERROR MESSAGE
+                // =====================================================
+
+                aiRoutineViewModel
+                    .errorMessage
+                    ?.let { message ->
+
+
+                        Card(
+                            modifier =
+                                Modifier.fillMaxWidth(),
+
+                            shape =
+                                RoundedCornerShape(
+                                    12.dp
+                                ),
+
+                            colors =
+                                CardDefaults.cardColors(
+                                    containerColor =
+                                        Color(0xFFFFEBEE)
+                                )
+                        ) {
+
+
+                            Text(
+                                text =
+                                    message,
+
+                                modifier =
+                                    Modifier.padding(
+                                        14.dp
+                                    ),
+
+                                color =
+                                    MaterialTheme
+                                        .colorScheme
+                                        .error,
+
+                                fontSize =
+                                    13.sp
+                            )
+                        }
+                    }
+
+
+                // =====================================================
                 // GENERATE BUTTON
                 // =====================================================
 
                 Button(
-                    onClick = onGenerateClick,
+                    onClick = {
+
+
+                        // ---------------------------------------------
+                        // BOTH EMPTY
+                        // ---------------------------------------------
+
+                        if (
+                            upcomingTest.isBlank() &&
+                            assignment.isBlank()
+                        ) {
+
+                            upcomingWorkError =
+                                "Please enter either an Upcoming Test or an Assignment / Project."
+
+                            return@Button
+                        }
+
+
+                        // ---------------------------------------------
+                        // BOTH FILLED
+                        // ---------------------------------------------
+
+                        if (
+                            upcomingTest.isNotBlank() &&
+                            assignment.isNotBlank()
+                        ) {
+
+                            upcomingWorkError =
+                                "Please enter only one: Upcoming Test OR Assignment / Project."
+
+                            return@Button
+                        }
+
+
+                        upcomingWorkError =
+                            null
+
+
+                        // ---------------------------------------------
+                        // CHECK TIME
+                        // ---------------------------------------------
+
+                        val startMinutes =
+                            routineTimeToMinutes(
+                                availableStart
+                            )
+
+
+                        val endMinutes =
+                            routineTimeToMinutes(
+                                availableEnd
+                            )
+
+
+                        if (
+                            startMinutes == -1 ||
+                            endMinutes == -1
+                        ) {
+
+                            return@Button
+                        }
+
+
+                        if (
+                            endMinutes <=
+                            startMinutes
+                        ) {
+
+                            return@Button
+                        }
+
+
+                        // ---------------------------------------------
+                        // GENERATE
+                        // ---------------------------------------------
+
+                        aiRoutineViewModel
+                            .generateRoutine(
+
+                                timetableEntries =
+                                    emptyList(),
+
+                                availableStart =
+                                    availableStart,
+
+                                availableEnd =
+                                    availableEnd,
+
+                                sessionLength =
+                                    sessionLength,
+
+                                difficulty =
+                                    difficulty,
+
+                                upcomingTest =
+                                    upcomingTest,
+
+                                assignment =
+                                    assignment,
+
+                                onSuccess =
+                                    onGenerateClick
+                            )
+                    },
+
+                    enabled =
+                        !aiRoutineViewModel
+                            .isLoading,
+
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(58.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = purple
-                    )
+                        .height(
+                            58.dp
+                        ),
+
+                    shape =
+                        RoundedCornerShape(
+                            14.dp
+                        ),
+
+                    colors =
+                        ButtonDefaults
+                            .buttonColors(
+                                containerColor =
+                                    purple
+                            )
                 ) {
 
-                    Icon(
-                        imageVector =
-                            Icons.Default.AutoAwesome,
-                        contentDescription = null,
-                        modifier = Modifier.size(21.dp)
-                    )
 
-                    Text(
-                        text = "  Generate with Gemini",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    if (
+                        aiRoutineViewModel
+                            .isLoading
+                    ) {
+
+
+                        CircularProgressIndicator(
+                            modifier =
+                                Modifier.size(
+                                    20.dp
+                                ),
+
+                            color =
+                                Color.White,
+
+                            strokeWidth =
+                                2.dp
+                        )
+
+
+                        Text(
+                            text =
+                                "  Generating Routine...",
+
+                            fontSize =
+                                14.sp,
+
+                            fontWeight =
+                                FontWeight.Bold
+                        )
+
+
+                    } else {
+
+
+                        Icon(
+                            imageVector =
+                                Icons.Default.AutoAwesome,
+
+                            contentDescription =
+                                null,
+
+                            modifier =
+                                Modifier.size(
+                                    21.dp
+                                )
+                        )
+
+
+                        Text(
+                            text =
+                                "  Generate with Gemini",
+
+                            fontSize =
+                                14.sp,
+
+                            fontWeight =
+                                FontWeight.Bold
+                        )
+                    }
                 }
 
 
                 Text(
-                    text = "Your timetable is only used to personalize your study routine.",
-                    modifier = Modifier.fillMaxWidth(),
-                    fontSize = 11.sp,
-                    lineHeight = 16.sp,
+                    text =
+                        "Your preferences are only used to personalize your study routine.",
+
+                    modifier =
+                        Modifier.fillMaxWidth(),
+
+                    fontSize =
+                        11.sp,
+
+                    lineHeight =
+                        16.sp,
+
                     textAlign =
-                        androidx.compose.ui.text.style.TextAlign.Center,
-                    color = textSecondary
+                        TextAlign.Center,
+
+                    color =
+                        textSecondary
                 )
 
 
                 Spacer(
-                    modifier = Modifier.height(10.dp)
+                    modifier =
+                        Modifier.height(
+                            10.dp
+                        )
                 )
             }
         }
@@ -531,32 +1028,48 @@ private fun RoutineTimeField(
     val context =
         LocalContext.current
 
+
     OutlinedButton(
         onClick = {
+
 
             val minutes =
                 routineTimeToMinutes(
                     selectedTime
                 )
 
+
             val defaultHour =
-                if (minutes >= 0) {
+                if (
+                    minutes >= 0
+                ) {
+
                     minutes / 60
+
                 } else {
+
                     19
                 }
 
+
             val defaultMinute =
-                if (minutes >= 0) {
+                if (
+                    minutes >= 0
+                ) {
+
                     minutes % 60
+
                 } else {
+
                     0
                 }
 
 
             TimePickerDialog(
                 context,
+
                 { _, hour, minute ->
+
 
                     onTimeSelected(
                         routineFormatTime(
@@ -565,55 +1078,101 @@ private fun RoutineTimeField(
                         )
                     )
                 },
+
                 defaultHour,
+
                 defaultMinute,
+
                 false
+
             ).show()
         },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp),
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(
-            1.dp,
-            Color(0xFFB8BCC7)
-        )
+
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(
+                    60.dp
+                ),
+
+        shape =
+            RoundedCornerShape(
+                12.dp
+            ),
+
+        border =
+            BorderStroke(
+                1.dp,
+                Color(0xFFB8BCC7)
+            )
     ) {
+
 
         Icon(
             imageVector =
                 Icons.Default.Schedule,
-            contentDescription = null,
-            tint = Color(0xFF4169E1)
+
+            contentDescription =
+                null,
+
+            tint =
+                Color(0xFF4169E1)
         )
 
+
         Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 12.dp),
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .padding(
+                        start = 12.dp
+                    ),
+
             horizontalAlignment =
                 Alignment.Start
         ) {
 
-            Text(
-                text = label,
-                fontSize = 10.sp,
-                color = Color(0xFF777B86)
-            )
 
             Text(
-                text = selectedTime,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF171A24)
+                text =
+                    label,
+
+                fontSize =
+                    10.sp,
+
+                color =
+                    Color(0xFF777B86)
+            )
+
+
+            Text(
+                text =
+                    selectedTime,
+
+                fontSize =
+                    14.sp,
+
+                fontWeight =
+                    FontWeight.SemiBold,
+
+                color =
+                    Color(0xFF171A24)
             )
         }
 
+
         Text(
-            text = "Choose",
-            color = Color(0xFF4169E1),
-            fontSize = 11.sp,
-            fontWeight = FontWeight.SemiBold
+            text =
+                "Choose",
+
+            color =
+                Color(0xFF4169E1),
+
+            fontSize =
+                11.sp,
+
+            fontWeight =
+                FontWeight.SemiBold
         )
     }
 }
@@ -623,7 +1182,10 @@ private fun RoutineTimeField(
 // DROPDOWN
 // =====================================================================
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(
+    ExperimentalMaterial3Api::class
+)
+
 @Composable
 private fun RoutineDropdown(
     label: String,
@@ -638,54 +1200,93 @@ private fun RoutineDropdown(
 
 
     ExposedDropdownMenuBox(
-        expanded = expanded,
+        expanded =
+            expanded,
+
         onExpandedChange = {
-            expanded = !expanded
+
+            expanded =
+                !expanded
         }
     ) {
 
+
         OutlinedTextField(
-            value = selected,
-            onValueChange = {},
-            readOnly = true,
-            modifier = Modifier
-                .menuAnchor()
-                .fillMaxWidth(),
+            value =
+                selected,
+
+            onValueChange =
+                {},
+
+            readOnly =
+                true,
+
+            modifier =
+                Modifier
+                    .menuAnchor()
+                    .fillMaxWidth(),
+
             label = {
-                Text(label)
+
+                Text(
+                    label
+                )
             },
+
             trailingIcon = {
+
 
                 ExposedDropdownMenuDefaults
                     .TrailingIcon(
-                        expanded = expanded
+                        expanded =
+                            expanded
                     )
             },
-            shape = RoundedCornerShape(12.dp)
+
+            shape =
+                RoundedCornerShape(
+                    12.dp
+                )
         )
 
 
         ExposedDropdownMenu(
-            expanded = expanded,
+            expanded =
+                expanded,
+
             onDismissRequest = {
-                expanded = false
+
+                expanded =
+                    false
             }
         ) {
 
-            options.forEach { option ->
 
-                DropdownMenuItem(
-                    text = {
-                        Text(option)
-                    },
-                    onClick = {
+            options
+                .forEach { option ->
 
-                        onSelected(option)
 
-                        expanded = false
-                    }
-                )
-            }
+                    DropdownMenuItem(
+                        text = {
+
+                            Text(
+                                option
+                            )
+                        },
+
+                        onClick = {
+
+
+                            onSelected(
+                                option
+                            )
+
+
+                            expanded =
+                                false
+                        }
+                    )
+                }
         }
     }
 }
@@ -701,9 +1302,14 @@ private fun routineFormatTime(
 ): String {
 
     val period =
-        if (hour >= 12) {
+        if (
+            hour >= 12
+        ) {
+
             "PM"
+
         } else {
+
             "AM"
         }
 
@@ -741,35 +1347,59 @@ private fun routineTimeToMinutes(
 
     return try {
 
+
         val parts =
-            time.trim().split(" ")
+            time
+                .trim()
+                .split(" ")
+
 
         val clock =
-            parts[0].split(":")
+            parts[0]
+                .split(":")
+
 
         var hour =
-            clock[0].toInt()
+            clock[0]
+                .toInt()
+
 
         val minute =
-            clock[1].toInt()
+            clock[1]
+                .toInt()
+
 
         val period =
-            parts[1].uppercase()
+            parts[1]
+                .uppercase()
 
 
-        if (hour == 12) {
-            hour = 0
+        if (
+            hour == 12
+        ) {
+
+            hour =
+                0
         }
 
-        if (period == "PM") {
-            hour += 12
+
+        if (
+            period == "PM"
+        ) {
+
+            hour +=
+                12
         }
 
-        hour * 60 + minute
 
-    } catch (e: Exception) {
+        hour * 60 +
+                minute
+
+
+    } catch (
+        e: Exception
+    ) {
 
         -1
     }
 }
-

@@ -11,18 +11,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,12 +36,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.aistudybuddy.components.BottomNavigationBar
-import com.example.aistudybuddy.data.GeneratedStudySession
+import com.example.aistudybuddy.data.StudyRoutine
 
 
 @Composable
 fun ViewRoutineScreen(
-    sessions: List<GeneratedStudySession>,
+    routines: List<StudyRoutine>,
+    onViewRoutineClick: (StudyRoutine) -> Unit = {},
+    onDeleteRoutineClick: (StudyRoutine) -> Unit = {},
     onAddRoutineClick: () -> Unit = {},
     onHomeClick: () -> Unit = {},
     onAssignmentsClick: () -> Unit = {},
@@ -59,15 +64,20 @@ fun ViewRoutineScreen(
     val greyText =
         Color(0xFF767987)
 
+    val deleteRed =
+        Color(0xFFD32F2F)
+
 
     Scaffold(
-
         containerColor =
             backgroundColor,
 
         bottomBar = {
 
             BottomNavigationBar(
+                selectedItem =
+                    "Planner",
+
                 onHomeClick =
                     onHomeClick,
 
@@ -84,7 +94,6 @@ fun ViewRoutineScreen(
                     onProfileClick
             )
         }
-
     ) { innerPadding ->
 
 
@@ -146,7 +155,7 @@ fun ViewRoutineScreen(
 
                     Text(
                         text =
-                            "View your AI-generated study routine.",
+                            "View or delete your AI-generated study routines.",
 
                         fontSize =
                             13.sp,
@@ -163,7 +172,7 @@ fun ViewRoutineScreen(
             // ==========================================
 
             if (
-                sessions.isEmpty()
+                routines.isEmpty()
             ) {
 
                 item {
@@ -249,15 +258,17 @@ fun ViewRoutineScreen(
 
 
             // ==========================================
-            // ROUTINE SESSIONS
+            // ROUTINE LIST
             // ==========================================
 
-            itemsIndexed(
+            items(
                 items =
-                    sessions
-            ) {
-                    index,
-                    session ->
+                    routines,
+
+                key = { routine ->
+                    routine.id
+                }
+            ) { routine ->
 
 
                 Card(
@@ -291,149 +302,105 @@ fun ViewRoutineScreen(
 
                     Column(
                         modifier =
-                            Modifier.padding(
-                                16.dp
-                            )
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    16.dp
+                                )
                     ) {
 
 
                         // ==========================================
-                        // SESSION NUMBER
-                        // ==========================================
-
-                        Text(
-                            text =
-                                "Session ${index + 1}",
-
-                            fontSize =
-                                11.sp,
-
-                            color =
-                                blue,
-
-                            fontWeight =
-                                FontWeight.Bold
-                        )
-
-
-                        Spacer(
-                            modifier =
-                                Modifier.height(
-                                    5.dp
-                                )
-                        )
-
-
-                        // ==========================================
-                        // SUBJECT
-                        // ==========================================
-
-                        Text(
-                            text =
-                                session.subject,
-
-                            fontSize =
-                                17.sp,
-
-                            fontWeight =
-                                FontWeight.Bold,
-
-                            color =
-                                darkText
-                        )
-
-
-                        Spacer(
-                            modifier =
-                                Modifier.height(
-                                    8.dp
-                                )
-                        )
-
-
-                        // ==========================================
-                        // TIME
+                        // ROUTINE INFORMATION
                         // ==========================================
 
                         Row(
+                            modifier =
+                                Modifier.fillMaxWidth(),
+
                             verticalAlignment =
                                 Alignment.CenterVertically
                         ) {
 
-                            Icon(
-                                imageVector =
-                                    Icons.Default.Schedule,
+                            Card(
+                                shape =
+                                    RoundedCornerShape(
+                                        10.dp
+                                    ),
 
-                                contentDescription =
-                                    "Time",
-
-                                tint =
-                                    greyText,
-
-                                modifier =
-                                    Modifier.size(
-                                        17.dp
+                                colors =
+                                    CardDefaults.cardColors(
+                                        containerColor =
+                                            Color(0xFFF1EDFF)
                                     )
-                            )
-
-
-                            Text(
-                                text =
-                                    " ${session.startTime} - ${session.endTime}",
-
-                                fontSize =
-                                    13.sp,
-
-                                color =
-                                    greyText
-                            )
-                        }
-
-
-                        // ==========================================
-                        // LOCATION
-                        // ==========================================
-
-                        if (
-                            session.location.isNotBlank()
-                        ) {
-
-                            Spacer(
-                                modifier =
-                                    Modifier.height(
-                                        5.dp
-                                    )
-                            )
-
-
-                            Row(
-                                verticalAlignment =
-                                    Alignment.CenterVertically
                             ) {
 
                                 Icon(
                                     imageVector =
-                                        Icons.Default.LocationOn,
+                                        Icons.Default.AutoAwesome,
 
                                     contentDescription =
-                                        "Location",
+                                        null,
 
                                     tint =
-                                        greyText,
+                                        Color(0xFF7C3AED),
 
                                     modifier =
-                                        Modifier.size(
-                                            17.dp
+                                        Modifier
+                                            .padding(
+                                                9.dp
+                                            )
+                                            .size(
+                                                21.dp
+                                            )
+                                )
+                            }
+
+
+                            Spacer(
+                                modifier =
+                                    Modifier.width(
+                                        12.dp
+                                    )
+                            )
+
+
+                            Column(
+                                modifier =
+                                    Modifier.weight(
+                                        1f
+                                    )
+                            ) {
+
+                                Text(
+                                    text =
+                                        routine.name,
+
+                                    fontSize =
+                                        17.sp,
+
+                                    fontWeight =
+                                        FontWeight.Bold,
+
+                                    color =
+                                        darkText
+                                )
+
+
+                                Spacer(
+                                    modifier =
+                                        Modifier.height(
+                                            3.dp
                                         )
                                 )
 
 
                                 Text(
                                     text =
-                                        " ${session.location}",
+                                        "${routine.sessions.size} study sessions",
 
                                     fontSize =
-                                        13.sp,
+                                        12.sp,
 
                                     color =
                                         greyText
@@ -445,71 +412,160 @@ fun ViewRoutineScreen(
                         Spacer(
                             modifier =
                                 Modifier.height(
-                                    10.dp
+                                    16.dp
                                 )
                         )
 
 
                         // ==========================================
-                        // TASK
+                        // VIEW / DELETE
                         // ==========================================
 
-                        Text(
-                            text =
-                                "Task",
+                        Row(
+                            modifier =
+                                Modifier.fillMaxWidth(),
 
-                            fontSize =
-                                12.sp,
+                            horizontalArrangement =
+                                Arrangement.spacedBy(
+                                    10.dp
+                                )
+                        ) {
 
-                            fontWeight =
-                                FontWeight.Bold,
+                            Button(
+                                onClick = {
+                                    onViewRoutineClick(
+                                        routine
+                                    )
+                                },
 
-                            color =
-                                darkText
-                        )
+                                modifier =
+                                    Modifier.weight(
+                                        1f
+                                    ),
+
+                                shape =
+                                    RoundedCornerShape(
+                                        10.dp
+                                    ),
+
+                                colors =
+                                    ButtonDefaults.buttonColors(
+                                        containerColor =
+                                            blue
+                                    )
+                            ) {
+
+                                Icon(
+                                    imageVector =
+                                        Icons.Default.Visibility,
+
+                                    contentDescription =
+                                        null,
+
+                                    modifier =
+                                        Modifier.size(
+                                            17.dp
+                                        )
+                                )
+
+                                Text(
+                                    text =
+                                        "  View Routine",
+
+                                    fontSize =
+                                        12.sp,
+
+                                    fontWeight =
+                                        FontWeight.Bold
+                                )
+                            }
 
 
-                        Text(
-                            text =
-                                session.task,
+                            OutlinedButton(
+                                onClick = {
+                                    onDeleteRoutineClick(
+                                        routine
+                                    )
+                                },
 
-                            fontSize =
-                                13.sp,
+                                modifier =
+                                    Modifier.weight(
+                                        1f
+                                    ),
 
-                            color =
-                                greyText
-                        )
+                                shape =
+                                    RoundedCornerShape(
+                                        10.dp
+                                    ),
+
+                                border =
+                                    BorderStroke(
+                                        1.dp,
+                                        deleteRed
+                                    )
+                            ) {
+
+                                Icon(
+                                    imageVector =
+                                        Icons.Default.Delete,
+
+                                    contentDescription =
+                                        null,
+
+                                    tint =
+                                        deleteRed,
+
+                                    modifier =
+                                        Modifier.size(
+                                            17.dp
+                                        )
+                                )
+
+                                Text(
+                                    text =
+                                        "  Delete",
+
+                                    fontSize =
+                                        12.sp,
+
+                                    fontWeight =
+                                        FontWeight.Bold,
+
+                                    color =
+                                        deleteRed
+                                )
+                            }
+                        }
                     }
                 }
             }
 
 
             // ==========================================
-            // ADD ROUTINE BUTTON
+            // ADD ROUTINE
             // ==========================================
 
             item {
 
                 Button(
-                    onClick = {
-
-                        onAddRoutineClick()
-                    },
+                    onClick =
+                        onAddRoutineClick,
 
                     modifier =
                         Modifier
                             .fillMaxWidth()
                             .padding(
-                                horizontal =
-                                    18.dp
+                                start = 18.dp,
+                                end = 18.dp,
+                                bottom = 18.dp
                             )
                             .height(
-                                52.dp
+                                50.dp
                             ),
 
                     shape =
                         RoundedCornerShape(
-                            14.dp
+                            12.dp
                         ),
 
                     colors =
@@ -524,26 +580,25 @@ fun ViewRoutineScreen(
                             Icons.Default.Add,
 
                         contentDescription =
-                            "Add Routine"
-                    )
+                            null,
 
+                        modifier =
+                            Modifier.size(
+                                20.dp
+                            )
+                    )
 
                     Text(
                         text =
                             "  Add Routine",
 
+                        fontSize =
+                            13.sp,
+
                         fontWeight =
                             FontWeight.Bold
                     )
                 }
-
-
-                Spacer(
-                    modifier =
-                        Modifier.height(
-                            20.dp
-                        )
-                )
             }
         }
     }

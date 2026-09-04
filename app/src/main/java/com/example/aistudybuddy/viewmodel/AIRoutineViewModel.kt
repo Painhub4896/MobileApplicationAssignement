@@ -30,6 +30,7 @@ class AIRoutineViewModel : ViewModel() {
     mutableStateOf<String?>(null)
         private set
 
+
     fun generateRoutine(
         timetableEntries: List<TimetableEntry>,
         availableStart: String,
@@ -40,47 +41,94 @@ class AIRoutineViewModel : ViewModel() {
         assignment: String,
         onSuccess: () -> Unit
     ) {
+
         if (isLoading) return
 
         viewModelScope.launch {
+
             isLoading = true
             errorMessage = null
+            generatedSessions = emptyList()
 
             try {
+
                 val response =
                     repository.generateStudyRoutine(
-                        timetableEntries,
-                        availableStart,
-                        availableEnd,
-                        sessionLength,
-                        difficulty,
-                        upcomingTest,
-                        assignment
+                        timetableEntries =
+                            timetableEntries,
+
+                        availableStart =
+                            availableStart,
+
+                        availableEnd =
+                            availableEnd,
+
+                        sessionLength =
+                            sessionLength,
+
+                        difficulty =
+                            difficulty,
+
+                        upcomingTest =
+                            upcomingTest,
+
+                        assignment =
+                            assignment
                     )
 
+
+                if (response.isBlank()) {
+
+                    throw Exception(
+                        "Gemini returned an empty response."
+                    )
+                }
+
+
                 val sessions =
-                    parseSessions(response)
+                    parseSessions(
+                        response
+                    )
+
 
                 if (sessions.isEmpty()) {
+
                     throw Exception(
                         "Gemini did not generate any study sessions."
                     )
                 }
 
+
                 generatedSessions =
                     sessions
+
+
+                if (generatedSessions.isEmpty()) {
+
+                    throw Exception(
+                        "Generated routine could not be saved."
+                    )
+                }
+
 
                 onSuccess()
 
             } catch (e: Exception) {
+
+                generatedSessions =
+                    emptyList()
+
                 errorMessage =
                     e.message
                         ?: "Unable to generate study routine."
+
             } finally {
+
                 isLoading = false
             }
         }
     }
+
 
     private fun parseSessions(
         response: String
@@ -88,62 +136,173 @@ class AIRoutineViewModel : ViewModel() {
 
         val clean =
             response
-                .replace("```json", "")
-                .replace("```JSON", "")
-                .replace("```", "")
+                .replace(
+                    "```json",
+                    ""
+                )
+                .replace(
+                    "```JSON",
+                    ""
+                )
+                .replace(
+                    "```",
+                    ""
+                )
                 .trim()
 
+
+        if (clean.isBlank()) {
+
+            throw Exception(
+                "Gemini returned an empty routine."
+            )
+        }
+
+
+        if (
+            !clean.startsWith("[") ||
+            !clean.endsWith("]")
+        ) {
+
+            throw Exception(
+                "Gemini returned an invalid routine format."
+            )
+        }
+
+
         val jsonArray =
-            JSONArray(clean)
+            try {
+
+                JSONArray(
+                    clean
+                )
+
+            } catch (e: Exception) {
+
+                throw Exception(
+                    "Unable to read Gemini routine: ${e.message}"
+                )
+            }
+
+
+        if (jsonArray.length() == 0) {
+
+            throw Exception(
+                "Gemini returned no study sessions."
+            )
+        }
+
 
         val sessions =
             mutableListOf<GeneratedStudySession>()
 
-        for (i in 0 until jsonArray.length()) {
+
+        for (
+        i in 0 until jsonArray.length()
+        ) {
+
             val item =
-                jsonArray.getJSONObject(i)
+                jsonArray
+                    .getJSONObject(i)
+
+
+            val subject =
+                item
+                    .optString(
+                        "subject"
+                    )
+                    .trim()
+
+
+            val startTime =
+                item
+                    .optString(
+                        "startTime"
+                    )
+                    .trim()
+
+
+            val endTime =
+                item
+                    .optString(
+                        "endTime"
+                    )
+                    .trim()
+
+
+            val task =
+                item
+                    .optString(
+                        "task"
+                    )
+                    .trim()
+
+
+            val reason =
+                item
+                    .optString(
+                        "reason"
+                    )
+                    .trim()
+
+
+            val location =
+                item
+                    .optString(
+                        "location",
+                        "Study Area"
+                    )
+                    .trim()
+
+
+            if (
+                subject.isBlank() ||
+                startTime.isBlank() ||
+                endTime.isBlank()
+            ) {
+
+                continue
+            }
+
 
             sessions.add(
+
                 GeneratedStudySession(
+
                     subject =
-                        item.optString("subject")
-                            .ifBlank {
-                                "Study Session"
-                            },
+                        subject,
 
                     startTime =
-                        item.optString("startTime"),
+                        startTime,
 
                     endTime =
-                        item.optString("endTime"),
+                        endTime,
 
                     task =
-                        item.optString("task")
-                            .ifBlank {
-                                "Review study materials"
-                            },
+                        task.ifBlank {
+                            "Review study materials"
+                        },
 
                     reason =
-                        item.optString("reason")
-                            .ifBlank {
-                                "Selected to support your studies."
-                            },
+                        reason.ifBlank {
+                            "Selected to support your studies."
+                        },
 
                     location =
-                        item.optString(
-                            "location",
-                            "Study Area"
-                        ).ifBlank {
+                        location.ifBlank {
                             "Study Area"
                         }
                 )
             )
         }
 
+
         return sessions
     }
 
+
     fun clearRoutine() {
+
         generatedSessions =
             emptyList()
 
@@ -151,7 +310,10 @@ class AIRoutineViewModel : ViewModel() {
             null
     }
 
+
     fun clearError() {
-        errorMessage = null
+
+        errorMessage =
+            null
     }
 }

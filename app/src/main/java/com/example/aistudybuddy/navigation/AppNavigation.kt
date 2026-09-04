@@ -18,7 +18,7 @@ import androidx.navigation.navDeepLink
 import com.example.aistudybuddy.auth.AuthUiState
 import com.example.aistudybuddy.auth.AuthViewModel
 
-import com.example.aistudybuddy.data.GeneratedStudySession
+import com.example.aistudybuddy.data.StudyRoutine
 import com.example.aistudybuddy.data.TimetableEntry
 
 import com.example.aistudybuddy.screens.AIRoutineSetupScreen
@@ -33,6 +33,7 @@ import com.example.aistudybuddy.screens.NotificationScreen
 import com.example.aistudybuddy.screens.ProfileScreen
 import com.example.aistudybuddy.screens.ProgressDashboardScreen
 import com.example.aistudybuddy.screens.ResetPasswordScreen
+import com.example.aistudybuddy.screens.RoutineDetailsScreen
 import com.example.aistudybuddy.screens.SignUpScreen
 import com.example.aistudybuddy.screens.SplashScreen
 import com.example.aistudybuddy.screens.StudyNotesScreen
@@ -79,10 +80,20 @@ fun AppNavigation(incomingDeepLink: Uri?) {
     // MEMBER'S ACCEPTED AI ROUTINE DATA
     // =========================================================
 
-    val acceptedRoutineSessions =
+    val acceptedRoutines =
         remember {
-            mutableStateListOf<GeneratedStudySession>()
+            mutableStateListOf<StudyRoutine>()
         }
+
+    var selectedRoutine by
+    remember {
+        mutableStateOf<StudyRoutine?>(null)
+    }
+
+    var routineNumber by
+    remember {
+        mutableStateOf(1)
+    }
 
     // =========================================================
     // MEMBER'S SHARED TIMETABLE DATA
@@ -765,8 +776,34 @@ fun AppNavigation(incomingDeepLink: Uri?) {
 
             ViewRoutineScreen(
 
-                sessions =
-                    acceptedRoutineSessions,
+                routines =
+                    acceptedRoutines,
+
+                onViewRoutineClick = { routine ->
+
+                    selectedRoutine =
+                        routine
+
+                    navController.navigate(
+                        Routes.RoutineDetails
+                    )
+                },
+
+                onDeleteRoutineClick = { routine ->
+
+                    acceptedRoutines.remove(
+                        routine
+                    )
+
+                    if (
+                        selectedRoutine?.id ==
+                        routine.id
+                    ) {
+
+                        selectedRoutine =
+                            null
+                    }
+                },
 
                 onAddRoutineClick = {
 
@@ -825,15 +862,75 @@ fun AppNavigation(incomingDeepLink: Uri?) {
         }
 
         // =====================================================
+        // ROUTINE DETAILS
+        // =====================================================
+
+        composable(Routes.RoutineDetails) {
+
+            RoutineDetailsScreen(
+
+                routine =
+                    selectedRoutine,
+
+                onBackClick = {
+
+                    navController.popBackStack()
+                },
+
+                onHomeClick = {
+
+                    navController.navigate(
+                        Routes.Home
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onAssignmentsClick = {
+
+                    navController.navigate(
+                        Routes.AssignmentTracker
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onPlannerClick = {
+
+                    navController.navigate(
+                        Routes.StudyPlanner
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProgressClick = {
+
+                    navController.navigate(
+                        Routes.ProgressDashboard
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProfileClick = {
+
+                    navController.navigate(
+                        Routes.Profile
+                    ) {
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        // =====================================================
         // AI ROUTINE SETUP
         // =====================================================
 
         composable(Routes.AIRoutineSetup) {
 
             AIRoutineSetupScreen(
-
-                timetableEntries =
-                    timetableEntries,
 
                 aiRoutineViewModel =
                     aiRoutineViewModel,
@@ -843,6 +940,59 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                     navController.navigate(
                         Routes.GeneratedRoutine
                     )
+                },
+
+                onHomeClick = {
+
+                    navController.navigate(
+                        Routes.Home
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onAssignmentClick = {
+
+                    navController.navigate(
+                        Routes.AssignmentTracker
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onPlannerClick = {
+
+                    navController.navigate(
+                        Routes.StudyPlanner
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProgressClick = {
+
+                    navController.navigate(
+                        Routes.ProgressDashboard
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProfileClick = {
+
+                    navController.navigate(
+                        Routes.Profile
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onBackClick = {
+                    navController.navigate(
+                        Routes.ViewRoutine
+                    ){
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -861,12 +1011,32 @@ fun AppNavigation(incomingDeepLink: Uri?) {
 
                 onAcceptClick = {
 
-                    acceptedRoutineSessions.clear()
-
-                    acceptedRoutineSessions.addAll(
+                    if (
                         aiRoutineViewModel
                             .generatedSessions
-                    )
+                            .isNotEmpty()
+                    ) {
+
+                        val newRoutine =
+                            StudyRoutine(
+                                id =
+                                    System.currentTimeMillis(),
+
+                                name =
+                                    "Routine $routineNumber",
+
+                                sessions =
+                                    aiRoutineViewModel
+                                        .generatedSessions
+                                        .toList()
+                            )
+
+                        acceptedRoutines.add(
+                            newRoutine
+                        )
+
+                        routineNumber += 1
+                    }
 
                     navController.navigate(
                         Routes.ViewRoutine

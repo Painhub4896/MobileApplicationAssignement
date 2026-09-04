@@ -22,6 +22,7 @@ object Routes {
     const val TimetableSetup = "timetable-setup"
 
     const val ViewRoutine = "view-routine"
+    const val RoutineDetails = "routine-details"
     const val AIRoutineSetup = "ai-routine-setup"
     const val GeneratedRoutine = "generated-routine"
 }
