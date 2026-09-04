@@ -18,6 +18,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assignment
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Today
@@ -42,6 +44,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.aistudybuddy.auth.AuthViewModel
 import com.example.aistudybuddy.components.AppHeader
 import com.example.aistudybuddy.components.BottomNavigationBar
+import com.example.aistudybuddy.data.StudyRoutine
 import com.example.aistudybuddy.data.StudyPlannerData
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -97,6 +100,8 @@ private val homeSessionTitleColors =
 fun HomeScreen(
     authViewModel: AuthViewModel,
     assignments: List<AssignmentItem>,
+    routines: List<StudyRoutine>,
+    onViewRoutineClick: () -> Unit,
     onHomeClick: () -> Unit,
     onAssignmentClick: () -> Unit,
     onPlannerClick: () -> Unit,
@@ -523,6 +528,219 @@ fun HomeScreen(
                                 )
                             }
                         }
+                    }
+                }
+            }
+
+
+            // ==================== AI ROUTINE ====================
+
+            item {
+
+                Card(
+                    modifier =
+                        Modifier.fillMaxWidth(),
+
+                    colors =
+                        CardDefaults.cardColors(
+                            containerColor =
+                                Color.White
+                        ),
+
+                    shape =
+                        RoundedCornerShape(
+                            10.dp
+                        ),
+
+                    onClick =
+                        onViewRoutineClick
+                ) {
+
+                    Row(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    12.dp
+                                ),
+
+                        verticalAlignment =
+                            Alignment.CenterVertically
+                    ) {
+
+                        Box(
+                            modifier =
+                                Modifier
+                                    .size(
+                                        40.dp
+                                    )
+                                    .clip(
+                                        RoundedCornerShape(
+                                            8.dp
+                                        )
+                                    )
+                                    .background(
+                                        Color(
+                                            0xFFF3EEFF
+                                        )
+                                    ),
+
+                            contentAlignment =
+                                Alignment.Center
+                        ) {
+
+                            Icon(
+                                imageVector =
+                                    Icons.Default.AutoAwesome,
+
+                                contentDescription =
+                                    "AI Routine",
+
+                                tint =
+                                    Color(
+                                        0xFF7C3AED
+                                    ),
+
+                                modifier =
+                                    Modifier.size(
+                                        20.dp
+                                    )
+                            )
+                        }
+
+
+                        Spacer(
+                            modifier =
+                                Modifier.width(
+                                    10.dp
+                                )
+                        )
+
+
+                        Column(
+                            modifier =
+                                Modifier.weight(
+                                    1f
+                                )
+                        ) {
+
+                            Text(
+                                text =
+                                    "AI Study Routine",
+
+                                fontSize =
+                                    14.sp,
+
+                                fontWeight =
+                                    FontWeight.Bold,
+
+                                color =
+                                    Color.Black
+                            )
+
+
+                            Text(
+                                text =
+                                    if (
+                                        routines.isEmpty()
+                                    ) {
+
+                                        "No routine generated yet"
+
+                                    } else {
+
+                                        "${routines.size} saved routines"
+                                    },
+
+                                fontSize =
+                                    11.sp,
+
+                                color =
+                                    Color.Gray
+                            )
+
+
+                            if (
+                                routines.isNotEmpty()
+                            ) {
+
+                                Text(
+                                    text =
+                                        "Latest: ${routines.last().name}",
+
+                                    fontSize =
+                                        10.sp,
+
+                                    color =
+                                        Color.Gray
+                                )
+                            }
+                        }
+
+
+                        if (
+                            routines.isNotEmpty()
+                        ) {
+
+                            Box(
+                                modifier =
+                                    Modifier
+                                        .background(
+                                            Color(
+                                                0xFF7C3AED
+                                            ),
+                                            RoundedCornerShape(
+                                                7.dp
+                                            )
+                                        )
+                                        .padding(
+                                            horizontal =
+                                                8.dp,
+                                            vertical =
+                                                4.dp
+                                        )
+                            ) {
+
+                                Text(
+                                    text =
+                                        "${routines.size} routines",
+
+                                    fontSize =
+                                        9.sp,
+
+                                    fontWeight =
+                                        FontWeight.Medium,
+
+                                    color =
+                                        Color.White
+                                )
+                            }
+
+
+                            Spacer(
+                                modifier =
+                                    Modifier.width(
+                                        6.dp
+                                    )
+                            )
+                        }
+
+
+                        Icon(
+                            imageVector =
+                                Icons.Default.ChevronRight,
+
+                            contentDescription =
+                                "View Routine",
+
+                            tint =
+                                Color.Gray,
+
+                            modifier =
+                                Modifier.size(
+                                    20.dp
+                                )
+                        )
                     }
                 }
             }

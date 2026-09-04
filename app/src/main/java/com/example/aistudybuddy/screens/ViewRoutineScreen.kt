@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -300,6 +301,7 @@ fun ViewRoutineScreen(
                         )
                 ) {
 
+
                     Column(
                         modifier =
                             Modifier
@@ -322,6 +324,7 @@ fun ViewRoutineScreen(
                                 Alignment.CenterVertically
                         ) {
 
+
                             Card(
                                 shape =
                                     RoundedCornerShape(
@@ -331,9 +334,12 @@ fun ViewRoutineScreen(
                                 colors =
                                     CardDefaults.cardColors(
                                         containerColor =
-                                            Color(0xFFF1EDFF)
+                                            Color(
+                                                0xFFF1EDFF
+                                            )
                                     )
                             ) {
+
 
                                 Icon(
                                     imageVector =
@@ -343,7 +349,9 @@ fun ViewRoutineScreen(
                                         null,
 
                                     tint =
-                                        Color(0xFF7C3AED),
+                                        Color(
+                                            0xFF7C3AED
+                                        ),
 
                                     modifier =
                                         Modifier
@@ -371,6 +379,7 @@ fun ViewRoutineScreen(
                                         1f
                                     )
                             ) {
+
 
                                 Text(
                                     text =
@@ -428,24 +437,42 @@ fun ViewRoutineScreen(
                             horizontalArrangement =
                                 Arrangement.spacedBy(
                                     10.dp
-                                )
+                                ),
+
+                            verticalAlignment =
+                                Alignment.CenterVertically
                         ) {
+
 
                             Button(
                                 onClick = {
+
                                     onViewRoutineClick(
                                         routine
                                     )
                                 },
 
                                 modifier =
-                                    Modifier.weight(
-                                        1f
-                                    ),
+                                    Modifier
+                                        .weight(
+                                            1.35f
+                                        )
+                                        .height(
+                                            50.dp
+                                        ),
 
                                 shape =
                                     RoundedCornerShape(
                                         10.dp
+                                    ),
+
+                                contentPadding =
+                                    PaddingValues(
+                                        horizontal =
+                                            10.dp,
+
+                                        vertical =
+                                            0.dp
                                     ),
 
                                 colors =
@@ -454,6 +481,7 @@ fun ViewRoutineScreen(
                                             blue
                                     )
                             ) {
+
 
                                 Icon(
                                     imageVector =
@@ -468,34 +496,60 @@ fun ViewRoutineScreen(
                                         )
                                 )
 
+
+                                Spacer(
+                                    modifier =
+                                        Modifier.width(
+                                            6.dp
+                                        )
+                                )
+
+
                                 Text(
                                     text =
-                                        "  View Routine",
+                                        "View Routine",
 
                                     fontSize =
                                         12.sp,
 
                                     fontWeight =
-                                        FontWeight.Bold
+                                        FontWeight.Bold,
+
+                                    maxLines =
+                                        1
                                 )
                             }
 
 
                             OutlinedButton(
                                 onClick = {
+
                                     onDeleteRoutineClick(
                                         routine
                                     )
                                 },
 
                                 modifier =
-                                    Modifier.weight(
-                                        1f
-                                    ),
+                                    Modifier
+                                        .weight(
+                                            1f
+                                        )
+                                        .height(
+                                            50.dp
+                                        ),
 
                                 shape =
                                     RoundedCornerShape(
                                         10.dp
+                                    ),
+
+                                contentPadding =
+                                    PaddingValues(
+                                        horizontal =
+                                            10.dp,
+
+                                        vertical =
+                                            0.dp
                                     ),
 
                                 border =
@@ -504,6 +558,7 @@ fun ViewRoutineScreen(
                                         deleteRed
                                     )
                             ) {
+
 
                                 Icon(
                                     imageVector =
@@ -521,9 +576,18 @@ fun ViewRoutineScreen(
                                         )
                                 )
 
+
+                                Spacer(
+                                    modifier =
+                                        Modifier.width(
+                                            6.dp
+                                        )
+                                )
+
+
                                 Text(
                                     text =
-                                        "  Delete",
+                                        "Delete",
 
                                     fontSize =
                                         12.sp,
@@ -532,7 +596,10 @@ fun ViewRoutineScreen(
                                         FontWeight.Bold,
 
                                     color =
-                                        deleteRed
+                                        deleteRed,
+
+                                    maxLines =
+                                        1
                                 )
                             }
                         }
@@ -547,6 +614,7 @@ fun ViewRoutineScreen(
 
             item {
 
+
                 Button(
                     onClick =
                         onAddRoutineClick,
@@ -555,9 +623,14 @@ fun ViewRoutineScreen(
                         Modifier
                             .fillMaxWidth()
                             .padding(
-                                start = 18.dp,
-                                end = 18.dp,
-                                bottom = 18.dp
+                                start =
+                                    18.dp,
+
+                                end =
+                                    18.dp,
+
+                                bottom =
+                                    18.dp
                             )
                             .height(
                                 50.dp
@@ -575,6 +648,7 @@ fun ViewRoutineScreen(
                         )
                 ) {
 
+
                     Icon(
                         imageVector =
                             Icons.Default.Add,
@@ -587,6 +661,7 @@ fun ViewRoutineScreen(
                                 20.dp
                             )
                     )
+
 
                     Text(
                         text =

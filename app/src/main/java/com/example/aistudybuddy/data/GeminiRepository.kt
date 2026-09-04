@@ -2,6 +2,7 @@ package com.example.aistudybuddy.data
 
 import com.example.aistudybuddy.BuildConfig
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
@@ -12,7 +13,6 @@ import java.net.URL
 class GeminiRepository {
 
     suspend fun generateStudyRoutine(
-        timetableEntries: List<TimetableEntry>,
         availableStart: String,
         availableEnd: String,
         sessionLength: String,
@@ -21,11 +21,14 @@ class GeminiRepository {
         assignment: String
     ): String = withContext(Dispatchers.IO) {
 
+
         val apiKey =
             BuildConfig.GEMINI_API_KEY
 
 
-        if (apiKey.isBlank()) {
+        if (
+            apiKey.isBlank()
+        ) {
 
             throw Exception(
                 "Gemini API key is missing."
@@ -33,31 +36,58 @@ class GeminiRepository {
         }
 
 
-        val timetableText =
-            if (timetableEntries.isEmpty()) {
+        // =====================================================
+        // VALIDATE UPCOMING WORK
+        // =====================================================
+
+        if (
+            upcomingTest.isBlank() &&
+            assignment.isBlank()
+        ) {
+
+            throw Exception(
+                "Please enter either an Upcoming Test or an Assignment / Project."
+            )
+        }
+
+
+        if (
+            upcomingTest.isNotBlank() &&
+            assignment.isNotBlank()
+        ) {
+
+            throw Exception(
+                "Please enter only one: Upcoming Test OR Assignment / Project."
+            )
+        }
+
+
+        // =====================================================
+        // UPCOMING WORK
+        // =====================================================
+
+        val upcomingWork =
+            if (
+                upcomingTest.isNotBlank()
+            ) {
 
                 """
-                No timetable classes were provided.
-
-                Use the upcoming test or assignment subjects if available.
-                If none are provided, create general study sessions such as:
-                Mathematics, Revision, Reading or Assignment Work.
+                Type: Upcoming Test
+                Details: $upcomingTest
                 """.trimIndent()
 
             } else {
 
-                timetableEntries
-                    .joinToString("\n") { entry ->
-
-                        """
-                        Subject: ${entry.subject}
-                        Day: ${entry.day}
-                        Time: ${entry.startTime} - ${entry.endTime}
-                        Room: ${entry.room}
-                        """.trimIndent()
-                    }
+                """
+                Type: Assignment / Project
+                Details: $assignment
+                """.trimIndent()
             }
 
+
+        // =====================================================
+        // PROMPT
+        // =====================================================
 
         val prompt =
             """
@@ -65,37 +95,36 @@ class GeminiRepository {
 
             Create a realistic study routine for the student.
 
-            SCHOOL TIMETABLE:
-            $timetableText
+            UPCOMING WORK:
+            $upcomingWork
 
             STUDENT PREFERENCES:
             Available study time: $availableStart to $availableEnd
             Preferred session length: $sessionLength
             Study intensity: $difficulty
-            Upcoming test: ${upcomingTest.ifBlank { "None" }}
-            Assignment/project: ${assignment.ifBlank { "None" }}
 
             RULES:
 
             1. Generate exactly 3 study sessions.
 
-            2. Prefer subjects from the school timetable when timetable subjects exist.
+            2. The study routine must focus on the student's upcoming work.
 
-            3. If the timetable is empty, still generate 3 useful study sessions.
+            3. If the upcoming work is a test, create useful revision sessions for the test.
 
-            4. Give higher priority to an upcoming test when one is provided.
+            4. If the upcoming work is an assignment or project, create useful working sessions for the assignment or project.
 
-            5. Give higher priority to an assignment or project when one is provided.
-
-            6. Every study session must be inside:
+            5. Every study session must be inside:
                $availableStart to $availableEnd
 
-            7. Try to follow the preferred session length:
+            6. Try to follow the preferred session length:
                $sessionLength
 
-            8. Do not overlap sessions.
+            7. Adjust the study activities according to this intensity:
+               $difficulty
 
-            9. Every session must include:
+            8. Do not overlap study sessions.
+
+            9. Every session must contain:
                subject
                startTime
                endTime
@@ -103,11 +132,13 @@ class GeminiRepository {
                reason
                location
 
-            10. Times must use this format:
+            10. Times must use 12-hour format such as:
                 7:00 PM
                 8:30 PM
 
-            11. Return ONLY a JSON array.
+            11. Use "Study Area" as the default location.
+
+            12. Return ONLY a JSON array.
 
             REQUIRED JSON FORMAT:
 
@@ -117,23 +148,23 @@ class GeminiRepository {
                 "startTime": "7:00 PM",
                 "endTime": "7:45 PM",
                 "task": "Review Chapter 3",
-                "reason": "Biology is prioritised because the student has an upcoming test.",
+                "reason": "This session helps prepare for the upcoming Biology test.",
                 "location": "Study Area"
               },
               {
-                "subject": "Mathematics",
+                "subject": "Biology",
                 "startTime": "8:00 PM",
                 "endTime": "8:45 PM",
-                "task": "Complete algebra practice questions",
-                "reason": "Regular mathematics practice supports problem solving skills.",
+                "task": "Complete practice questions",
+                "reason": "Practice questions help reinforce important Biology concepts.",
                 "location": "Study Area"
               },
               {
-                "subject": "Computer Science",
+                "subject": "Biology",
                 "startTime": "9:00 PM",
                 "endTime": "9:45 PM",
-                "task": "Review programming concepts",
-                "reason": "This session balances the student's study routine.",
+                "task": "Review difficult topics",
+                "reason": "Reviewing difficult topics helps prepare for the upcoming test.",
                 "location": "Study Area"
               }
             ]
@@ -151,6 +182,10 @@ class GeminiRepository {
             Return only the JSON array.
             """.trimIndent()
 
+
+        // =====================================================
+        // REQUEST BODY
+        // =====================================================
 
         val requestBody =
             JSONObject().apply {
@@ -201,6 +236,81 @@ class GeminiRepository {
             }
 
 
+        // =====================================================
+        // AUTOMATIC RETRY
+        // =====================================================
+
+        var attempt =
+            0
+
+
+        val maximumAttempts =
+            3
+
+
+        var retryDelay =
+            2000L
+
+
+        while (
+            attempt < maximumAttempts
+        ) {
+
+            attempt++
+
+
+            try {
+
+                return@withContext sendGeminiRequest(
+                    apiKey =
+                        apiKey,
+
+                    requestBody =
+                        requestBody
+                )
+
+
+            } catch (
+                e: GeminiServerException
+            ) {
+
+
+                if (
+                    attempt >= maximumAttempts
+                ) {
+
+                    throw Exception(
+                        "Gemini is busy right now. Please try again in a moment."
+                    )
+                }
+
+
+                delay(
+                    retryDelay
+                )
+
+
+                retryDelay *=
+                    2
+            }
+        }
+
+
+        throw Exception(
+            "Unable to generate study routine."
+        )
+    }
+
+
+    // =====================================================
+    // SEND GEMINI REQUEST
+    // =====================================================
+
+    private fun sendGeminiRequest(
+        apiKey: String,
+        requestBody: JSONObject
+    ): String {
+
         val url =
             URL(
                 "https://generativelanguage.googleapis.com/" +
@@ -220,8 +330,10 @@ class GeminiRepository {
             connection.requestMethod =
                 "POST"
 
+
             connection.connectTimeout =
                 30000
+
 
             connection.readTimeout =
                 120000
@@ -241,6 +353,7 @@ class GeminiRepository {
 
             connection.doInput =
                 true
+
 
             connection.doOutput =
                 true
@@ -273,6 +386,7 @@ class GeminiRepository {
                         .inputStream
                         .bufferedReader()
                         .use {
+
                             it.readText()
                         }
 
@@ -282,11 +396,30 @@ class GeminiRepository {
                         .errorStream
                         ?.bufferedReader()
                         ?.use {
+
                             it.readText()
                         }
                         ?: "Unknown Gemini error"
                 }
 
+
+            // =====================================================
+            // TEMPORARY SERVER ERROR
+            // =====================================================
+
+            if (
+                responseCode >= 500
+            ) {
+
+                throw GeminiServerException(
+                    responseCode
+                )
+            }
+
+
+            // =====================================================
+            // OTHER ERRORS
+            // =====================================================
 
             if (
                 responseCode !in 200..299
@@ -303,6 +436,10 @@ class GeminiRepository {
                 )
             }
 
+
+            // =====================================================
+            // READ RESPONSE
+            // =====================================================
 
             val responseJson =
                 JSONObject(
@@ -332,7 +469,9 @@ class GeminiRepository {
 
             val candidate =
                 candidates
-                    .getJSONObject(0)
+                    .getJSONObject(
+                        0
+                    )
 
 
             val content =
@@ -367,7 +506,9 @@ class GeminiRepository {
 
             val generatedText =
                 parts
-                    .getJSONObject(0)
+                    .getJSONObject(
+                        0
+                    )
                     .optString(
                         "text"
                     )
@@ -384,7 +525,8 @@ class GeminiRepository {
             }
 
 
-            generatedText
+            return generatedText
+
 
         } catch (
             e: SocketTimeoutException
@@ -394,11 +536,6 @@ class GeminiRepository {
                 "Gemini request timed out. Please try again."
             )
 
-        } catch (
-            e: Exception
-        ) {
-
-            throw e
 
         } finally {
 
@@ -406,6 +543,10 @@ class GeminiRepository {
         }
     }
 
+
+    // =====================================================
+    // READABLE GEMINI ERROR
+    // =====================================================
 
     private fun getReadableGeminiError(
         responseCode: Int,
@@ -458,11 +599,6 @@ class GeminiRepository {
                     "Gemini usage limit has been reached. Please try again later."
 
 
-                responseCode >= 500 ->
-
-                    "Gemini server is temporarily unavailable. Please try again."
-
-
                 message.isNotBlank() ->
 
                     message
@@ -473,6 +609,7 @@ class GeminiRepository {
                     "Gemini API error: HTTP $responseCode"
             }
 
+
         } catch (
             _: Exception
         ) {
@@ -480,4 +617,15 @@ class GeminiRepository {
             "Gemini API error: HTTP $responseCode"
         }
     }
+
+
+    // =====================================================
+    // GEMINI SERVER ERROR
+    // =====================================================
+
+    private class GeminiServerException(
+        val responseCode: Int
+    ) : Exception(
+        "Gemini server error: HTTP $responseCode"
+    )
 }

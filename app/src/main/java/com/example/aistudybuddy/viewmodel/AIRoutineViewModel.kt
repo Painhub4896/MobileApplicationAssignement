@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aistudybuddy.data.GeneratedStudySession
 import com.example.aistudybuddy.data.GeminiRepository
-import com.example.aistudybuddy.data.TimetableEntry
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 
@@ -16,15 +15,18 @@ class AIRoutineViewModel : ViewModel() {
     private val repository =
         GeminiRepository()
 
+
     var generatedSessions by
     mutableStateOf<List<GeneratedStudySession>>(
         emptyList()
     )
         private set
 
+
     var isLoading by
     mutableStateOf(false)
         private set
+
 
     var errorMessage by
     mutableStateOf<String?>(null)
@@ -32,7 +34,6 @@ class AIRoutineViewModel : ViewModel() {
 
 
     fun generateRoutine(
-        timetableEntries: List<TimetableEntry>,
         availableStart: String,
         availableEnd: String,
         sessionLength: String,
@@ -42,20 +43,32 @@ class AIRoutineViewModel : ViewModel() {
         onSuccess: () -> Unit
     ) {
 
-        if (isLoading) return
+        if (
+            isLoading
+        ) {
+
+            return
+        }
+
 
         viewModelScope.launch {
 
-            isLoading = true
-            errorMessage = null
-            generatedSessions = emptyList()
+            isLoading =
+                true
+
+
+            errorMessage =
+                null
+
+
+            generatedSessions =
+                emptyList()
+
 
             try {
 
                 val response =
                     repository.generateStudyRoutine(
-                        timetableEntries =
-                            timetableEntries,
 
                         availableStart =
                             availableStart,
@@ -77,7 +90,9 @@ class AIRoutineViewModel : ViewModel() {
                     )
 
 
-                if (response.isBlank()) {
+                if (
+                    response.isBlank()
+                ) {
 
                     throw Exception(
                         "Gemini returned an empty response."
@@ -91,7 +106,9 @@ class AIRoutineViewModel : ViewModel() {
                     )
 
 
-                if (sessions.isEmpty()) {
+                if (
+                    sessions.isEmpty()
+                ) {
 
                     throw Exception(
                         "Gemini did not generate any study sessions."
@@ -103,7 +120,9 @@ class AIRoutineViewModel : ViewModel() {
                     sessions
 
 
-                if (generatedSessions.isEmpty()) {
+                if (
+                    generatedSessions.isEmpty()
+                ) {
 
                     throw Exception(
                         "Generated routine could not be saved."
@@ -113,20 +132,44 @@ class AIRoutineViewModel : ViewModel() {
 
                 onSuccess()
 
-            } catch (e: Exception) {
+
+            } catch (
+                e: Exception
+            ) {
 
                 generatedSessions =
                     emptyList()
+
 
                 errorMessage =
                     e.message
                         ?: "Unable to generate study routine."
 
+
             } finally {
 
-                isLoading = false
+                isLoading =
+                    false
             }
         }
+    }
+
+
+    fun clearRoutine() {
+
+        generatedSessions =
+            emptyList()
+
+
+        errorMessage =
+            null
+    }
+
+
+    fun clearError() {
+
+        errorMessage =
+            null
     }
 
 
@@ -134,14 +177,10 @@ class AIRoutineViewModel : ViewModel() {
         response: String
     ): List<GeneratedStudySession> {
 
-        val clean =
+        val cleanedResponse =
             response
                 .replace(
                     "```json",
-                    ""
-                )
-                .replace(
-                    "```JSON",
                     ""
                 )
                 .replace(
@@ -151,17 +190,8 @@ class AIRoutineViewModel : ViewModel() {
                 .trim()
 
 
-        if (clean.isBlank()) {
-
-            throw Exception(
-                "Gemini returned an empty routine."
-            )
-        }
-
-
         if (
-            !clean.startsWith("[") ||
-            !clean.endsWith("]")
+            !cleanedResponse.startsWith("[")
         ) {
 
             throw Exception(
@@ -171,26 +201,9 @@ class AIRoutineViewModel : ViewModel() {
 
 
         val jsonArray =
-            try {
-
-                JSONArray(
-                    clean
-                )
-
-            } catch (e: Exception) {
-
-                throw Exception(
-                    "Unable to read Gemini routine: ${e.message}"
-                )
-            }
-
-
-        if (jsonArray.length() == 0) {
-
-            throw Exception(
-                "Gemini returned no study sessions."
+            JSONArray(
+                cleanedResponse
             )
-        }
 
 
         val sessions =
@@ -198,12 +211,14 @@ class AIRoutineViewModel : ViewModel() {
 
 
         for (
-        i in 0 until jsonArray.length()
+        index in 0 until jsonArray.length()
         ) {
 
             val item =
                 jsonArray
-                    .getJSONObject(i)
+                    .getJSONObject(
+                        index
+                    )
 
 
             val subject =
@@ -266,9 +281,7 @@ class AIRoutineViewModel : ViewModel() {
 
 
             sessions.add(
-
                 GeneratedStudySession(
-
                     subject =
                         subject,
 
@@ -279,18 +292,21 @@ class AIRoutineViewModel : ViewModel() {
                         endTime,
 
                     task =
-                        task.ifBlank {
-                            "Review study materials"
-                        },
+                        task,
 
                     reason =
-                        reason.ifBlank {
-                            "Selected to support your studies."
-                        },
+                        reason,
 
                     location =
-                        location.ifBlank {
+                        if (
+                            location.isBlank()
+                        ) {
+
                             "Study Area"
+
+                        } else {
+
+                            location
                         }
                 )
             )
@@ -298,22 +314,5 @@ class AIRoutineViewModel : ViewModel() {
 
 
         return sessions
-    }
-
-
-    fun clearRoutine() {
-
-        generatedSessions =
-            emptyList()
-
-        errorMessage =
-            null
-    }
-
-
-    fun clearError() {
-
-        errorMessage =
-            null
     }
 }

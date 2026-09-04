@@ -330,6 +330,19 @@ fun AppNavigation(incomingDeepLink: Uri?) {
 
                 authViewModel = authViewModel,
                 assignments = assignments,
+
+                routines =
+                    acceptedRoutines,
+
+                onViewRoutineClick = {
+
+                    navController.navigate(
+                        Routes.ViewRoutine
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
                 onHomeClick = {
 
                     navController.navigate(
@@ -983,14 +996,6 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                     navController.navigate(
                         Routes.Profile
                     ) {
-                        launchSingleTop = true
-                    }
-                },
-
-                onBackClick = {
-                    navController.navigate(
-                        Routes.ViewRoutine
-                    ){
                         launchSingleTop = true
                     }
                 }

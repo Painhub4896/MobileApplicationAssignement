@@ -16,7 +16,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Schedule
@@ -31,7 +30,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -53,7 +51,6 @@ import androidx.compose.ui.unit.sp
 import com.example.aistudybuddy.components.BottomNavigationBar
 import com.example.aistudybuddy.viewmodel.AIRoutineViewModel
 
-val darkText = Color(0xFF252838)
 
 @Composable
 fun AIRoutineSetupScreen(
@@ -63,8 +60,7 @@ fun AIRoutineSetupScreen(
     onAssignmentClick: () -> Unit = {},
     onPlannerClick: () -> Unit = {},
     onProgressClick: () -> Unit = {},
-    onProfileClick: () -> Unit = {},
-    onBackClick: () -> Unit = {}
+    onProfileClick: () -> Unit = {}
 ) {
 
     var availableStart by remember {
@@ -153,49 +149,28 @@ fun AIRoutineSetupScreen(
                 verticalArrangement =
                     Arrangement.spacedBy(
                         14.dp
-                    ),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    )
             ) {
 
 
                 // =====================================================
                 // TITLE
                 // =====================================================
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            horizontal = 2.dp,
-                            vertical = 4.dp
-                        ),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(
-                        onClick = {
-                            onBackClick()
-                        }
-                    ) {
 
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back to Study Planner",
-                            tint = darkText
-                        )
-                    }
-
-                    Spacer(
-                        modifier = Modifier.height(18.dp)
-                    )
-
-                }
-
-                // Title
                 Text(
-                    text = "Create AI Routine",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = darkText
+                    text =
+                        "Create My AI Routine",
+
+                    fontSize =
+                        27.sp,
+
+                    fontWeight =
+                        FontWeight.Bold,
+
+                    color =
+                        textPrimary
                 )
+
 
                 Text(
                     text =
@@ -281,7 +256,6 @@ fun AIRoutineSetupScreen(
                                 upcomingTest =
                                     it
 
-
                                 upcomingWorkError =
                                     when {
 
@@ -300,7 +274,6 @@ fun AIRoutineSetupScreen(
                                         else ->
                                             null
                                     }
-
 
                                 aiRoutineViewModel
                                     .clearError()
@@ -385,7 +358,6 @@ fun AIRoutineSetupScreen(
                                 assignment =
                                     it
 
-
                                 upcomingWorkError =
                                     when {
 
@@ -404,7 +376,6 @@ fun AIRoutineSetupScreen(
                                         else ->
                                             null
                                     }
-
 
                                 aiRoutineViewModel
                                     .clearError()
@@ -457,7 +428,6 @@ fun AIRoutineSetupScreen(
 
                         upcomingWorkError
                             ?.let { message ->
-
 
                                 Text(
                                     text =
@@ -868,9 +838,6 @@ fun AIRoutineSetupScreen(
                         aiRoutineViewModel
                             .generateRoutine(
 
-                                timetableEntries =
-                                    emptyList(),
-
                                 availableStart =
                                     availableStart,
 
@@ -1070,7 +1037,6 @@ private fun RoutineTimeField(
 
                 { _, hour, minute ->
 
-
                     onTimeSelected(
                         routineFormatTime(
                             hour,
@@ -1234,7 +1200,6 @@ private fun RoutineDropdown(
             },
 
             trailingIcon = {
-
 
                 ExposedDropdownMenuDefaults
                     .TrailingIcon(
