@@ -58,23 +58,10 @@ fun StudyPlannerScreen(
     // ==========================================
 
     val selectedDaySessions =
-        StudyPlannerData.sessions
-            .filter { session ->
-
-                session.date ==
-                        selectedDate ||
-
-                        session.repeatDays
-                            ?.contains(
-                                selectedDate.dayOfWeek
-                            ) == true
-            }
-            .sortedBy { session ->
-
-                convertTimeToMinutes(
-                    session.startTime
-                )
-            }
+        StudyPlannerData
+            .getSessionsForDate(
+                selectedDate
+            )
 
 
     Scaffold(
@@ -543,12 +530,9 @@ private fun getNextAvailableColor(
 
     val usedColors =
         StudyPlannerData
-            .sessions
-            .filter {
-
-                it.date ==
-                        date
-            }
+            .getSessionsForDate(
+                date
+            )
             .map {
 
                 it.colorIndex
@@ -564,71 +548,4 @@ private fun getNextAvailableColor(
                     usedColors
 
         } ?: 0
-}
-
-
-
-// ==========================================
-// CONVERT TIME TO MINUTES
-// USED TO SORT STUDY SESSIONS
-// ==========================================
-
-private fun convertTimeToMinutes(
-    time: String
-): Int {
-
-    val parts =
-        time
-            .trim()
-            .split(" ")
-
-
-    val timePart =
-        parts[0]
-
-
-    val amPm =
-        parts[1]
-
-
-    val hourMinute =
-        timePart
-            .split(":")
-
-
-    var hour =
-        hourMinute[0]
-            .toInt()
-
-
-    val minute =
-        hourMinute[1]
-            .toInt()
-
-
-    if (
-        amPm.equals(
-            "PM",
-            ignoreCase = true
-        ) &&
-        hour != 12
-    ) {
-
-        hour += 12
-    }
-
-
-    if (
-        amPm.equals(
-            "AM",
-            ignoreCase = true
-        ) &&
-        hour == 12
-    ) {
-
-        hour = 0
-    }
-
-
-    return hour * 60 + minute
 }

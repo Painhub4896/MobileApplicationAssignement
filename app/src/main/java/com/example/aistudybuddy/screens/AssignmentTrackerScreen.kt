@@ -22,7 +22,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Assignment
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -34,6 +36,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.aistudybuddy.components.BottomNavigationBar
@@ -59,12 +63,12 @@ val AssignRed = Color(0xFFEF4444)
 val AssignYellow = Color(0xFFF59E0B)
 val AssignGreen = Color(0xFF10B981)
 
-
 data class AssignmentItem(
     val title: String,
     val subject: String,
     val dueDate: String,
-    val difficulty: String
+    val difficulty: String,
+    val isCompleted: Boolean = false
 )
 
 
@@ -78,7 +82,8 @@ fun AssignmentTrackerScreen(
     onProfileClick: () -> Unit = {},
     onAddClick: () -> Unit,
     onEditClick: (AssignmentItem) -> Unit,
-    onDeleteClick: (AssignmentItem) -> Unit
+    onDeleteClick: (AssignmentItem) -> Unit,
+    onToggleComplete: (AssignmentItem) -> Unit
 ) {
 
     // Selected Assignment
@@ -86,12 +91,29 @@ fun AssignmentTrackerScreen(
         mutableStateOf<AssignmentItem?>(null)
     }
 
-    // Count all assignments
-    val taskCount = assignments.size
+    // Assignments shown during the current visit to this screen
+    // Completed assignments from previous visits are hidden
+    val visibleAssignments = remember {
 
-    // Count assignments due within 5 days
+        mutableStateListOf<AssignmentItem>().apply {
+
+            addAll(
+                assignments.filter { assignment ->
+                    !assignment.isCompleted
+                }
+            )
+        }
+    }
+
+    // Count remaining assignments
+    val taskCount = assignments.count { assignment ->
+        !assignment.isCompleted
+    }
+
+    // Count unfinished assignments due within 5 days
     val dueSoonCount = assignments.count { assignment ->
-        isDueSoon(assignment.dueDate)
+        !assignment.isCompleted &&
+                isDueSoon(assignment.dueDate)
     }
 
 
@@ -345,7 +367,7 @@ fun AssignmentTrackerScreen(
             // ASSIGNMENT LIST
             // =====================================================
 
-            if (assignments.isEmpty()) {
+            if (visibleAssignments.isEmpty()) {
 
                 item {
 
@@ -384,7 +406,7 @@ fun AssignmentTrackerScreen(
 
 
                         Text(
-                            text = "No assignments yet",
+                            text = "No remaining assignments",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = AssignTextDark
@@ -397,7 +419,7 @@ fun AssignmentTrackerScreen(
 
 
                         Text(
-                            text = "Tap + to create your first assignment",
+                            text = "Tap + to create a new assignment",
                             fontSize = 12.sp,
                             color = AssignTextGrey
                         )
@@ -406,7 +428,7 @@ fun AssignmentTrackerScreen(
 
             } else {
 
-                items(assignments) { assignment ->
+                items(visibleAssignments) { assignment ->
 
                     Box(
                         modifier = Modifier
@@ -420,8 +442,32 @@ fun AssignmentTrackerScreen(
 
                         AssignmentCard(
                             item = assignment,
+
                             onClick = {
                                 selectedAssignment = assignment
+                            },
+
+                            onToggleComplete = {
+
+                                val index =
+                                    visibleAssignments.indexOf(
+                                        assignment
+                                    )
+
+                                if (
+                                    index in visibleAssignments.indices
+                                ) {
+
+                                    visibleAssignments[index] =
+                                        assignment.copy(
+                                            isCompleted =
+                                                !assignment.isCompleted
+                                        )
+                                }
+
+                                onToggleComplete(
+                                    assignment
+                                )
                             }
                         )
                     }
@@ -483,6 +529,7 @@ fun AssignmentTrackerScreen(
 
                         selectedAssignment = null
 
+                        visibleAssignments.remove(assignment)
                         onDeleteClick(assignment)
                     }
                 ) {
@@ -502,7 +549,8 @@ fun AssignmentTrackerScreen(
 @Composable
 fun AssignmentCard(
     item: AssignmentItem,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onToggleComplete: () -> Unit
 ) {
 
     Card(
@@ -511,44 +559,121 @@ fun AssignmentCard(
             .clickable {
                 onClick()
             },
-        shape = RoundedCornerShape(12.dp),
+
+        shape = RoundedCornerShape(18.dp),
+
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         ),
-        border = BorderStroke(
-            width = 1.dp,
-            color = Color(0xFFE5E9F1)
+
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 1.dp
         )
     ) {
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(18.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-
-            // =====================================================
-            // ASSIGNMENT ICON
-            // =====================================================
-
+            // Assignment Icon
             Box(
                 modifier = Modifier
-                    .size(48.dp)
-                    .clip(
-                        RoundedCornerShape(12.dp)
-                    )
-                    .background(AssignLightBlue),
+                    .size(54.dp)
+                    .background(
+                        color = Color(0xFFF0F2FF),
+                        shape = RoundedCornerShape(15.dp)
+                    ),
                 contentAlignment = Alignment.Center
             ) {
 
                 Icon(
                     imageVector = Icons.Default.Assignment,
-                    contentDescription = "Assignment",
+                    contentDescription = null,
                     tint = AssignPrimaryBlue,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(28.dp)
                 )
+            }
+
+
+            Spacer(
+                modifier = Modifier.width(14.dp)
+            )
+
+
+            // Assignment Information
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+
+                Text(
+                    text = item.title,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+
+                    color =
+                        if (item.isCompleted) {
+                            AssignTextGrey
+                        } else {
+                            AssignTextDark
+                        },
+
+                    textDecoration =
+                        if (item.isCompleted) {
+                            TextDecoration.LineThrough
+                        } else {
+                            TextDecoration.None
+                        }
+                )
+
+
+                Spacer(
+                    modifier = Modifier.height(5.dp)
+                )
+
+
+                Text(
+                    text = item.subject,
+                    fontSize = 13.sp,
+                    color =
+                        if (item.isCompleted) {
+                            AssignTextGrey
+                        } else {
+                            AssignPrimaryBlue
+                        }
+                )
+
+
+                Spacer(
+                    modifier = Modifier.height(14.dp)
+                )
+
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = null,
+                        tint = Color(0xFF9CA3AF),
+                        modifier = Modifier.size(17.dp)
+                    )
+
+
+                    Spacer(
+                        modifier = Modifier.width(6.dp)
+                    )
+
+
+                    Text(
+                        text = "Due: ${item.dueDate}",
+                        fontSize = 12.sp,
+                        color = AssignTextGrey
+                    )
+                }
             }
 
 
@@ -557,106 +682,107 @@ fun AssignmentCard(
             )
 
 
-            // =====================================================
-            // ASSIGNMENT INFORMATION
-            // =====================================================
-
+            // Right Side
             Column(
-                modifier = Modifier.weight(1f)
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.Center
             ) {
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+                // Difficulty
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = when (
+                                item.difficulty.lowercase()
+                            ) {
+
+                                "easy" ->
+                                    Color(0xFFEAF9EF)
+
+                                "hard" ->
+                                    Color(0xFFFFEEEE)
+
+                                else ->
+                                    Color(0xFFFFF5DF)
+                            },
+
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        .padding(
+                            horizontal = 12.dp,
+                            vertical = 7.dp
+                        )
                 ) {
 
                     Text(
-                        text = item.title,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = AssignTextDark,
-                        modifier = Modifier.weight(1f)
-                    )
-
-
-                    // Difficulty Badge
-                    val badgeColor: Color
-                    val badgeBg: Color
-
-
-                    when (item.difficulty) {
-
-                        "Hard" -> {
-
-                            badgeColor = AssignRed
-
-                            badgeBg = Color(0xFFFFE4E6)
-                        }
-
-
-                        "Medium" -> {
-
-                            badgeColor = AssignYellow
-
-                            badgeBg = Color(0xFFFFF3D7)
-                        }
-
-
-                        else -> {
-
-                            badgeColor = AssignGreen
-
-                            badgeBg = Color(0xFFE0F8EC)
-                        }
-                    }
-
-
-                    Text(
                         text = item.difficulty,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = badgeColor,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .clip(
-                                RoundedCornerShape(8.dp)
-                            )
-                            .background(badgeBg)
-                            .padding(
-                                horizontal = 7.dp,
-                                vertical = 4.dp
-                            )
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+
+                        color = when (
+                            item.difficulty.lowercase()
+                        ) {
+
+                            "easy" ->
+                                Color(0xFF38A169)
+
+                            "hard" ->
+                                Color(0xFFE05252)
+
+                            else ->
+                                Color(0xFFE2A325)
+                        }
                     )
                 }
 
 
                 Spacer(
-                    modifier = Modifier.height(4.dp)
+                    modifier = Modifier.height(14.dp)
                 )
 
 
-                // Subject
-                Text(
-                    text = item.subject,
-                    fontSize = 12.sp,
-                    color = AssignPrimaryBlue
-                )
-
-
-                Spacer(
-                    modifier = Modifier.height(6.dp)
-                )
-
-
-                // Due Date
+                // Complete Button
                 Row(
+                    modifier = Modifier
+                        .background(
+                            color =
+                                if (item.isCompleted) {
+                                    Color(0xFFEAF9F2)
+                                } else {
+                                    Color(0xFFF3F4F6)
+                                },
+
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .clickable {
+                            onToggleComplete()
+                        }
+                        .padding(
+                            horizontal = 10.dp,
+                            vertical = 7.dp
+                        ),
+
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
                     Icon(
-                        imageVector = Icons.Default.DateRange,
-                        contentDescription = "Due Date",
-                        tint = Color(0xFF9CA3AF),
-                        modifier = Modifier.size(15.dp)
+                        imageVector =
+                            if (item.isCompleted) {
+                                Icons.Default.CheckCircle
+                            } else {
+                                Icons.Default.RadioButtonUnchecked
+                            },
+
+                        contentDescription = null,
+
+                        tint =
+                            if (item.isCompleted) {
+                                AssignGreen
+                            } else {
+                                Color(0xFF9CA3AF)
+                            },
+
+                        modifier = Modifier.size(17.dp)
                     )
 
 
@@ -666,9 +792,16 @@ fun AssignmentCard(
 
 
                     Text(
-                        text = "Due: ${item.dueDate}",
-                        fontSize = 12.sp,
-                        color = AssignTextGrey
+                        text = "Done",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.SemiBold,
+
+                        color =
+                            if (item.isCompleted) {
+                                AssignGreen
+                            } else {
+                                AssignTextGrey
+                            }
                     )
                 }
             }

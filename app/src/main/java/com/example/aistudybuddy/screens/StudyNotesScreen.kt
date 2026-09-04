@@ -91,6 +91,7 @@ fun StudyNotesScreen(
 ) {
 
     val context = LocalContext.current
+    val darkText = Color(0xFF252838)
 
     // ==================================================
     // FOLDERS
@@ -232,7 +233,7 @@ fun StudyNotesScreen(
     // ==================================================
 
     Scaffold(
-
+        containerColor = Color(0xFFF5F5F5),
         bottomBar = {
 
             BottomNavigationBar(
@@ -271,313 +272,313 @@ fun StudyNotesScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 16.dp)
                 ) {
 
-                    IconButton(
-                        onClick = onBackClick
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = 8.dp,
+                                vertical = 4.dp
+                            ),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
-                        )
+
+                        IconButton(
+                            onClick = {
+                                onBackClick()
+                            }
+                        ) {
+
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "Back",
+                                tint = darkText
+                            )
+                        }
                     }
 
-                    Text(
-                        text = "Study Notes",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF252838)
-                    )
 
-
-                    Spacer(
-                        modifier = Modifier.height(12.dp)
-                    )
-
-
-                    // ------------------------------------------
-                    // SEARCH
-                    // ------------------------------------------
-
-                    OutlinedTextField(
-                        value = searchText,
-
-                        onValueChange = {
-                            searchText = it
-                        },
-
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(55.dp),
-
-                        placeholder = {
-                            Text(
-                                text = "Search notes",
-                                fontSize = 12.sp,
-                                color = Color(0xFF8A8C96)
-                            )
-                        },
-
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = "Search notes",
-                                tint = Color(0xFF8A8C96)
-                            )
-                        },
-
-                        singleLine = true,
-
-                        shape = RoundedCornerShape(16.dp)
-                    )
-
-
-                    Spacer(
-                        modifier = Modifier.height(14.dp)
-                    )
-
-
-                    // ------------------------------------------
-                    // FOLDER LIST
-                    // ------------------------------------------
-
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-
-                        verticalArrangement =
-                            Arrangement.spacedBy(8.dp),
-
-                        contentPadding =
-                            PaddingValues(bottom = 20.dp)
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
 
-                        items(
-                            items = folders,
+                        Spacer(
+                            modifier = Modifier.height(18.dp)
+                        )
 
-                            key = {
-                                it.name
-                            }
-                        ) { folder ->
 
-                            val folderNotes =
-                                notes.filter {
-                                    it.subject == folder.name
+                        Text(
+                            text = "Study Notes",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = darkText
+                        )
+
+
+                        Spacer(
+                            modifier = Modifier.height(32.dp)
+                        )
+
+
+                        // ------------------------------------------
+                        // SEARCH
+                        // ------------------------------------------
+
+                        OutlinedTextField(
+                            value = searchText,
+
+                            onValueChange = {
+                                searchText = it
+                            },
+
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(55.dp),
+
+                            placeholder = {
+                                Text(
+                                    text = "Search notes",
+                                    fontSize = 12.sp,
+                                    color = Color(0xFF8A8C96)
+                                )
+                            },
+
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = "Search notes",
+                                    tint = Color(0xFF8A8C96)
+                                )
+                            },
+
+                            singleLine = true,
+
+                            shape = RoundedCornerShape(16.dp)
+                        )
+
+
+                        Spacer(
+                            modifier = Modifier.height(14.dp)
+                        )
+
+
+                        // ------------------------------------------
+                        // FOLDER LIST
+                        // ------------------------------------------
+
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+
+                            verticalArrangement =
+                                Arrangement.spacedBy(8.dp),
+
+                            contentPadding =
+                                PaddingValues(bottom = 20.dp)
+                        ) {
+
+                            items(
+                                items = folders,
+
+                                key = {
+                                    it.name
                                 }
+                            ) { folder ->
+
+                                val folderNotes =
+                                    notes.filter {
+                                        it.subject == folder.name
+                                    }
 
 
-                            val showFolder =
+                                val showFolder =
 
-                                searchText.isBlank() ||
+                                    searchText.isBlank() ||
 
-                                        folder.name.contains(
-                                            searchText,
-                                            ignoreCase = true
-                                        ) ||
-
-                                        folderNotes.any {
-
-                                            it.title.contains(
+                                            folder.name.contains(
                                                 searchText,
                                                 ignoreCase = true
-                                            )
+                                            ) ||
+
+                                            folderNotes.any {
+
+                                                it.title.contains(
+                                                    searchText,
+                                                    ignoreCase = true
+                                                )
+                                            }
+
+
+                                if (showFolder) {
+
+                                    NoteFolderCard(
+
+                                        title =
+                                            folder.name,
+
+                                        notes =
+                                            "${folderNotes.size} Notes",
+
+                                        folderColor =
+                                            getFolderColor(
+                                                folder.name
+                                            ),
+
+                                        iconColor =
+                                            getFolderIconColor(
+                                                folder.name
+                                            ),
+
+                                        onClick = {
+
+                                            selectedSubject =
+                                                folder.name
+                                        },
+
+                                        onEdit = {
+
+                                            folderBeingEdited =
+                                                folder
+                                        },
+
+                                        onDelete = {
+
+                                            folderBeingDeleted =
+                                                folder
                                         }
-
-
-                            if (showFolder) {
-
-                                NoteFolderCard(
-
-                                    title =
-                                        folder.name,
-
-                                    notes =
-                                        "${folderNotes.size} Notes",
-
-                                    folderColor =
-                                        getFolderColor(
-                                            folder.name
-                                        ),
-
-                                    iconColor =
-                                        getFolderIconColor(
-                                            folder.name
-                                        ),
-
-                                    onClick = {
-
-                                        selectedSubject =
-                                            folder.name
-                                    },
-
-                                    onEdit = {
-
-                                        folderBeingEdited =
-                                            folder
-                                    },
-
-                                    onDelete = {
-
-                                        folderBeingDeleted =
-                                            folder
-                                    }
-                                )
+                                    )
+                                }
                             }
-                        }
 
 
-                        // ------------------------------------------
-                        // ADD SUBJECT BUTTON
-                        // ------------------------------------------
+                            // ------------------------------------------
+                            // ADD SUBJECT BUTTON
+                            // ------------------------------------------
 
-                        item {
-
-                            Spacer(
-                                modifier =
-                                    Modifier.height(8.dp)
-                            )
-
-
-                            Button(
-
-                                onClick = {
-
-                                    showAddFolderDialog =
-                                        true
-                                },
-
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(42.dp),
-
-                                colors =
-                                    ButtonDefaults.buttonColors(
-                                        containerColor =
-                                            Color(0xFF4169E1),
-
-                                        contentColor =
-                                            Color.White
-                                    ),
-
-                                shape =
-                                    RoundedCornerShape(9.dp)
-                            ) {
-
-                                Icon(
-
-                                    imageVector =
-                                        Icons.Default.Add,
-
-                                    contentDescription =
-                                        "Add subject",
-
-                                    modifier =
-                                        Modifier.size(18.dp)
-                                )
-
+                            item {
 
                                 Spacer(
                                     modifier =
-                                        Modifier.width(4.dp)
+                                        Modifier.height(8.dp)
                                 )
 
 
-                                Text(
+                                Button(
 
-                                    text =
-                                        "Add Notes",
+                                    onClick = {
 
-                                    fontSize = 12.sp,
+                                        showAddFolderDialog =
+                                            true
+                                    },
 
-                                    fontWeight =
-                                        FontWeight.Bold
-                                )
-                            }
-                        }
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(42.dp),
 
+                                    colors =
+                                        ButtonDefaults.buttonColors(
+                                            containerColor =
+                                                Color(0xFF4169E1),
 
-                        // ------------------------------------------
-                        // AI STUDY TIP
-                        // ------------------------------------------
+                                            contentColor =
+                                                Color.White
+                                        ),
 
-                        item {
-
-                            Spacer(
-                                modifier =
-                                    Modifier.height(14.dp)
-                            )
-
-
-                            Box(
-
-                                modifier = Modifier
-
-                                    .fillMaxWidth()
-
-                                    .background(
-                                        color =
-                                            Color(0xFFF5F0FF),
-
-                                        shape =
-                                            RoundedCornerShape(10.dp)
-                                    )
-
-                                    .border(
-                                        width = 0.5.dp,
-
-                                        color =
-                                            Color(0xFFD9CCFF),
-
-                                        shape =
-                                            RoundedCornerShape(10.dp)
-                                    )
-
-                                    .padding(12.dp)
-                            ) {
-
-                                Row(
-
-                                    modifier =
-                                        Modifier.fillMaxWidth(),
-
-                                    verticalAlignment =
-                                        Alignment.Top
+                                    shape =
+                                        RoundedCornerShape(9.dp)
                                 ) {
 
-                                    Text(
+                                    Icon(
 
-                                        text = "✦",
+                                        imageVector =
+                                            Icons.Default.Add,
 
-                                        fontSize = 16.sp,
+                                        contentDescription =
+                                            "Add subject",
 
-                                        color =
-                                            Color(0xFF7657D9)
+                                        modifier =
+                                            Modifier.size(18.dp)
                                     )
 
 
                                     Spacer(
                                         modifier =
-                                            Modifier.width(8.dp)
+                                            Modifier.width(4.dp)
                                     )
 
 
-                                    Column(
+                                    Text(
+
+                                        text =
+                                            "Add Notes",
+
+                                        fontSize = 12.sp,
+
+                                        fontWeight =
+                                            FontWeight.Bold
+                                    )
+                                }
+                            }
+
+
+                            // ------------------------------------------
+                            // AI STUDY TIP
+                            // ------------------------------------------
+
+                            item {
+
+                                Spacer(
+                                    modifier =
+                                        Modifier.height(14.dp)
+                                )
+
+
+                                Box(
+
+                                    modifier = Modifier
+
+                                        .fillMaxWidth()
+
+                                        .background(
+                                            color =
+                                                Color(0xFFF5F0FF),
+
+                                            shape =
+                                                RoundedCornerShape(10.dp)
+                                        )
+
+                                        .border(
+                                            width = 0.5.dp,
+
+                                            color =
+                                                Color(0xFFD9CCFF),
+
+                                            shape =
+                                                RoundedCornerShape(10.dp)
+                                        )
+
+                                        .padding(12.dp)
+                                ) {
+
+                                    Row(
 
                                         modifier =
-                                            Modifier.weight(1f)
+                                            Modifier.fillMaxWidth(),
+
+                                        verticalAlignment =
+                                            Alignment.Top
                                     ) {
 
                                         Text(
 
-                                            text =
-                                                "AI Study Tip",
+                                            text = "✦",
 
-                                            fontSize = 12.sp,
-
-                                            fontWeight =
-                                                FontWeight.Bold,
+                                            fontSize = 16.sp,
 
                                             color =
                                                 Color(0xFF7657D9)
@@ -586,35 +587,63 @@ fun StudyNotesScreen(
 
                                         Spacer(
                                             modifier =
-                                                Modifier.height(4.dp)
+                                                Modifier.width(8.dp)
                                         )
+
+
+                                        Column(
+
+                                            modifier =
+                                                Modifier.weight(1f)
+                                        ) {
+
+                                            Text(
+
+                                                text =
+                                                    "AI Study Tip",
+
+                                                fontSize = 12.sp,
+
+                                                fontWeight =
+                                                    FontWeight.Bold,
+
+                                                color =
+                                                    Color(0xFF7657D9)
+                                            )
+
+
+                                            Spacer(
+                                                modifier =
+                                                    Modifier.height(4.dp)
+                                            )
+
+
+                                            Text(
+
+                                                text =
+                                                    "Review your notes regularly to improve retention. Great job staying consistent!",
+
+                                                fontSize = 10.sp,
+
+                                                color =
+                                                    Color(0xFF555863),
+
+                                                lineHeight =
+                                                    14.sp
+                                            )
+                                        }
 
 
                                         Text(
 
-                                            text =
-                                                "Review your notes regularly to improve retention. Great job staying consistent!",
+                                            text = "›",
 
-                                            fontSize = 10.sp,
+                                            fontSize = 20.sp,
 
                                             color =
-                                                Color(0xFF555863),
-
-                                            lineHeight =
-                                                14.sp
+                                                Color(0xFF7657D9)
                                         )
                                     }
-
-
-                                    Text(
-
-                                        text = "›",
-
-                                        fontSize = 20.sp,
-
-                                        color =
-                                            Color(0xFF7657D9)
-                                    )
                                 }
                             }
                         }
@@ -641,7 +670,10 @@ fun StudyNotesScreen(
 
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
+                            .padding(
+                                horizontal = 8.dp,
+                                vertical = 4.dp
+                            ),
 
                         verticalAlignment =
                             Alignment.CenterVertically
@@ -662,9 +694,26 @@ fun StudyNotesScreen(
                                     Icons.Default.ArrowBack,
 
                                 contentDescription =
-                                    "Back"
+                                    "Back",
+
+                                tint =
+                                    darkText
                             )
                         }
+                    }
+
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+
+                        Spacer(
+                            modifier =
+                                Modifier.height(18.dp)
+                        )
 
 
                         Text(
@@ -672,21 +721,21 @@ fun StudyNotesScreen(
                             text =
                                 selectedSubject!!,
 
-                            fontSize = 17.sp,
+                            fontSize = 24.sp,
 
                             fontWeight =
                                 FontWeight.Bold,
 
                             color =
-                                Color(0xFF252838)
+                                darkText
+                        )
+
+
+                        Spacer(
+                            modifier =
+                                Modifier.height(24.dp)
                         )
                     }
-
-
-                    Spacer(
-                        modifier =
-                            Modifier.height(8.dp)
-                    )
 
 
                     // ------------------------------------------

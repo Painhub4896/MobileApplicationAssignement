@@ -43,6 +43,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -95,8 +96,13 @@ fun ProfileScreen(
     }
 
 
-    // Get user email from AuthViewModel
+    val userName by authViewModel.userName.collectAsStateWithLifecycle()
+
     val userEmail by authViewModel.userEmail.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        authViewModel.fetchUserProfile()
+    }
 
 
     when (currentScreen) {
@@ -105,6 +111,7 @@ fun ProfileScreen(
 
             ProfileMainScreen(
                 authViewModel = authViewModel,
+                userName = userName,
                 userEmail = userEmail,
                 onNavigateToLogin = onNavigateToLogin,
 
@@ -137,6 +144,7 @@ fun ProfileScreen(
 @Composable
 fun ProfileMainScreen(
     authViewModel: AuthViewModel,
+    userName: String?,
     userEmail: String?,
     onNavigateToLogin: () -> Unit,
     onNavigateToAbout: () -> Unit,
@@ -154,25 +162,11 @@ fun ProfileMainScreen(
         Context.MODE_PRIVATE
     )
 
+    val displayName =
+        userName ?: "User"
 
-    // Name is still from SharedPreferences (editable)
-    var userName by remember {
-
-        mutableStateOf(
-            sharedPref.getString(
-                "name",
-                "Alex Lee"
-            ) ?: "Alex Lee"
-        )
-    }
-
-
-    // Email comes from Supabase Auth (read-only)
     val displayEmail =
-        userEmail ?: sharedPref.getString(
-            "email",
-            "alex.lee@student.com"
-        )
+        userEmail ?: "No email"
 
 
     var showEditDialog by remember {
@@ -264,7 +258,7 @@ fun ProfileMainScreen(
                             ) {
 
                                 Text(
-                                    text = userName
+                                    text = displayName
                                         .take(2)
                                         .uppercase(),
                                     fontSize = 32.sp,
@@ -311,7 +305,7 @@ fun ProfileMainScreen(
 
 
                     Text(
-                        text = userName,
+                        text = displayName,
                         color = Color.White,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold
@@ -325,7 +319,7 @@ fun ProfileMainScreen(
 
                     // Email from Supabase (read-only)
                     Text(
-                        text = displayEmail ?: "No email",
+                        text = displayEmail,
                         color = Color.White.copy(
                             alpha = 0.8f
                         ),
@@ -448,8 +442,8 @@ fun ProfileMainScreen(
     if (showEditDialog) {
 
         EditProfileDialog(
-            currentName = userName,
-            currentEmail = displayEmail ?: "",
+            currentName = displayName,
+            currentEmail = displayEmail,
 
             onDismiss = {
                 showEditDialog = false
@@ -457,18 +451,11 @@ fun ProfileMainScreen(
 
             onConfirm = { newName ->
 
-                userName = newName
+                authViewModel.updateUserName(
+                    newName
+                )
 
                 showEditDialog = false
-
-
-                // Save name to SharedPreferences
-                sharedPref.edit()
-                    .putString(
-                        "name",
-                        newName
-                    )
-                    .apply()
             }
         )
     }

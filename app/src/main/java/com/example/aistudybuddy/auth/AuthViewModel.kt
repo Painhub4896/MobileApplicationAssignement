@@ -9,6 +9,7 @@ import io.github.jan.supabase.auth.providers.builtin.Email
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
@@ -19,17 +20,22 @@ class AuthViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
     val uiState = _uiState.asStateFlow()
 
-    // ========== User Email State ==========
+    // Current User Profile State
+    private val _userName = MutableStateFlow<String?>(null)
+    val userName = _userName.asStateFlow()
+
+    // Current User Email State
     private val _userEmail = MutableStateFlow<String?>(null)
     val userEmail = _userEmail.asStateFlow()
 
-    // ===================== SESSION =====================
+    // SESSION
     fun checkSession() {
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
             try {
                 val session = supabase.auth.currentSessionOrNull()
                 _uiState.value = if (session != null) {
+                    fetchUserProfile()
                     AuthUiState.Authenticated
                 } else {
                     AuthUiState.NotAuthenticated
@@ -41,13 +47,54 @@ class AuthViewModel : ViewModel() {
     }
 
     // ===================== FETCH USER EMAIL =====================
-    fun fetchUserEmail() {
+    fun fetchUserProfile() {
         viewModelScope.launch {
             try {
                 val currentUser = supabase.auth.currentUserOrNull()
+
                 _userEmail.value = currentUser?.email
+
+                _userName.value =
+                    (currentUser?.userMetadata?.get("full_name") as? JsonPrimitive)?.content
+
             } catch (e: Exception) {
-                // Silent fail - keep existing email
+                // Silent fail - keep existing user data
+            }
+        }
+    }
+
+    // ===================== UPDATE USER NAME =====================
+    fun updateUserName(newName: String) {
+
+        if (newName.isBlank()) {
+            _uiState.value =
+                AuthUiState.Error("Name cannot be empty.")
+            return
+        }
+
+        viewModelScope.launch {
+
+            try {
+
+                supabase.auth.updateUser {
+
+                    data {
+                        put(
+                            "full_name",
+                            newName.trim()
+                        )
+                    }
+                }
+
+                _userName.value =
+                    newName.trim()
+
+            } catch (e: Exception) {
+
+                _uiState.value =
+                    AuthUiState.Error(
+                        "Unable to update name."
+                    )
             }
         }
     }
@@ -75,7 +122,7 @@ class AuthViewModel : ViewModel() {
                     this.password = password
                 }
                 _uiState.value = AuthUiState.Authenticated
-                fetchUserEmail()  // ← Now this function exists
+                fetchUserProfile()
             } catch (e: Exception) {
                 _uiState.value = AuthUiState.Error("Incorrect email or password.")
             }
@@ -120,7 +167,7 @@ class AuthViewModel : ViewModel() {
 
                 if (supabase.auth.currentSessionOrNull() != null) {
                     _uiState.value = AuthUiState.Authenticated
-                    fetchUserEmail()  // ← Fetch email after signup
+                    fetchUserProfile()
                 } else {
                     _uiState.value = AuthUiState.EmailConfirmationRequired
                 }
@@ -136,7 +183,8 @@ class AuthViewModel : ViewModel() {
             _uiState.value = AuthUiState.Loading
             try {
                 supabase.auth.signOut()
-                _userEmail.value = null  // ← Clear email on logout
+                _userName.value = null  // Clear name after logout
+                _userEmail.value = null  // Clear email after logout
                 _uiState.value = AuthUiState.NotAuthenticated
                 onSuccess()
             } catch (e: Exception) {

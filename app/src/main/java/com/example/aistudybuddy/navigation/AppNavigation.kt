@@ -317,6 +317,8 @@ fun AppNavigation(incomingDeepLink: Uri?) {
 
             HomeScreen(
 
+                authViewModel = authViewModel,
+                assignments = assignments,
                 onHomeClick = {
 
                     navController.navigate(
@@ -495,6 +497,25 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                     assignments.remove(
                         assignment
                     )
+                },
+
+                onToggleComplete = { assignment ->
+
+                    val index =
+                        assignments.indexOf(
+                            assignment
+                        )
+
+                    if (
+                        index in assignments.indices
+                    ) {
+
+                        assignments[index] =
+                            assignment.copy(
+                                isCompleted =
+                                    !assignment.isCompleted
+                            )
+                    }
                 }
             )
         }
@@ -533,7 +554,12 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                             title = title,
                             subject = subject,
                             dueDate = dueDate,
-                            difficulty = difficulty
+                            difficulty = difficulty,
+
+                            isCompleted =
+                                editingAssignment
+                                    ?.isCompleted
+                                    ?: false
                         )
 
                     if (

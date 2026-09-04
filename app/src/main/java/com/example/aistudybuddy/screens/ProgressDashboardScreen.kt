@@ -53,11 +53,21 @@ fun ProgressDashboardScreen(
     // ASSIGNMENT DATA
     // =====================================================
 
-    val tasksRemaining = assignments.size
+    val tasksRemaining =
+        assignments.count { assignment ->
 
-    val dueSoonCount = assignments.count { assignment ->
-        isDueSoon(assignment.dueDate)
-    }
+            !assignment.isCompleted
+        }
+
+
+    val dueSoonCount =
+        assignments.count { assignment ->
+
+            !assignment.isCompleted &&
+                    isDueSoon(
+                        assignment.dueDate
+                    )
+        }
 
     // =====================================================
     // STUDY PROGRESS DATA

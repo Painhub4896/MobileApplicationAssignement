@@ -19,59 +19,114 @@ data class StudySession(
 
 object StudyPlannerData {
 
-    val sessions = mutableStateListOf(
-
-        StudySession(
-            id = 1,
-            date = LocalDate.now(),
-            subject = "Mathematics",
-            startTime = "10:00 AM",
-            endTime = "11:00 AM",
-            room = "Room 101",
-            repeatDays = null,
-            colorIndex = 0
-        ),
-
-        StudySession(
-            id = 2,
-            date = LocalDate.now(),
-            subject = "Physics",
-            startTime = "12:00 PM",
-            endTime = "1:00 PM",
-            room = null,
-            repeatDays = null,
-            colorIndex = 1
-        ),
-
-        StudySession(
-            id = 3,
-            date = LocalDate.now(),
-            subject = "Bahasa Melayu",
-            startTime = "5:00 PM",
-            endTime = "6:00 PM",
-            room = null,
-            repeatDays = null,
-            colorIndex = 2
-        ),
-
-        StudySession(
-            id = 4,
-            date = LocalDate.now(),
-            subject = "Biology Revision",
-            startTime = "8:00 PM",
-            endTime = "9:00 PM",
-            room = null,
-            repeatDays = null,
-            colorIndex = 3
-        )
-    )
+    // All study sessions created by the user
+    val sessions =
+        mutableStateListOf<StudySession>()
 
 
-    private var nextId = 5L
+    private var nextId = 1L
 
 
     fun generateId(): Long {
 
         return nextId++
+    }
+
+
+    // ==========================================
+    // GET SESSIONS FOR A SPECIFIC DATE
+    // ==========================================
+
+    fun getSessionsForDate(
+        date: LocalDate
+    ): List<StudySession> {
+
+        return sessions
+            .filter { session ->
+
+                // Normal session created on this date
+                session.date == date ||
+
+                        // Repeating session
+                        (
+                                session.repeatDays
+                                    ?.contains(
+                                        date.dayOfWeek
+                                    ) == true &&
+
+                                        // Do not show repeating session
+                                        // before its original starting date
+                                        !date.isBefore(
+                                            session.date
+                                        )
+                                )
+            }
+            .sortedBy { session ->
+
+                convertTimeToMinutes(
+                    session.startTime
+                )
+            }
+    }
+
+
+    // ==========================================
+    // CONVERT TIME TO MINUTES
+    // USED FOR SORTING
+    // ==========================================
+
+    private fun convertTimeToMinutes(
+        time: String
+    ): Int {
+
+        val parts =
+            time
+                .trim()
+                .split(" ")
+
+        val timePart =
+            parts[0]
+
+        val amPm =
+            parts[1]
+
+        val hourMinute =
+            timePart
+                .split(":")
+
+        var hour =
+            hourMinute[0]
+                .toInt()
+
+        val minute =
+            hourMinute[1]
+                .toInt()
+
+
+        if (
+            amPm.equals(
+                "PM",
+                ignoreCase = true
+            ) &&
+            hour != 12
+        ) {
+
+            hour += 12
+        }
+
+
+        if (
+            amPm.equals(
+                "AM",
+                ignoreCase = true
+            ) &&
+            hour == 12
+        ) {
+
+            hour = 0
+        }
+
+
+        return hour * 60 + minute
     }
 }

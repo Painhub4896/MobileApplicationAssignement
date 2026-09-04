@@ -216,6 +216,7 @@ fun FocusTimerScreen(
 
 
     Scaffold(
+        containerColor = Color(0xFFF5F5F5),
         bottomBar = {
             BottomNavigationBar(
                 selectedItem = "",
