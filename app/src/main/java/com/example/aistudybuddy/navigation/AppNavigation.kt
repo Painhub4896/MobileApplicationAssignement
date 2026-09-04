@@ -14,10 +14,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
+
 import com.example.aistudybuddy.auth.AuthUiState
 import com.example.aistudybuddy.auth.AuthViewModel
+
 import com.example.aistudybuddy.data.GeneratedStudySession
 import com.example.aistudybuddy.data.TimetableEntry
+
 import com.example.aistudybuddy.screens.AIRoutineSetupScreen
 import com.example.aistudybuddy.screens.AddAssignmentScreen
 import com.example.aistudybuddy.screens.AssignmentItem
@@ -36,9 +39,12 @@ import com.example.aistudybuddy.screens.StudyNotesScreen
 import com.example.aistudybuddy.screens.StudyPlannerScreen
 import com.example.aistudybuddy.screens.TimetableSetupScreen
 import com.example.aistudybuddy.screens.ViewRoutineScreen
+
 import com.example.aistudybuddy.viewmodel.AIRoutineViewModel
+
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
+
 
 @Composable
 fun AppNavigation(incomingDeepLink: Uri?) {
@@ -48,23 +54,48 @@ fun AppNavigation(incomingDeepLink: Uri?) {
     val authViewModel: AuthViewModel =
         viewModel()
 
-    val assignments = remember { mutableStateListOf<AssignmentItem>() }
-    var editingAssignmentIndex by remember { mutableStateOf<Int?>(null) }
-    // Shared Gemini ViewModel
+    // =========================================================
+    // YOUR ASSIGNMENT DATA
+    // =========================================================
+
+    val assignments =
+        remember {
+            mutableStateListOf<AssignmentItem>()
+        }
+
+    var editingAssignmentIndex by
+    remember {
+        mutableStateOf<Int?>(null)
+    }
+
+    // =========================================================
+    // MEMBER'S SHARED GEMINI VIEWMODEL
+    // =========================================================
+
     val aiRoutineViewModel: AIRoutineViewModel =
         viewModel()
 
-    // Accepted AI routine data
+    // =========================================================
+    // MEMBER'S ACCEPTED AI ROUTINE DATA
+    // =========================================================
+
     val acceptedRoutineSessions =
         remember {
             mutableStateListOf<GeneratedStudySession>()
         }
 
-    // Shared timetable data
+    // =========================================================
+    // MEMBER'S SHARED TIMETABLE DATA
+    // =========================================================
+
     val timetableEntries =
         remember {
             mutableStateListOf<TimetableEntry>()
         }
+
+    // =========================================================
+    // DEEP LINK
+    // =========================================================
 
     val isPasswordResetLink =
         incomingDeepLink?.scheme == "aistudybuddy" &&
@@ -84,6 +115,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
             navController.currentDestination?.route !=
             Routes.ResetPassword
         ) {
+
             navController.navigate(
                 Routes.ResetPassword
             ) {
@@ -92,14 +124,18 @@ fun AppNavigation(incomingDeepLink: Uri?) {
         }
     }
 
+    // =========================================================
+    // NAV HOST
+    // =========================================================
+
     NavHost(
         navController = navController,
         startDestination = initialDestination
     ) {
 
-        // =========================================================
+        // =====================================================
         // SPLASH
-        // =========================================================
+        // =====================================================
 
         composable(Routes.Splash) {
 
@@ -108,7 +144,11 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 .collectAsStateWithLifecycle()
 
             LaunchedEffect(Unit) {
-                delay(1500.milliseconds)
+
+                delay(
+                    1500.milliseconds
+                )
+
                 authViewModel.checkSession()
             }
 
@@ -121,7 +161,10 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                         navController.navigate(
                             Routes.Home
                         ) {
-                            popUpTo(Routes.Splash) {
+
+                            popUpTo(
+                                Routes.Splash
+                            ) {
                                 inclusive = true
                             }
                         }
@@ -134,7 +177,10 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                         navController.navigate(
                             Routes.Login
                         ) {
-                            popUpTo(Routes.Splash) {
+
+                            popUpTo(
+                                Routes.Splash
+                            ) {
                                 inclusive = true
                             }
                         }
@@ -149,21 +195,26 @@ fun AppNavigation(incomingDeepLink: Uri?) {
             SplashScreen()
         }
 
-        // =========================================================
+        // =====================================================
         // LOGIN
-        // =========================================================
+        // =====================================================
 
         composable(Routes.Login) {
 
             LoginScreen(
-                authViewModel = authViewModel,
+
+                authViewModel =
+                    authViewModel,
 
                 onLoginSuccess = {
 
                     navController.navigate(
                         Routes.Home
                     ) {
-                        popUpTo(Routes.Login) {
+
+                        popUpTo(
+                            Routes.Login
+                        ) {
                             inclusive = true
                         }
                     }
@@ -180,21 +231,26 @@ fun AppNavigation(incomingDeepLink: Uri?) {
             )
         }
 
-        // =========================================================
+        // =====================================================
         // SIGN UP
-        // =========================================================
+        // =====================================================
 
         composable(Routes.SignUp) {
 
             SignUpScreen(
-                authViewModel = authViewModel,
+
+                authViewModel =
+                    authViewModel,
 
                 onSignUpSuccess = {
 
                     navController.navigate(
                         Routes.Home
                     ) {
-                        popUpTo(Routes.Login) {
+
+                        popUpTo(
+                            Routes.Login
+                        ) {
                             inclusive = true
                         }
                     }
@@ -209,12 +265,13 @@ fun AppNavigation(incomingDeepLink: Uri?) {
             )
         }
 
-        // =========================================================
+        // =====================================================
         // RESET PASSWORD
-        // =========================================================
+        // =====================================================
 
         composable(
             route = Routes.ResetPassword,
+
             deepLinks = listOf(
                 navDeepLink {
                     uriPattern =
@@ -224,11 +281,14 @@ fun AppNavigation(incomingDeepLink: Uri?) {
         ) {
 
             ResetPasswordScreen(
-                authViewModel = authViewModel,
+
+                authViewModel =
+                    authViewModel,
 
                 onPasswordUpdated = {
 
                     authViewModel.logout(
+
                         onSuccess = {
 
                             navController.navigate(
@@ -249,15 +309,16 @@ fun AppNavigation(incomingDeepLink: Uri?) {
             )
         }
 
-        // =========================================================
+        // =====================================================
         // HOME
-        // =========================================================
+        // =====================================================
 
         composable(Routes.Home) {
 
             HomeScreen(
 
                 onHomeClick = {
+
                     navController.navigate(
                         Routes.Home
                     ) {
@@ -266,6 +327,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onPlannerClick = {
+
                     navController.navigate(
                         Routes.StudyPlanner
                     ) {
@@ -274,6 +336,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onAssignmentClick = {
+
                     navController.navigate(
                         Routes.AssignmentTracker
                     ) {
@@ -282,6 +345,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onProgressClick = {
+
                     navController.navigate(
                         Routes.ProgressDashboard
                     ) {
@@ -290,6 +354,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onProfileClick = {
+
                     navController.navigate(
                         Routes.Profile
                     ) {
@@ -298,6 +363,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onNotificationClick = {
+
                     navController.navigate(
                         Routes.Notification
                     ) {
@@ -306,6 +372,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onTimerClick = {
+
                     navController.navigate(
                         Routes.FocusTimer
                     ) {
@@ -314,6 +381,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onStudyNotesClick = {
+
                     navController.navigate(
                         Routes.StudyNotes
                     ) {
@@ -324,6 +392,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 onLogoutClick = {
 
                     authViewModel.logout(
+
                         onSuccess = {
 
                             navController.navigate(
@@ -344,15 +413,19 @@ fun AppNavigation(incomingDeepLink: Uri?) {
             )
         }
 
-        // =========================================================
+        // =====================================================
         // ASSIGNMENT TRACKER
-        // =========================================================
+        // =====================================================
 
         composable(Routes.AssignmentTracker) {
 
             AssignmentTrackerScreen(
-                assignments = assignments,
+
+                assignments =
+                    assignments,
+
                 onHomeClick = {
+
                     navController.navigate(
                         Routes.Home
                     ) {
@@ -361,6 +434,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onPlannerClick = {
+
                     navController.navigate(
                         Routes.StudyPlanner
                     ) {
@@ -369,6 +443,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onAssignmentClick = {
+
                     navController.navigate(
                         Routes.AssignmentTracker
                     ) {
@@ -377,6 +452,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onProgressClick = {
+
                     navController.navigate(
                         Routes.ProgressDashboard
                     ) {
@@ -385,100 +461,158 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onProfileClick = {
+
                     navController.navigate(
                         Routes.Profile
                     ) {
                         launchSingleTop = true
                     }
-                } ,
-
-                onAddClick = {navController.navigate(Routes.AddAssignment){launchSingleTop} },
-                onEditClick = { assignment ->
-                    editingAssignmentIndex = assignments.indexOf(assignment)
-                    navController.navigate(Routes.AddAssignment)
                 },
+
+                onAddClick = {
+
+                    navController.navigate(
+                        Routes.AddAssignment
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onEditClick = { assignment ->
+
+                    editingAssignmentIndex =
+                        assignments.indexOf(
+                            assignment
+                        )
+
+                    navController.navigate(
+                        Routes.AddAssignment
+                    )
+                },
+
                 onDeleteClick = { assignment ->
-                    assignments.remove(assignment)
+
+                    assignments.remove(
+                        assignment
+                    )
                 }
             )
         }
 
-        // =========================================================
-        // Add Assignment
-        // =========================================================
+        // =====================================================
+        // ADD / EDIT ASSIGNMENT
+        // =====================================================
+
         composable(Routes.AddAssignment) {
 
             val editingAssignment =
                 editingAssignmentIndex?.let { index ->
-                    assignments.getOrNull(index)
-                }
 
+                    assignments.getOrNull(
+                        index
+                    )
+                }
 
             AddAssignmentScreen(
 
                 onCancelClick = {
+
                     editingAssignmentIndex = null
+
                     navController.popBackStack()
                 },
 
-                onAddClick = { title, subject, difficulty, dueDate ->
+                onAddClick = {
+                        title,
+                        subject,
+                        difficulty,
+                        dueDate ->
 
-                    val updatedAssignment = AssignmentItem(
-                        title = title,
-                        subject = subject,
-                        dueDate = dueDate,
-                        difficulty = difficulty
-                    )
+                    val updatedAssignment =
+                        AssignmentItem(
+                            title = title,
+                            subject = subject,
+                            dueDate = dueDate,
+                            difficulty = difficulty
+                        )
 
+                    if (
+                        editingAssignmentIndex != null
+                    ) {
 
-                    if (editingAssignmentIndex != null) {
+                        val index =
+                            editingAssignmentIndex!!
 
-                        val index = editingAssignmentIndex!!
+                        if (
+                            index in assignments.indices
+                        ) {
 
-                        if (index in assignments.indices) {
-                            assignments[index] = updatedAssignment
+                            assignments[index] =
+                                updatedAssignment
                         }
 
                     } else {
 
-                        assignments.add(updatedAssignment)
+                        assignments.add(
+                            updatedAssignment
+                        )
                     }
-
 
                     editingAssignmentIndex = null
 
                     navController.popBackStack()
                 },
 
-                initialTitle = editingAssignment?.title ?: "",
-                initialSubject = editingAssignment?.subject ?: "",
-                initialDifficulty = editingAssignment?.difficulty ?: "",
-                initialDate = editingAssignment?.dueDate ?: "",
+                initialTitle =
+                    editingAssignment?.title
+                        ?: "",
+
+                initialSubject =
+                    editingAssignment?.subject
+                        ?: "",
+
+                initialDifficulty =
+                    editingAssignment?.difficulty
+                        ?: "",
+
+                initialDate =
+                    editingAssignment?.dueDate
+                        ?: "",
 
                 screenTitle =
-                    if (editingAssignment != null)
+                    if (
+                        editingAssignment != null
+                    ) {
                         "Edit Assignment"
-                    else
-                        "Add Assignment",
+                    } else {
+                        "Add Assignment"
+                    },
 
                 buttonText =
-                    if (editingAssignment != null)
+                    if (
+                        editingAssignment != null
+                    ) {
                         "Save"
-                    else
+                    } else {
                         "Add"
+                    }
             )
         }
 
-        // =========================================================
+        // =====================================================
         // STUDY PLANNER
-        // =========================================================
+        // =====================================================
 
         composable(Routes.StudyPlanner) {
 
             StudyPlannerScreen(
 
+                // -----------------------------
                 // Bottom Navigation
+                // -----------------------------
+
                 onHomeClick = {
+
                     navController.navigate(
                         Routes.Home
                     ) {
@@ -487,6 +621,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onPlannerClick = {
+
                     navController.navigate(
                         Routes.StudyPlanner
                     ) {
@@ -495,6 +630,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onAssignmentsClick = {
+
                     navController.navigate(
                         Routes.AssignmentTracker
                     ) {
@@ -503,6 +639,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onProgressClick = {
+
                     navController.navigate(
                         Routes.ProgressDashboard
                     ) {
@@ -511,6 +648,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onProfileClick = {
+
                     navController.navigate(
                         Routes.Profile
                     ) {
@@ -518,8 +656,12 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                     }
                 },
 
+                // -----------------------------
                 // Focus Timer
+                // -----------------------------
+
                 onFocusTimerClick = {
+
                     navController.navigate(
                         Routes.FocusTimer
                     ) {
@@ -527,15 +669,23 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                     }
                 },
 
-                // Timetable
+                // -----------------------------
+                // Member's Timetable
+                // -----------------------------
+
                 onTimetableSetupClick = {
+
                     navController.navigate(
                         Routes.TimetableSetup
                     )
                 },
 
-                // View Routine
+                // -----------------------------
+                // Member's View Routine
+                // -----------------------------
+
                 onViewRoutineClick = {
+
                     navController.navigate(
                         Routes.ViewRoutine
                     )
@@ -543,15 +693,16 @@ fun AppNavigation(incomingDeepLink: Uri?) {
             )
         }
 
-        // =========================================================
+        // =====================================================
         // TIMETABLE SETUP
-        // =========================================================
+        // =====================================================
 
         composable(Routes.TimetableSetup) {
 
             TimetableSetupScreen(
 
                 onBackClick = {
+
                     navController.navigate(
                         Routes.StudyPlanner
                     ) {
@@ -570,6 +721,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onViewTimetable = {
+
                     navController.navigate(
                         Routes.StudyPlanner
                     ) {
@@ -579,9 +731,9 @@ fun AppNavigation(incomingDeepLink: Uri?) {
             )
         }
 
-        // =========================================================
+        // =====================================================
         // VIEW ROUTINE
-        // =========================================================
+        // =====================================================
 
         composable(Routes.ViewRoutine) {
 
@@ -600,6 +752,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onHomeClick = {
+
                     navController.navigate(
                         Routes.Home
                     ) {
@@ -608,6 +761,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onAssignmentsClick = {
+
                     navController.navigate(
                         Routes.AssignmentTracker
                     ) {
@@ -616,6 +770,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onPlannerClick = {
+
                     navController.navigate(
                         Routes.StudyPlanner
                     ) {
@@ -624,6 +779,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onProgressClick = {
+
                     navController.navigate(
                         Routes.ProgressDashboard
                     ) {
@@ -632,6 +788,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onProfileClick = {
+
                     navController.navigate(
                         Routes.Profile
                     ) {
@@ -641,9 +798,9 @@ fun AppNavigation(incomingDeepLink: Uri?) {
             )
         }
 
-        // =========================================================
+        // =====================================================
         // AI ROUTINE SETUP
-        // =========================================================
+        // =====================================================
 
         composable(Routes.AIRoutineSetup) {
 
@@ -664,23 +821,25 @@ fun AppNavigation(incomingDeepLink: Uri?) {
             )
         }
 
-        // =========================================================
+        // =====================================================
         // GENERATED ROUTINE
-        // =========================================================
+        // =====================================================
 
         composable(Routes.GeneratedRoutine) {
 
             GeneratedRoutineScreen(
 
                 sessions =
-                    aiRoutineViewModel.generatedSessions,
+                    aiRoutineViewModel
+                        .generatedSessions,
 
                 onAcceptClick = {
 
                     acceptedRoutineSessions.clear()
 
                     acceptedRoutineSessions.addAll(
-                        aiRoutineViewModel.generatedSessions
+                        aiRoutineViewModel
+                            .generatedSessions
                     )
 
                     navController.navigate(
@@ -698,20 +857,161 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onAdjustClick = {
+
                     navController.popBackStack()
                 }
             )
         }
 
-        // =========================================================
+
+
+        // =====================================================
         // FOCUS TIMER
-        // =========================================================
+        // =====================================================
 
         composable(Routes.FocusTimer) {
 
             FocusTimerScreen(
 
                 onBackClick = {
+
+                    navController.popBackStack()
+                },
+
+                onHomeClick = {
+
+                    navController.navigate(
+                        Routes.Home
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onAssignmentsClick = {
+
+                    navController.navigate(
+                        Routes.AssignmentTracker
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onPlannerClick = {
+
+                    navController.navigate(
+                        Routes.StudyPlanner
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProgressClick = {
+
+                    navController.navigate(
+                        Routes.ProgressDashboard
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProfileClick = {
+
+                    navController.navigate(
+                        Routes.Profile
+                    ) {
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        // =====================================================
+        // NOTIFICATION
+        // =====================================================
+
+        composable(Routes.Notification) {
+
+            NotificationScreen(
+
+                onBackClick = {
+
+                    navController.navigate(
+                        Routes.Home
+                    ) {
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        // =====================================================
+        // PROGRESS DASHBOARD
+        // =====================================================
+
+        composable(Routes.ProgressDashboard) {
+
+            ProgressDashboardScreen(
+
+                // YOUR ASSIGNMENT DATA
+                assignments =
+                    assignments,
+
+                onHomeClick = {
+
+                    navController.navigate(
+                        Routes.Home
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onAssignmentsClick = {
+
+                    navController.navigate(
+                        Routes.AssignmentTracker
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onPlannerClick = {
+
+                    navController.navigate(
+                        Routes.StudyPlanner
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProgressClick = {
+
+                    navController.navigate(
+                        Routes.ProgressDashboard
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onProfileClick = {
+
+                    navController.navigate(
+                        Routes.Profile
+                    ) {
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        // =====================================================
+        // STUDY NOTES
+        // =====================================================
+
+        composable(Routes.StudyNotes) {
+
+            StudyNotesScreen(
+
+                onBackClick = {
                     navController.popBackStack()
                 },
 
@@ -722,8 +1022,8 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                         launchSingleTop = true
                     }
                 },
-
                 onAssignmentsClick = {
+
                     navController.navigate(
                         Routes.AssignmentTracker
                     ) {
@@ -732,6 +1032,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onPlannerClick = {
+
                     navController.navigate(
                         Routes.StudyPlanner
                     ) {
@@ -740,6 +1041,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onProgressClick = {
+
                     navController.navigate(
                         Routes.ProgressDashboard
                     ) {
@@ -748,6 +1050,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onProfileClick = {
+
                     navController.navigate(
                         Routes.Profile
                     ) {
@@ -757,140 +1060,33 @@ fun AppNavigation(incomingDeepLink: Uri?) {
             )
         }
 
-        // =========================================================
-        // NOTIFICATION
-        // =========================================================
-
-        composable(Routes.Notification) {
-
-            NotificationScreen(
-
-                onBackClick = {
-                    navController.navigate(
-                        Routes.Home
-                    ) {
-                        launchSingleTop = true
-                    }
-                }
-            )
-        }
-
-        // =========================================================
-        // PROGRESS
-        // =========================================================
-
-        composable(Routes.ProgressDashboard) {
-
-            ProgressDashboardScreen(
-
-                onHomeClick = {
-                    navController.navigate(
-                        Routes.Home
-                    ) {
-                        launchSingleTop = true
-                    }
-                },
-
-                onAssignmentsClick = {
-                    navController.navigate(
-                        Routes.AssignmentTracker
-                    ) {
-                        launchSingleTop = true
-                    }
-                },
-
-                onPlannerClick = {
-                    navController.navigate(
-                        Routes.StudyPlanner
-                    ) {
-                        launchSingleTop = true
-                    }
-                },
-
-                onProgressClick = {
-                    navController.navigate(
-                        Routes.ProgressDashboard
-                    ) {
-                        launchSingleTop = true
-                    }
-                },
-
-                onProfileClick = {
-                    navController.navigate(
-                        Routes.Profile
-                    ) {
-                        launchSingleTop = true
-                    }
-                }
-            )
-        }
-
-        // =========================================================
-        // STUDY NOTES
-        // =========================================================
-
-        composable(Routes.StudyNotes) {
-
-            StudyNotesScreen(
-
-                onHomeClick = {
-                    navController.navigate(
-                        Routes.Home
-                    ) {
-                        launchSingleTop = true
-                    }
-                },
-
-                onAssignmentsClick = {
-                    navController.navigate(
-                        Routes.AssignmentTracker
-                    ) {
-                        launchSingleTop = true
-                    }
-                },
-
-                onPlannerClick = {
-                    navController.navigate(
-                        Routes.StudyPlanner
-                    ) {
-                        launchSingleTop = true
-                    }
-                },
-
-                onProgressClick = {
-                    navController.navigate(
-                        Routes.ProgressDashboard
-                    ) {
-                        launchSingleTop = true
-                    }
-                },
-
-                onProfileClick = {
-                    navController.navigate(
-                        Routes.Profile
-                    ) {
-                        launchSingleTop = true
-                    }
-                }
-            )
-        }
-
-        // =========================================================
+        // =====================================================
         // PROFILE
-        // =========================================================
+        // =====================================================
 
         composable(Routes.Profile) {
 
             ProfileScreen(
-                authViewModel = authViewModel,
+
+                authViewModel =
+                    authViewModel,
 
                 onNavigateToLogin = {
-                    navController.navigate(Routes.Login) {
-                        popUpTo(Routes.Home) { inclusive = true }
+
+                    navController.navigate(
+                        Routes.Login
+                    ) {
+
+                        popUpTo(
+                            Routes.Home
+                        ) {
+                            inclusive = true
+                        }
                     }
                 },
 
                 onHomeClick = {
+
                     navController.navigate(
                         Routes.Home
                     ) {
@@ -899,6 +1095,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onPlannerClick = {
+
                     navController.navigate(
                         Routes.StudyPlanner
                     ) {
@@ -907,6 +1104,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onAssignmentsClick = {
+
                     navController.navigate(
                         Routes.AssignmentTracker
                     ) {
@@ -915,6 +1113,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onProgressClick = {
+
                     navController.navigate(
                         Routes.ProgressDashboard
                     ) {
@@ -923,6 +1122,7 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onProfileClick = {
+
                     navController.navigate(
                         Routes.Profile
                     ) {

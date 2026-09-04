@@ -44,7 +44,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.aistudybuddy.components.AppHeader
 import com.example.aistudybuddy.components.BottomNavigationBar
 import kotlinx.coroutines.delay
 
@@ -219,6 +218,7 @@ fun FocusTimerScreen(
     Scaffold(
         bottomBar = {
             BottomNavigationBar(
+                selectedItem = "",
                 onHomeClick = onHomeClick,
                 onAssignmentsClick = onAssignmentsClick,
                 onPlannerClick = onPlannerClick,
@@ -233,9 +233,6 @@ fun FocusTimerScreen(
                 .padding(innerPadding)
                 .background(background)
         ) {
-
-            // App Header
-            AppHeader()
 
             Row(
                 modifier = Modifier

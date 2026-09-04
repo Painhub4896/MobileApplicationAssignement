@@ -18,7 +18,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.ShowChart
 import androidx.compose.material.icons.filled.Timer
@@ -34,12 +36,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.aistudybuddy.components.AppHeader
 import com.example.aistudybuddy.components.BottomNavigationBar
 
 
 @Composable
 fun ProgressDashboardScreen(
+    assignments: List<AssignmentItem>,
     onHomeClick: () -> Unit = {},
     onAssignmentsClick: () -> Unit = {},
     onPlannerClick: () -> Unit = {},
@@ -47,11 +49,25 @@ fun ProgressDashboardScreen(
     onProfileClick: () -> Unit = {}
 ) {
 
-    val completedMinutes = StudyProgress.getThisWeekMinutes()
+    // =====================================================
+    // ASSIGNMENT DATA
+    // =====================================================
+
+    val tasksRemaining = assignments.size
+
+    val dueSoonCount = assignments.count { assignment ->
+        isDueSoon(assignment.dueDate)
+    }
+
+    // =====================================================
+    // STUDY PROGRESS DATA
+    // =====================================================
+
+    val completedMinutes =
+        StudyProgress.getThisWeekMinutes()
 
 
     Scaffold(
-        containerColor = Color.White,
 
         bottomBar = {
 
@@ -61,18 +77,19 @@ fun ProgressDashboardScreen(
                 onAssignmentsClick = onAssignmentsClick,
                 onPlannerClick = onPlannerClick,
                 onProgressClick = onProgressClick,
-                onProfileClick = onProfileClick,
+                onProfileClick = onProfileClick
             )
         }
 
     ) { innerPadding ->
 
 
-        // =====================================================
+        // =================================================
         // SCROLLABLE SCREEN CONTENT
-        // =====================================================
+        // =================================================
 
         LazyColumn(
+
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
@@ -84,9 +101,9 @@ fun ProgressDashboardScreen(
         ) {
 
 
-            // =====================================================
+            // =================================================
             // TITLE
-            // =====================================================
+            // =================================================
 
             item {
 
@@ -102,48 +119,90 @@ fun ProgressDashboardScreen(
                     )
                 )
 
-
                 Spacer(
                     modifier = Modifier.height(14.dp)
                 )
             }
 
 
-            // =====================================================
+            // =================================================
             // STATISTICS CARDS - FIRST ROW
-            // =====================================================
+            // =================================================
 
             item {
 
                 Row(
+
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
                             start = 16.dp,
                             end = 16.dp
                         ),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+
+                    horizontalArrangement =
+                        Arrangement.spacedBy(8.dp)
+
                 ) {
 
+
+                    // -----------------------------
+                    // STUDY HOURS
+                    // -----------------------------
+
                     ProgressStatCard(
-                        modifier = Modifier.weight(1f),
-                        icon = Icons.Default.Timer,
-                        title = "Study Hours",
-                        value = formatStudyHours(completedMinutes),
-                        subtitle = "This Week",
-                        cardBackground = Color(0xFFF0F5FF),
-                        iconColor = Color(0xFF4169E1)
+
+                        modifier =
+                            Modifier.weight(1f),
+
+                        icon =
+                            Icons.Default.Timer,
+
+                        title =
+                            "Study Hours",
+
+                        value =
+                            formatStudyHours(
+                                completedMinutes
+                            ),
+
+                        subtitle =
+                            "This Week",
+
+                        cardBackground =
+                            Color(0xFFF0F5FF),
+
+                        iconColor =
+                            Color(0xFF4169E1)
                     )
 
 
+                    // -----------------------------
+                    // TASKS REMAINING
+                    // -----------------------------
+
                     ProgressStatCard(
-                        modifier = Modifier.weight(1f),
-                        icon = Icons.Default.CheckCircle,
-                        title = "Completed Assignments",
-                        value = "6",
-                        subtitle = "This Week",
-                        cardBackground = Color(0xFFF1FAF0),
-                        iconColor = Color(0xFF5DBB63)
+
+                        modifier =
+                            Modifier.weight(1f),
+
+                        icon =
+                            Icons.Default.Assignment,
+
+                        title =
+                            "Tasks Remaining",
+
+                        value =
+                            tasksRemaining.toString(),
+
+                        subtitle =
+                            "All Tasks",
+
+                        cardBackground =
+                            Color(0xFFF1FAF0),
+
+                        iconColor =
+                            Color(0xFF5DBB63)
                     )
                 }
 
@@ -154,41 +213,82 @@ fun ProgressDashboardScreen(
             }
 
 
-            // =====================================================
+            // =================================================
             // STATISTICS CARDS - SECOND ROW
-            // =====================================================
+            // =================================================
 
             item {
 
                 Row(
+
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
                             start = 16.dp,
                             end = 16.dp
                         ),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+
+                    horizontalArrangement =
+                        Arrangement.spacedBy(8.dp)
+
                 ) {
 
+
+                    // -----------------------------
+                    // STUDY STREAK
+                    // -----------------------------
+
                     ProgressStatCard(
-                        modifier = Modifier.weight(1f),
-                        icon = Icons.Default.FlashOn,
-                        title = "Study Streak",
-                        value = "${StudyProgress.getStudyStreak()} Days",
-                        subtitle = "Keep it up!",
-                        cardBackground = Color(0xFFF6F0FF),
-                        iconColor = Color(0xFF8755D6)
+
+                        modifier =
+                            Modifier.weight(1f),
+
+                        icon =
+                            Icons.Default.FlashOn,
+
+                        title =
+                            "Study Streak",
+
+                        value =
+                            "${StudyProgress.getStudyStreak()} Days",
+
+                        subtitle =
+                            "Keep it up!",
+
+                        cardBackground =
+                            Color(0xFFF6F0FF),
+
+                        iconColor =
+                            Color(0xFF8755D6)
                     )
 
 
+                    // -----------------------------
+                    // DUE SOON
+                    // -----------------------------
+
                     ProgressStatCard(
-                        modifier = Modifier.weight(1f),
-                        icon = Icons.Default.ShowChart,
-                        title = "AI Plan Completion",
-                        value = "82%",
-                        subtitle = "On Track",
-                        cardBackground = Color(0xFFFFFAED),
-                        iconColor = Color(0xFFF2B632)
+
+                        modifier =
+                            Modifier.weight(1f),
+
+                        icon =
+                            Icons.Default.DateRange,
+
+                        title =
+                            "Due Soon",
+
+                        value =
+                            dueSoonCount.toString(),
+
+                        subtitle =
+                            "Next 5 Days",
+
+                        cardBackground =
+                            Color(0xFFFFFAED),
+
+                        iconColor =
+                            Color(0xFFF2B632)
                     )
                 }
 
@@ -199,19 +299,21 @@ fun ProgressDashboardScreen(
             }
 
 
-            // =====================================================
+            // =================================================
             // WEEKLY STUDY HOURS
-            // =====================================================
+            // =================================================
 
             item {
 
                 Box(
+
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
                             start = 16.dp,
                             end = 16.dp
                         )
+
                 ) {
 
                     WeeklyStudyHoursCard()
@@ -224,19 +326,21 @@ fun ProgressDashboardScreen(
             }
 
 
-            // =====================================================
+            // =================================================
             // RECENT ACTIVITY
-            // =====================================================
+            // =================================================
 
             item {
 
                 Box(
+
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
                             start = 16.dp,
                             end = 16.dp
                         )
+
                 ) {
 
                     RecentActivityCard()
@@ -253,16 +357,25 @@ fun ProgressDashboardScreen(
 
 @Composable
 fun ProgressStatCard(
+
     modifier: Modifier = Modifier,
+
     icon: ImageVector,
+
     title: String,
+
     value: String,
+
     subtitle: String,
+
     cardBackground: Color,
+
     iconColor: Color
+
 ) {
 
     Box(
+
         modifier = modifier
             .height(102.dp)
             .background(
@@ -278,21 +391,30 @@ fun ProgressStatCard(
                 horizontal = 10.dp,
                 vertical = 10.dp
             )
+
     ) {
 
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
 
+
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment =
+                    Alignment.CenterVertically
             ) {
 
                 Icon(
+
                     imageVector = icon,
-                    contentDescription = title,
+
+                    contentDescription =
+                        title,
+
                     tint = iconColor,
-                    modifier = Modifier.size(15.dp)
+
+                    modifier =
+                        Modifier.size(15.dp)
                 )
 
 
@@ -302,10 +424,16 @@ fun ProgressStatCard(
 
 
                 Text(
+
                     text = title,
+
                     fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF30323D)
+
+                    fontWeight =
+                        FontWeight.Bold,
+
+                    color =
+                        Color(0xFF30323D)
                 )
             }
 
@@ -316,11 +444,19 @@ fun ProgressStatCard(
 
 
             Text(
+
                 text = value,
+
                 fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF252838),
-                modifier = Modifier.padding(start = 4.dp)
+
+                fontWeight =
+                    FontWeight.Bold,
+
+                color =
+                    Color(0xFF252838),
+
+                modifier =
+                    Modifier.padding(start = 4.dp)
             )
 
 
@@ -330,10 +466,16 @@ fun ProgressStatCard(
 
 
             Text(
+
                 text = subtitle,
+
                 fontSize = 9.sp,
-                color = Color(0xFF777983),
-                modifier = Modifier.padding(start = 4.dp)
+
+                color =
+                    Color(0xFF777983),
+
+                modifier =
+                    Modifier.padding(start = 4.dp)
             )
         }
     }
@@ -347,16 +489,19 @@ fun ProgressStatCard(
 @Composable
 fun WeeklyStudyHoursCard() {
 
-    val dailyMinutes = StudyProgress.getDailyStudyMinutes()
+    val dailyMinutes =
+        StudyProgress.getDailyStudyMinutes()
 
 
-    val hours = dailyMinutes.map { minutes ->
+    val hours =
+        dailyMinutes.map { minutes ->
 
-        minutes / 60f
-    }
+            minutes / 60f
+        }
 
 
     val days = listOf(
+
         "Mon",
         "Tue",
         "Wed",
@@ -368,6 +513,7 @@ fun WeeklyStudyHoursCard() {
 
 
     Column(
+
         modifier = Modifier
             .fillMaxWidth()
             .height(145.dp)
@@ -381,13 +527,22 @@ fun WeeklyStudyHoursCard() {
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(10.dp)
+
     ) {
 
+
         Text(
-            text = "Study Hours This Week",
+
+            text =
+                "Study Hours This Week",
+
             fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF30323D)
+
+            fontWeight =
+                FontWeight.Bold,
+
+            color =
+                Color(0xFF30323D)
         )
 
 
@@ -397,17 +552,26 @@ fun WeeklyStudyHoursCard() {
 
 
         Row(
+
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            verticalAlignment = Alignment.Bottom
+
+            verticalAlignment =
+                Alignment.Bottom
+
         ) {
 
+
             Column(
+
                 modifier = Modifier
                     .width(22.dp)
                     .fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceBetween
+
+                verticalArrangement =
+                    Arrangement.SpaceBetween
+
             ) {
 
                 Text(
@@ -416,13 +580,11 @@ fun WeeklyStudyHoursCard() {
                     color = Color(0xFF777983)
                 )
 
-
                 Text(
                     text = "3h",
                     fontSize = 7.sp,
                     color = Color(0xFF777983)
                 )
-
 
                 Text(
                     text = "2h",
@@ -430,13 +592,11 @@ fun WeeklyStudyHoursCard() {
                     color = Color(0xFF777983)
                 )
 
-
                 Text(
                     text = "1h",
                     fontSize = 7.sp,
                     color = Color(0xFF777983)
                 )
-
 
                 Text(
                     text = "0",
@@ -447,43 +607,66 @@ fun WeeklyStudyHoursCard() {
 
 
             Row(
+
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.Bottom
+
+                horizontalArrangement =
+                    Arrangement.SpaceEvenly,
+
+                verticalAlignment =
+                    Alignment.Bottom
+
             ) {
 
                 hours.forEachIndexed { index, hour ->
 
                     Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Bottom
+
+                        horizontalAlignment =
+                            Alignment.CenterHorizontally,
+
+                        verticalArrangement =
+                            Arrangement.Bottom
+
                     ) {
 
                         Box(
+
                             modifier = Modifier
                                 .width(18.dp)
-                                .height((hour / 4f * 75f).dp)
+                                .height(
+                                    (hour / 4f * 75f).dp
+                                )
                                 .background(
-                                    color = Color(0xFF4169E1),
-                                    shape = RoundedCornerShape(
-                                        topStart = 4.dp,
-                                        topEnd = 4.dp
-                                    )
+                                    color =
+                                        Color(0xFF4169E1),
+
+                                    shape =
+                                        RoundedCornerShape(
+                                            topStart = 4.dp,
+                                            topEnd = 4.dp
+                                        )
                                 )
                         )
 
 
                         Spacer(
-                            modifier = Modifier.height(3.dp)
+                            modifier =
+                                Modifier.height(3.dp)
                         )
 
 
                         Text(
-                            text = days[index],
+
+                            text =
+                                days[index],
+
                             fontSize = 7.sp,
-                            color = Color(0xFF777983)
+
+                            color =
+                                Color(0xFF777983)
                         )
                     }
                 }
@@ -500,10 +683,12 @@ fun WeeklyStudyHoursCard() {
 @Composable
 fun RecentActivityCard() {
 
-    val activities = StudyProgress.completedStudySessions
+    val activities =
+        StudyProgress.completedStudySessions
 
 
     Column(
+
         modifier = Modifier
             .fillMaxWidth()
             .background(
@@ -516,27 +701,50 @@ fun RecentActivityCard() {
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(10.dp)
+
     ) {
 
+
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+
+            modifier =
+                Modifier.fillMaxWidth(),
+
+            horizontalArrangement =
+                Arrangement.SpaceBetween,
+
+            verticalAlignment =
+                Alignment.CenterVertically
+
         ) {
 
             Text(
-                text = "Recent Activity",
+
+                text =
+                    "Recent Activity",
+
                 fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF30323D)
+
+                fontWeight =
+                    FontWeight.Bold,
+
+                color =
+                    Color(0xFF30323D)
             )
 
 
             Text(
-                text = "View All",
+
+                text =
+                    "View All",
+
                 fontSize = 9.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF4169E1)
+
+                fontWeight =
+                    FontWeight.Bold,
+
+                color =
+                    Color(0xFF4169E1)
             )
         }
 
@@ -549,134 +757,214 @@ fun RecentActivityCard() {
         if (activities.isEmpty()) {
 
             Text(
-                text = "No study activity yet.",
+
+                text =
+                    "No study activity yet.",
+
                 fontSize = 10.sp,
-                color = Color(0xFF777983),
-                modifier = Modifier.padding(vertical = 8.dp)
+
+                color =
+                    Color(0xFF777983),
+
+                modifier =
+                    Modifier.padding(
+                        vertical = 8.dp
+                    )
             )
 
         } else {
 
-            activities.take(3).forEachIndexed { index, activity ->
+            activities
+                .take(3)
+                .forEachIndexed { index, activity ->
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                    Row(
 
-                    Box(
-                        modifier = Modifier
-                            .size(32.dp)
-                            .background(
-                                color = Color(0xFFE5F8E8),
-                                shape = RoundedCornerShape(6.dp)
-                            ),
-                        contentAlignment = Alignment.Center
+                        modifier =
+                            Modifier.fillMaxWidth(),
+
+                        verticalAlignment =
+                            Alignment.CenterVertically
+
                     ) {
 
-                        Icon(
-                            imageVector = Icons.Default.Timer,
-                            contentDescription = "Study session",
-                            tint = Color(0xFF59B96A),
-                            modifier = Modifier.size(17.dp)
-                        )
-                    }
 
+                        Box(
 
-                    Spacer(
-                        modifier = Modifier.width(9.dp)
-                    )
+                            modifier = Modifier
+                                .size(32.dp)
+                                .background(
+                                    color =
+                                        Color(0xFFE5F8E8),
 
+                                    shape =
+                                        RoundedCornerShape(6.dp)
+                                ),
 
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
+                            contentAlignment =
+                                Alignment.Center
 
-                        Text(
-                            text = activity.title,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color(0xFF30323D)
-                        )
+                        ) {
+
+                            Icon(
+
+                                imageVector =
+                                    Icons.Default.Timer,
+
+                                contentDescription =
+                                    "Study session",
+
+                                tint =
+                                    Color(0xFF59B96A),
+
+                                modifier =
+                                    Modifier.size(17.dp)
+                            )
+                        }
 
 
                         Spacer(
-                            modifier = Modifier.height(2.dp)
+                            modifier =
+                                Modifier.width(9.dp)
                         )
 
 
-                        Text(
-                            text = "${activity.minutes} minutes • ${
-                                formatActivityDateTime(activity.dateTime)
-                            }",
-                            fontSize = 8.sp,
-                            color = Color(0xFF777983)
+                        Column(
+
+                            modifier =
+                                Modifier.weight(1f)
+
+                        ) {
+
+                            Text(
+
+                                text =
+                                    activity.title,
+
+                                fontSize = 10.sp,
+
+                                fontWeight =
+                                    FontWeight.Medium,
+
+                                color =
+                                    Color(0xFF30323D)
+                            )
+
+
+                            Spacer(
+                                modifier =
+                                    Modifier.height(2.dp)
+                            )
+
+
+                            Text(
+
+                                text =
+                                    "${activity.minutes} minutes • ${
+                                        formatActivityDateTime(
+                                            activity.dateTime
+                                        )
+                                    }",
+
+                                fontSize = 8.sp,
+
+                                color =
+                                    Color(0xFF777983)
+                            )
+                        }
+
+
+                        Icon(
+
+                            imageVector =
+                                Icons.Default.CheckCircle,
+
+                            contentDescription =
+                                "Completed",
+
+                            tint =
+                                Color(0xFF59B96A),
+
+                            modifier =
+                                Modifier.size(14.dp)
                         )
                     }
 
 
-                    Icon(
-                        imageVector = Icons.Default.CheckCircle,
-                        contentDescription = "Completed",
-                        tint = Color(0xFF59B96A),
-                        modifier = Modifier.size(14.dp)
-                    )
+                    if (
+                        index <
+                        activities.take(3).size - 1
+                    ) {
+
+                        Spacer(
+                            modifier =
+                                Modifier.height(10.dp)
+                        )
+                    }
                 }
-
-
-                if (index < activities.take(3).size - 1) {
-
-                    Spacer(
-                        modifier = Modifier.height(10.dp)
-                    )
-                }
-            }
         }
     }
 }
 
 
+// =====================================================
+// FORMAT ACTIVITY DATE
+// =====================================================
+
 private fun formatActivityDateTime(
 
-    dateTime: java.time.LocalDateTime
+    dateTime:
+    java.time.LocalDateTime
 
 ): String {
 
-    val today = java.time.LocalDate.now()
+    val today =
+        java.time.LocalDate.now()
 
-    val date = dateTime.toLocalDate()
+    val date =
+        dateTime.toLocalDate()
 
 
-    val time = dateTime.toLocalTime()
-        .format(
-            java.time.format.DateTimeFormatter.ofPattern("h:mm a")
-        )
+    val time =
+        dateTime.toLocalTime()
+            .format(
+                java.time.format.DateTimeFormatter
+                    .ofPattern("h:mm a")
+            )
 
 
     return when {
 
-        date == today -> "Today, $time"
+        date == today ->
+            "Today, $time"
 
+        date == today.minusDays(1) ->
+            "Yesterday, $time"
 
-        date == today.minusDays(1) -> "Yesterday, $time"
-
-
-        else -> dateTime.format(
-            java.time.format.DateTimeFormatter.ofPattern(
-                "dd MMM, h:mm a"
+        else ->
+            dateTime.format(
+                java.time.format.DateTimeFormatter
+                    .ofPattern(
+                        "dd MMM, h:mm a"
+                    )
             )
-        )
     }
 }
 
+
+// =====================================================
+// FORMAT STUDY HOURS
+// =====================================================
 
 private fun formatStudyHours(
     minutes: Int
 ): String {
 
-    val hours = minutes / 60
+    val hours =
+        minutes / 60
 
-    val remainingMinutes = minutes % 60
+    val remainingMinutes =
+        minutes % 60
 
 
     return if (hours > 0) {
@@ -702,5 +990,7 @@ private fun formatStudyHours(
 @Composable
 fun ProgressDashboardScreenPreview() {
 
-    ProgressDashboardScreen()
+    ProgressDashboardScreen(
+        assignments = emptyList()
+    )
 }

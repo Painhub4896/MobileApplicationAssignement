@@ -55,8 +55,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.aistudybuddy.components.AppHeader
 import com.example.aistudybuddy.components.BottomNavigationBar
+
 
 
 // ======================================================
@@ -82,6 +82,7 @@ data class StudyNote(
 
 @Composable
 fun StudyNotesScreen(
+    onBackClick: () -> Unit = {},
     onHomeClick: () -> Unit = {},
     onAssignmentsClick: () -> Unit = {},
     onPlannerClick: () -> Unit = {},
@@ -258,7 +259,7 @@ fun StudyNotesScreen(
                 .background(Color.White)
         ) {
 
-            AppHeader()
+
 
 
             // ==================================================
@@ -273,13 +274,18 @@ fun StudyNotesScreen(
                         .padding(horizontal = 16.dp)
                 ) {
 
-                    // ------------------------------------------
-                    // TITLE
-                    // ------------------------------------------
+                    IconButton(
+                        onClick = onBackClick
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
 
                     Text(
                         text = "Study Notes",
-                        fontSize = 17.sp,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF252838)
                     )
