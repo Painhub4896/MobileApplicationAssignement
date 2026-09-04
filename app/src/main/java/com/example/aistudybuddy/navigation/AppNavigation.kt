@@ -16,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import com.example.aistudybuddy.auth.AuthUiState
 import com.example.aistudybuddy.auth.AuthViewModel
+import com.example.aistudybuddy.data.GeneratedStudySession
 import com.example.aistudybuddy.data.TimetableEntry
 import com.example.aistudybuddy.screens.AIRoutineSetupScreen
 import com.example.aistudybuddy.screens.AddAssignmentScreen
@@ -34,7 +35,7 @@ import com.example.aistudybuddy.screens.SplashScreen
 import com.example.aistudybuddy.screens.StudyNotesScreen
 import com.example.aistudybuddy.screens.StudyPlannerScreen
 import com.example.aistudybuddy.screens.TimetableSetupScreen
-import com.example.aistudybuddy.screens.WeeklyTimetableScreen
+import com.example.aistudybuddy.screens.ViewRoutineScreen
 import com.example.aistudybuddy.viewmodel.AIRoutineViewModel
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
@@ -52,6 +53,12 @@ fun AppNavigation(incomingDeepLink: Uri?) {
     // Shared Gemini ViewModel
     val aiRoutineViewModel: AIRoutineViewModel =
         viewModel()
+
+    // Accepted AI routine data
+    val acceptedRoutineSessions =
+        remember {
+            mutableStateListOf<GeneratedStudySession>()
+        }
 
     // Shared timetable data
     val timetableEntries =
@@ -527,9 +534,10 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                     )
                 },
 
-                onWeeklyTimetableClick = {
+                // View Routine
+                onViewRoutineClick = {
                     navController.navigate(
-                        Routes.WeeklyTimetable
+                        Routes.ViewRoutine
                     )
                 }
             )
@@ -562,23 +570,52 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                 },
 
                 onViewTimetable = {
-
                     navController.navigate(
-                        Routes.WeeklyTimetable
-                    )
+                        Routes.StudyPlanner
+                    ) {
+                        launchSingleTop = true
+                    }
                 }
             )
         }
 
         // =========================================================
-        // WEEKLY TIMETABLE
+        // VIEW ROUTINE
         // =========================================================
 
-        composable(Routes.WeeklyTimetable) {
+        composable(Routes.ViewRoutine) {
 
-            WeeklyTimetableScreen(
+            ViewRoutineScreen(
 
-                onBackClick = {
+                sessions =
+                    acceptedRoutineSessions,
+
+                onAddRoutineClick = {
+
+                    aiRoutineViewModel.clearRoutine()
+
+                    navController.navigate(
+                        Routes.AIRoutineSetup
+                    )
+                },
+
+                onHomeClick = {
+                    navController.navigate(
+                        Routes.Home
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onAssignmentsClick = {
+                    navController.navigate(
+                        Routes.AssignmentTracker
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+
+                onPlannerClick = {
                     navController.navigate(
                         Routes.StudyPlanner
                     ) {
@@ -586,23 +623,20 @@ fun AppNavigation(incomingDeepLink: Uri?) {
                     }
                 },
 
-                entries =
-                    timetableEntries,
-
-                onAddClassClick = {
-
+                onProgressClick = {
                     navController.navigate(
-                        Routes.TimetableSetup
-                    )
+                        Routes.ProgressDashboard
+                    ) {
+                        launchSingleTop = true
+                    }
                 },
 
-                onGenerateRoutineClick = {
-
-                    aiRoutineViewModel.clearRoutine()
-
+                onProfileClick = {
                     navController.navigate(
-                        Routes.AIRoutineSetup
-                    )
+                        Routes.Profile
+                    ) {
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -643,12 +677,18 @@ fun AppNavigation(incomingDeepLink: Uri?) {
 
                 onAcceptClick = {
 
+                    acceptedRoutineSessions.clear()
+
+                    acceptedRoutineSessions.addAll(
+                        aiRoutineViewModel.generatedSessions
+                    )
+
                     navController.navigate(
-                        Routes.StudyPlanner
+                        Routes.ViewRoutine
                     ) {
 
                         popUpTo(
-                            Routes.StudyPlanner
+                            Routes.ViewRoutine
                         ) {
                             inclusive = false
                         }

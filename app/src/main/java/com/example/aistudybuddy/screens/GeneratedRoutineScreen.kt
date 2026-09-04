@@ -42,17 +42,6 @@ import com.example.aistudybuddy.components.BottomNavigationBar
 import com.example.aistudybuddy.ui.theme.AIStudyBuddyTheme
 import com.example.aistudybuddy.data.GeneratedStudySession
 
-
-data class GeneratedStudySession(
-    val subject: String,
-    val startTime: String,
-    val endTime: String,
-    val task: String,
-    val reason: String,
-    val location: String = "Study Area"
-)
-
-
 @Composable
 fun GeneratedRoutineScreen(
     sessions: List<GeneratedStudySession> = sampleGeneratedSessions(),

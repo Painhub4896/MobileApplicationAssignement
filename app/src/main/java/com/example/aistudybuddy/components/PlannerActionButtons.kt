@@ -4,14 +4,10 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -28,12 +24,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.aistudybuddy.data.StudySession
+import java.time.DayOfWeek
+
 
 @Composable
 fun PlannerActionButtons(
-    onAddSession: (String, String) -> Unit,
-    onGenerateWithAI: () -> Unit,
-    onViewTimetableClick: () -> Unit = {},
+    onAddSession: (
+        String,
+        String,
+        String,
+        String?,
+        Set<DayOfWeek>?
+    ) -> Unit,
+    onViewRoutineClick: () -> Unit,
     existingSessions: List<StudySession> = emptyList()
 ) {
 
@@ -41,136 +44,127 @@ fun PlannerActionButtons(
         mutableStateOf(false)
     }
 
+
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement =
+            Arrangement.spacedBy(8.dp)
     ) {
 
-        // ==================================================
-        // GENERATE WITH AI + ADD SESSION
-        // ==================================================
-
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier =
+                Modifier.fillMaxWidth(),
+            horizontalArrangement =
+                Arrangement.spacedBy(8.dp),
+            verticalAlignment =
+                Alignment.CenterVertically
         ) {
+
+
+            // ==========================================
+            // VIEW ROUTINE
+            // ==========================================
 
             Button(
                 onClick = {
-                    onGenerateWithAI()
+                    onViewRoutineClick()
                 },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(46.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color(0xFF4169E1)
-                ),
-                border = BorderStroke(
-                    width = 1.dp,
-                    color = Color(0xFF4169E1)
-                ),
-                elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 0.dp
-                )
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .height(46.dp),
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor =
+                            Color.White,
+                        contentColor =
+                            Color(0xFF4169E1)
+                    ),
+                border =
+                    BorderStroke(
+                        width = 1.dp,
+                        color =
+                            Color(0xFF4169E1)
+                    ),
+                elevation =
+                    ButtonDefaults.buttonElevation(
+                        defaultElevation = 0.dp
+                    )
             ) {
 
-                Icon(
-                    imageVector = Icons.Default.AutoAwesome,
-                    contentDescription = "Generate with AI"
-                )
-
                 Text(
-                    text = "Generate with AI",
+                    text = "View Routine",
                     fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight =
+                        FontWeight.Bold
                 )
             }
+
+
+            // ==========================================
+            // ADD SESSION
+            // ==========================================
 
             Button(
                 onClick = {
                     showAddSessionDialog = true
                 },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(46.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4169E1),
-                    contentColor = Color.White
-                )
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .height(46.dp),
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor =
+                            Color(0xFF4169E1),
+                        contentColor =
+                            Color.White
+                    )
             ) {
 
                 Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add Session"
+                    imageVector =
+                        Icons.Default.Add,
+                    contentDescription =
+                        "Add Session"
                 )
 
                 Text(
                     text = "Add Session",
                     fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight =
+                        FontWeight.Bold
                 )
             }
-        }
-
-
-
-
-        // ==================================================
-        // VIEW TIMETABLE
-        // ==================================================
-
-        Button(
-            onClick = {
-                onViewTimetableClick()
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(42.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.White,
-                contentColor = Color(0xFF4169E1)
-            ),
-            border = BorderStroke(
-                width = 1.dp,
-                color = Color(0xFF4169E1)
-            ),
-            elevation = ButtonDefaults.buttonElevation(
-                defaultElevation = 0.dp
-            )
-        ) {
-
-            Icon(
-                imageVector = Icons.Default.CalendarMonth,
-                contentDescription = "View Timetable"
-            )
-
-            Text(
-                text = "View Timetable",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold
-            )
         }
     }
 
 
-    // ==================================================
-    // ADD SESSION DIALOG
-    // ==================================================
-
-    if (showAddSessionDialog) {
+    if (
+        showAddSessionDialog
+    ) {
 
         AddSessionDialog(
             onDismiss = {
                 showAddSessionDialog = false
             },
-            existingSessions = existingSessions,
-            onAddSession = { subject, time ->
+
+            existingSessions =
+                existingSessions,
+
+            onAddSession = {
+                    subject,
+                    startTime,
+                    endTime,
+                    room,
+                    repeatDays ->
 
                 onAddSession(
                     subject,
-                    time
+                    startTime,
+                    endTime,
+                    room,
+                    repeatDays
                 )
 
                 showAddSessionDialog = false

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -40,7 +39,7 @@ fun StudyPlannerScreen(
     onProgressClick: () -> Unit = {},
     onProfileClick: () -> Unit = {},
     onTimetableSetupClick: () -> Unit = {},
-    onWeeklyTimetableClick: () -> Unit = {},
+    onViewRoutineClick: () -> Unit = {},
     onFocusTimerClick: () -> Unit = {}
 ) {
 
@@ -52,10 +51,30 @@ fun StudyPlannerScreen(
         mutableStateOf(LocalDate.now())
     }
 
+
+    // ==========================================
+    // GET SESSION FOR SELECTED DATE
+    // AND ARRANGE BY START TIME
+    // ==========================================
+
     val selectedDaySessions =
-        StudyPlannerData.sessions.filter {
-            it.date == selectedDate
-        }
+        StudyPlannerData.sessions
+            .filter { session ->
+
+                session.date ==
+                        selectedDate ||
+
+                        session.repeatDays
+                            ?.contains(
+                                selectedDate.dayOfWeek
+                            ) == true
+            }
+            .sortedBy { session ->
+
+                convertTimeToMinutes(
+                    session.startTime
+                )
+            }
 
 
     Scaffold(
@@ -65,282 +84,470 @@ fun StudyPlannerScreen(
 
             BottomNavigationBar(
                 onHomeClick = onHomeClick,
-                onAssignmentsClick = onAssignmentsClick,
-                onPlannerClick = onPlannerClick,
-                onProgressClick = onProgressClick,
-                onProfileClick = onProfileClick,
+                onAssignmentsClick =
+                    onAssignmentsClick,
+                onPlannerClick =
+                    onPlannerClick,
+                onProgressClick =
+                    onProgressClick,
+                onProfileClick =
+                    onProfileClick,
             )
         }
 
     ) { innerPadding ->
 
 
-        // =====================================================
-        // SCROLLABLE PLANNER CONTENT
-        // =====================================================
-
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White)
-                .padding(innerPadding),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(
+                        Color.White
+                    )
+                    .padding(
+                        innerPadding
+                    ),
 
-            contentPadding = PaddingValues(
-                start = 16.dp,
-                end = 16.dp,
-                top = 16.dp,
-                bottom = 16.dp
-            ),
+            contentPadding =
+                PaddingValues(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = 16.dp,
+                    bottom = 16.dp
+                ),
 
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement =
+                Arrangement.spacedBy(
+                    8.dp
+                )
         ) {
 
 
-            // =====================================================
+            // ==========================================
             // TOP HEADER
-            // =====================================================
+            // ==========================================
 
             item {
 
                 Text(
-                    text = "Study Planner",
+                    text =
+                        "Study Planner",
                     fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF252838)
+                    fontWeight =
+                        FontWeight.Bold,
+                    color =
+                        Color(
+                            0xFF252838
+                        )
                 )
 
 
                 Spacer(
-                    modifier = Modifier.height(6.dp)
+                    modifier =
+                        Modifier.height(
+                            6.dp
+                        )
                 )
             }
 
 
-            // =====================================================
+            // ==========================================
             // WEEK SELECTOR
-            // =====================================================
+            // ==========================================
 
             item {
 
                 WeekSelector(
-                    onDateSelected = { date ->
+                    onDateSelected = {
+                            date ->
 
-                        selectedDate = date
+                        selectedDate =
+                            date
                     }
                 )
 
 
                 Spacer(
-                    modifier = Modifier.height(14.dp)
+                    modifier =
+                        Modifier.height(
+                            14.dp
+                        )
                 )
             }
 
 
-            // =====================================================
+            // ==========================================
             // STUDY SESSIONS
-            // =====================================================
+            // ==========================================
 
             items(
-                items = selectedDaySessions,
-                key = { session ->
+                items =
+                    selectedDaySessions,
+
+                key = {
+                        session ->
 
                     session.id
                 }
 
             ) { session ->
 
+
                 val index =
-                    StudyPlannerData.sessions.indexOf(session)
+                    StudyPlannerData
+                        .sessions
+                        .indexOf(
+                            session
+                        )
 
 
                 StudySessionCard(
-                    title = session.subject,
-                    time = session.time,
+                    title =
+                        session.subject,
+
+                    time =
+                        "${session.startTime} - ${session.endTime}",
+
+                    room =
+                        session.room,
 
                     cardBackground =
-                        sessionColors[session.colorIndex],
+                        sessionColors[
+                            session.colorIndex
+                        ],
 
                     titleColor =
-                        sessionTitleColors[session.colorIndex],
+                        sessionTitleColors[
+                            session.colorIndex
+                        ],
 
-                    aiSuggested = session.subject.equals(
-                        "Biology Revision",
-                        true
-                    ),
+                    aiSuggested =
+                        false,
 
                     onEdit = {
 
-                        editingIndex = index
+                        editingIndex =
+                            index
                     },
 
                     onDelete = {
 
-                        StudyPlannerData.sessions.removeAt(index)
+                        StudyPlannerData
+                            .sessions
+                            .removeAt(
+                                index
+                            )
                     }
                 )
             }
 
 
-            // =====================================================
+            // ==========================================
             // PLANNER ACTION BUTTONS
-            // =====================================================
+            // ==========================================
 
             item {
 
                 Spacer(
-                    modifier = Modifier.height(9.dp)
+                    modifier =
+                        Modifier.height(
+                            9.dp
+                        )
                 )
 
 
                 PlannerActionButtons(
 
-                    onAddSession = { subject, time ->
+                    onAddSession = {
+                            subject,
+                            startTime,
+                            endTime,
+                            room,
+                            repeatDays ->
 
-                        StudyPlannerData.sessions.add(
 
-                            StudySession(
-                                id = StudyPlannerData.generateId(),
-                                date = selectedDate,
-                                subject = subject,
-                                time = time,
-                                colorIndex = getNextAvailableColor(
-                                    selectedDate
+                        StudyPlannerData
+                            .sessions
+                            .add(
+
+                                StudySession(
+                                    id =
+                                        StudyPlannerData
+                                            .generateId(),
+
+                                    date =
+                                        selectedDate,
+
+                                    subject =
+                                        subject,
+
+                                    startTime =
+                                        startTime,
+
+                                    endTime =
+                                        endTime,
+
+                                    room =
+                                        room,
+
+                                    repeatDays =
+                                        repeatDays,
+
+                                    colorIndex =
+                                        getNextAvailableColor(
+                                            selectedDate
+                                        )
                                 )
                             )
-                        )
-                    },
-
-                    onGenerateWithAI = {
-
-                        // AI generation will be added later
                     },
 
 
-                    onViewTimetableClick = {
+                    onViewRoutineClick = {
 
-                        onWeeklyTimetableClick()
+                        onViewRoutineClick()
                     },
 
-                    existingSessions = selectedDaySessions
+
+                    existingSessions =
+                        selectedDaySessions
                 )
 
 
                 Spacer(
-                    modifier = Modifier.height(80.dp)
+                    modifier =
+                        Modifier.height(
+                            80.dp
+                        )
                 )
             }
         }
     }
 
 
-    // =====================================================
+    // ==========================================
     // EDIT SESSION DIALOG
-    // =====================================================
+    // ==========================================
 
-    editingIndex?.let { index ->
-
-        val session =
-            StudyPlannerData.sessions[index]
+    editingIndex
+        ?.let { index ->
 
 
-        AddSessionDialog(
-
-            onDismiss = {
-
-                editingIndex = null
-            },
-
-            existingSubject = session.subject,
-
-            existingTime = session.time,
-
-            existingSessions = selectedDaySessions,
-
-            currentSessionIndex =
-                selectedDaySessions.indexOf(session),
-
-            isEditing = true,
-
-            onAddSession = { subject, time ->
-
-                StudyPlannerData.sessions[index] =
-
-                    StudySession(
-                        id = session.id,
-                        date = session.date,
-                        subject = subject,
-                        time = time,
-                        colorIndex = session.colorIndex
-                    )
+            val session =
+                StudyPlannerData
+                    .sessions[
+                    index
+                ]
 
 
-                editingIndex = null
-            }
-        )
-    }
+            AddSessionDialog(
+
+                onDismiss = {
+
+                    editingIndex =
+                        null
+                },
+
+
+                existingSubject =
+                    session.subject,
+
+
+                existingStartTime =
+                    session.startTime,
+
+
+                existingEndTime =
+                    session.endTime,
+
+
+                existingRoom =
+                    session.room,
+
+
+                existingRepeatDays =
+                    session.repeatDays,
+
+
+                existingSessions =
+                    selectedDaySessions,
+
+
+                currentSessionIndex =
+                    selectedDaySessions
+                        .indexOf(
+                            session
+                        ),
+
+
+                isEditing =
+                    true,
+
+
+                onAddSession = {
+                        subject,
+                        startTime,
+                        endTime,
+                        room,
+                        repeatDays ->
+
+
+                    StudyPlannerData
+                        .sessions[
+                        index
+                    ] =
+
+                        StudySession(
+                            id =
+                                session.id,
+
+                            date =
+                                session.date,
+
+                            subject =
+                                subject,
+
+                            startTime =
+                                startTime,
+
+                            endTime =
+                                endTime,
+
+                            room =
+                                room,
+
+                            repeatDays =
+                                repeatDays,
+
+                            colorIndex =
+                                session.colorIndex
+                        )
+
+
+                    editingIndex =
+                        null
+                }
+            )
+        }
 }
 
 
 
-private val sessionColors = listOf(
+// ==========================================
+// SESSION CARD BACKGROUND COLORS
+// ==========================================
 
-    Color(0xFFFFF0F5),
+private val sessionColors =
+    listOf(
 
-    Color(0xFFF6EDFF),
+        Color(
+            0xFFFFF0F5
+        ),
 
-    Color(0xFFECFFF0),
+        Color(
+            0xFFF6EDFF
+        ),
 
-    Color(0xFFFFFFE8),
+        Color(
+            0xFFECFFF0
+        ),
 
-    Color(0xFFEAF7FF),
+        Color(
+            0xFFFFFFE8
+        ),
 
-    Color(0xFFFFF1E6),
+        Color(
+            0xFFEAF7FF
+        ),
 
-    Color(0xFFF0F0FF),
+        Color(
+            0xFFFFF1E6
+        ),
 
-    Color(0xFFEFFFF7),
+        Color(
+            0xFFF0F0FF
+        ),
 
-    Color(0xFFFFF0E8),
+        Color(
+            0xFFEFFFF7
+        ),
 
-    Color(0xFFEFF7FF)
-)
+        Color(
+            0xFFFFF0E8
+        ),
 
-
-
-private val sessionTitleColors = listOf(
-
-    Color(0xFFFF3D8D),
-
-    Color(0xFFB565F5),
-
-    Color(0xFF45D878),
-
-    Color(0xFFD0D000),
-
-    Color(0xFF2997D6),
-
-    Color(0xFFFF8A3D),
-
-    Color(0xFF6565D8),
-
-    Color(0xFF22AA77),
-
-    Color(0xFFE56B4A),
-
-    Color(0xFF4285D4)
-)
+        Color(
+            0xFFEFF7FF
+        )
+    )
 
 
+
+// ==========================================
+// SESSION TITLE COLORS
+// ==========================================
+
+private val sessionTitleColors =
+    listOf(
+
+        Color(
+            0xFFFF3D8D
+        ),
+
+        Color(
+            0xFFB565F5
+        ),
+
+        Color(
+            0xFF45D878
+        ),
+
+        Color(
+            0xFFD0D000
+        ),
+
+        Color(
+            0xFF2997D6
+        ),
+
+        Color(
+            0xFFFF8A3D
+        ),
+
+        Color(
+            0xFF6565D8
+        ),
+
+        Color(
+            0xFF22AA77
+        ),
+
+        Color(
+            0xFFE56B4A
+        ),
+
+        Color(
+            0xFF4285D4
+        )
+    )
+
+
+
+// ==========================================
+// GET NEXT AVAILABLE COLOR
+// ==========================================
 
 private fun getNextAvailableColor(
     date: LocalDate
 ): Int {
 
     val usedColors =
-        StudyPlannerData.sessions
+        StudyPlannerData
+            .sessions
             .filter {
 
-                it.date == date
+                it.date ==
+                        date
             }
             .map {
 
@@ -349,9 +556,79 @@ private fun getNextAvailableColor(
             .toSet()
 
 
-    return sessionColors.indices.firstOrNull {
+    return sessionColors
+        .indices
+        .firstOrNull {
 
-        it !in usedColors
+            it !in
+                    usedColors
 
-    } ?: 0
+        } ?: 0
+}
+
+
+
+// ==========================================
+// CONVERT TIME TO MINUTES
+// USED TO SORT STUDY SESSIONS
+// ==========================================
+
+private fun convertTimeToMinutes(
+    time: String
+): Int {
+
+    val parts =
+        time
+            .trim()
+            .split(" ")
+
+
+    val timePart =
+        parts[0]
+
+
+    val amPm =
+        parts[1]
+
+
+    val hourMinute =
+        timePart
+            .split(":")
+
+
+    var hour =
+        hourMinute[0]
+            .toInt()
+
+
+    val minute =
+        hourMinute[1]
+            .toInt()
+
+
+    if (
+        amPm.equals(
+            "PM",
+            ignoreCase = true
+        ) &&
+        hour != 12
+    ) {
+
+        hour += 12
+    }
+
+
+    if (
+        amPm.equals(
+            "AM",
+            ignoreCase = true
+        ) &&
+        hour == 12
+    ) {
+
+        hour = 0
+    }
+
+
+    return hour * 60 + minute
 }

@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 fun StudySessionCard(
     title: String,
     time: String,
+    room: String? = null,
     cardBackground: Color = Color.White,
     titleColor: Color = Color(0xFF30323D),
     aiSuggested: Boolean = false,
@@ -81,6 +82,20 @@ fun StudySessionCard(
                     fontWeight = FontWeight.Medium,
                     color = Color.Black
                 )
+
+                if (!room.isNullOrBlank()) {
+
+                    Spacer(
+                        modifier =
+                            Modifier.height(3.dp)
+                    )
+
+                    Text(
+                        text = "📍 $room",
+                        fontSize = 12.sp,
+                        color = Color(0xFF767987)
+                    )
+                }
 
                 if (aiSuggested) {
                     Spacer(modifier = Modifier.height(2.dp))
